@@ -1,0 +1,25 @@
+@import "ember-bootstrap/bootstrap";
+
+html, .ember-application {
+  height: 100%;
+}
+
+.ember-application {
+  padding-top: 56px; // navbar height
+}
+
+.center-card {
+  max-width: 400px;
+}
+
+.product-card {
+  flex: 0 0 400px;
+}
+
+.product-card-image {
+  width: 35%;
+}
+
+.product-quantity-input {
+  width: 65px;
+}

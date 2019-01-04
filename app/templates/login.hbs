@@ -1,0 +1,31 @@
+<div class="h-100 d-flex justify-content-center align-items-center">
+  <div class="card flex-fill center-card">
+    <div class="card-header">
+      Sign in
+    </div>
+    <BsForm
+      class="card-body form-inline"
+      @model={{this.formState}}
+      @onSubmit={{perform this.login}}
+      as |form|
+    >
+      <form.element
+        @controlType="email"
+        @label="Email address"
+        @placeholder="Enter email"
+        @property="email"
+        @customError={{this.formState.error}}
+      />
+      <BsButton
+        @buttonType="submit"
+        @type="primary"
+        @disabled={{form.isSubmitting}}
+      >
+        Login
+        {{#if form.isSubmitting}}
+          {{fa-icon "spinner" spin=true}}
+        {{/if}}
+      </BsButton>
+    </BsForm>
+  </div>
+</div>

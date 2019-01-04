@@ -5,11 +5,10 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: [
-    'ember'
+    'eslint-plugin-turbopatent'
   ],
   extends: [
-    'eslint:recommended',
-    'plugin:ember/recommended'
+    'plugin:turbopatent/ember'
   ],
   env: {
     browser: true

@@ -1,0 +1,23 @@
+{{#if this.order.isOrderingOpen}}
+  <h4 class="my-3 text-center">Choose what you want this week</h4>
+
+  <div class="d-flex flex-wrap justify-content-center">
+    {{#each this.order.products as |product|}}
+      <ProductOrder
+        @product={{product}}
+        @setOrder={{perform this.order.setProductOrder product}}
+      />
+    {{/each}}
+  </div>
+{{else}}
+  <div class="h-100 d-flex justify-content-center align-items-center" data-test-order-closed>
+    <div class="card flex-fill center-card">
+      <div class="card-header">
+        Ordering closed
+      </div>
+      <div class="card-body">
+        We are currently not accepting orders. Please check back later.
+      </div>
+    </div>
+  </div>
+{{/if}}

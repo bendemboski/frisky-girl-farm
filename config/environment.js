@@ -20,6 +20,16 @@ module.exports = function(environment) {
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
+    },
+
+    localSettings: {
+      serializer: 'json',
+      adapter: 'local-storage'
+    },
+
+    api: {
+      host: 'https://byed8trkxf.execute-api.us-west-2.amazonaws.com',
+      namespace: 'stage'
     }
   };
 
@@ -29,6 +39,9 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
+
+    ENV.api.host = '';
+    ENV.api.namespace = 'api';
   }
 
   if (environment === 'test') {
@@ -41,6 +54,11 @@ module.exports = function(environment) {
 
     ENV.APP.rootElement = '#ember-testing';
     ENV.APP.autoboot = false;
+
+    ENV.localSettings.adapter = 'local-memory';
+
+    ENV.api.host = '';
+    ENV.api.namespace = '';
   }
 
   if (environment === 'production') {
