@@ -28,7 +28,7 @@ module.exports = function(environment) {
     },
 
     api: {
-      host: 'https://byed8trkxf.execute-api.us-west-2.amazonaws.com',
+      host: 'https://qh0g0s7o0k.execute-api.us-west-2.amazonaws.com',
       namespace: 'stage'
     }
   };
@@ -40,8 +40,8 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
 
-    ENV.api.host = '';
-    ENV.api.namespace = 'api';
+    ENV.api.host = 'http://localhost:3000';
+    ENV.api.namespace = '';
   }
 
   if (environment === 'test') {

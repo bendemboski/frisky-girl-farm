@@ -1,7 +1,7 @@
 # frisky-girl-farm
 
-This README outlines the details of collaborating on this Ember application.
-A short introduction of this app could easily go here.
+The front-end for the Frisky Girl Farm CSA web site. Runs against
+[frisky-girl-farm-api](https://github.com/bendemboski/frisky-girl-farm-api).
 
 ## Prerequisites
 
@@ -24,6 +24,10 @@ You will need the following things properly installed on your computer.
 * `ember serve`
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 * Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
+
+When running in development mode, the app will try to connect to the API server
+running at `http://localhost:3000` (which can be configured in
+`config/environment.js`).
 
 ### Code Generators
 
