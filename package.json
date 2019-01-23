@@ -15,7 +15,9 @@
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
     "start": "ember serve",
-    "test": "ember test"
+    "test": "ember test",
+    "deploy": "AWS_PROFILE=friskygirl ember deploy",
+    "activate": "AWS_PROFILE=friskygirl ember deploy:activate"
   },
   "devDependencies": {
     "@ember/optional-features": "^0.7.0",
@@ -29,6 +31,8 @@
     "ember-cli-app-version": "^3.2.0",
     "ember-cli-babel": "^7.1.2",
     "ember-cli-dependency-checker": "^3.0.0",
+    "ember-cli-deploy": "^1.0.2",
+    "ember-cli-deploy-s3-pack": "^1.0.0-beta.5",
     "ember-cli-eslint": "^5.0.0",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-cli-htmlbars-inline-precompile": "^2.1.0",

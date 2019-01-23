@@ -29,7 +29,7 @@ module.exports = function(environment) {
 
     api: {
       host: 'https://qh0g0s7o0k.execute-api.us-west-2.amazonaws.com',
-      namespace: 'stage'
+      namespace: 'prod'
     }
   };
 
