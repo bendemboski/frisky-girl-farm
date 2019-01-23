@@ -17,6 +17,7 @@
     "start": "ember serve",
     "test": "ember test",
     "deploy": "AWS_PROFILE=friskygirl ember deploy",
+    "list-revisions": "AWS_PROFILE=friskygirl ember deploy:list",
     "activate": "AWS_PROFILE=friskygirl ember deploy:activate"
   },
   "devDependencies": {
