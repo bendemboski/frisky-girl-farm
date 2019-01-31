@@ -99,7 +99,7 @@ module('Acceptance | navbar', function(hooks) {
         name: 'Lettuce',
         imageUrl: 'http://lettuce.com/image.jpg',
         price: 3.50,
-        available: 5,
+        available: 8,
         ordered: 3
       },
       {
@@ -115,7 +115,7 @@ module('Acceptance | navbar', function(hooks) {
         name: 'Spicy Greens',
         imageUrl: 'http://spicy-greens.com/image.jpg',
         price: 13.00,
-        available: 10,
+        available: 16,
         ordered: 6
       }
     ]);
@@ -149,7 +149,7 @@ module('Acceptance | navbar', function(hooks) {
         name: 'Lettuce',
         imageUrl: 'http://lettuce.com/image.jpg',
         price: 3.50,
-        available: 5,
+        available: 8,
         ordered: 3
       },
       {
@@ -165,7 +165,7 @@ module('Acceptance | navbar', function(hooks) {
         name: 'Spicy Greens',
         imageUrl: 'http://spicy-greens.com/image.jpg',
         price: 13.00,
-        available: 10,
+        available: 12,
         ordered: 2
       }
     ]);

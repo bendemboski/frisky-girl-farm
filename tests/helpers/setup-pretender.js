@@ -49,31 +49,41 @@ export default function setupPretender(hooks) {
     }));
 
     this.pretender.put('/products/:id', this.pretenderState.putProductStub.callsFake(({ params: { id: productId }, requestBody }) => {
-      if (this.pretenderState.products) {
-        let product = this.pretenderState.products.find(({ id }) => id === productId);
-        if (product) {
-          let { ordered } = JSON.parse(requestBody);
-          product.available -= (ordered - product.ordered);
-          product.ordered = ordered;
-          return [
-            200,
-            { 'Content-Type': 'application/json' },
-            JSON.stringify({ products: this.pretenderState.products })
-          ];
-        } else {
-          return [
-            404,
-            { 'Content-Type': 'application/json' },
-            JSON.stringify({ code: 'productNotFound' })
-          ];
-        }
-      } else {
+      if (!this.pretenderState.products) {
         return [
           404,
           { 'Content-Type': 'application/json' },
           JSON.stringify({ code: 'ordersNotOpen' })
         ];
       }
+
+      let product = this.pretenderState.products.find(({ id }) => id === productId);
+      if (!product) {
+        return [
+          404,
+          { 'Content-Type': 'application/json' },
+          JSON.stringify({ code: 'productNotFound' })
+        ];
+      }
+
+      let { ordered } = JSON.parse(requestBody);
+      if (ordered > product.available) {
+        return [
+          409,
+          { 'Content-Type': 'application/json' },
+          JSON.stringify({
+            code: 'quantityNotAvailable',
+            extra: { available: product.available }
+          })
+        ];
+      }
+
+      product.ordered = ordered;
+      return [
+        200,
+        { 'Content-Type': 'application/json' },
+        JSON.stringify({ products: this.pretenderState.products })
+      ];
     }));
   });
 

@@ -75,7 +75,7 @@ module('Unit | Service | order', function(hooks) {
           name: 'Kale',
           imageUrl: 'http://kale.com/image.jpg',
           price: 5.00,
-          available: 0,
+          available: 5,
           ordered: 5
         },
         {
@@ -83,7 +83,7 @@ module('Unit | Service | order', function(hooks) {
           name: 'Spicy Greens',
           imageUrl: 'http://spicy-greens.com/image.jpg',
           price: 13.00,
-          available: 10,
+          available: 25,
           ordered: 15
         }
       ];
@@ -119,7 +119,7 @@ module('Unit | Service | order', function(hooks) {
           name: 'Kale',
           imageUrl: 'http://kale.com/image.jpg',
           price: 5.00,
-          available: 0,
+          available: 5,
           ordered: 5
         },
         {
@@ -127,7 +127,7 @@ module('Unit | Service | order', function(hooks) {
           name: 'Spicy Greens',
           imageUrl: 'http://spicy-greens.com/image.jpg',
           price: 13.00,
-          available: 10,
+          available: 25,
           ordered: 15
         }
       ];
@@ -138,10 +138,23 @@ module('Unit | Service | order', function(hooks) {
 
     test('it works', async function(assert) {
       await service.setProductOrder.perform(service.products[0], 3);
-      products[0].available -= 3;
       products[0].ordered += 3;
       assert.deepEqual(service.products, products);
       assert.equal(this.pretenderState.putProductStub.firstCall.args[0].queryParams.userId, 'ashley@friskygirlfarm.com');
+    });
+
+    test('it errors when the quantity is not available', async function(assert) {
+      let error;
+      try {
+        await service.setProductOrder.perform(service.products[2], 50);
+      } catch (e) {
+        error = e;
+      }
+
+      assert.ok(error);
+      assert.equal(error.code, 'quantityNotAvailable');
+      assert.deepEqual(error.extra, { available: 25 });
+
     });
   });
 

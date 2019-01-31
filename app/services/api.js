@@ -31,9 +31,10 @@ export default Service.extend({
 });
 
 export class ApiError extends Error {
-  constructor(code, ...args) {
+  constructor(code, extra, ...args) {
     super(...args);
     this.code = code;
+    this.extra = extra;
     Error.captureStackTrace(this, ApiError);
   }
 
@@ -83,8 +84,8 @@ async function apiFetch(relUrl, options) {
   }
   let toThrow;
   try {
-    let { code } = await response.json();
-    toThrow = new ApiError(code);
+    let { code, extra } = await response.json();
+    toThrow = new ApiError(code, extra);
   } catch (e) {
     toThrow = new Error(`Error logging in: ${response.status}`);
   }

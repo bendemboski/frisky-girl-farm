@@ -7,12 +7,11 @@
     <BsForm
       class="pl-2 flex-grow-1 d-flex flex-column"
       @model={{this}}
-      @onSubmit={{action this.setOrder this.ordered}}
+      @onSubmit={{perform this.submit this.ordered}}
       as |form|
     >
       <div class="d-flex mb-2 text-muted small">
         <span class="flex-grow-1">{{currency @product.price}}</span>
-        {{max 0 (sub @product.available this.ordered)}} available
       </div>
       <form.group class="d-flex flex-grow-1">
         <label class="col-form-label">Ordered:</label>
@@ -20,7 +19,6 @@
           type="number" 
           class="form-control product-quantity-input ml-2"
           min="0"
-          max={{@product.available}}
           value={{this.ordered}}
           oninput={{action (mut this.ordered) value="target.value"}}
         >
@@ -30,6 +28,22 @@
       </form.group>
       {{#if (not (eq this.ordered @product.ordered))}}
         <div class="text-right">
+          <div>
+            <small class="text-danger">
+              {{#if this.availabilityError}}
+                Sorry,
+                {{#if this.availabilityError.available}}
+                  only {{this.availabilityError.available}}
+                {{else}}
+                  none
+                {{/if}}
+                of these are available.
+              {{else}}
+                {{! Keep height fixed so the layout doesn't jump }}
+                &nbsp;
+              {{/if}}
+            </small>
+          </div>
           <BsButton
             @buttonType="cancel"
             @disabled={{form.isSubmitting}}
