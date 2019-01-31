@@ -28,7 +28,7 @@ module.exports = function(environment) {
     },
 
     api: {
-      host: 'https://qh0g0s7o0k.execute-api.us-west-2.amazonaws.com',
+      host: 'https://uh7v0bgk40.execute-api.us-west-2.amazonaws.com',
       namespace: 'prod'
     }
   };
