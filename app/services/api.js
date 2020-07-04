@@ -42,10 +42,6 @@ export class ApiError extends Error {
     return this.code === 'ordersNotOpen';
   }
 
-  get isSpreadsheetLocked() {
-    return this.code === 'spreadsheetLocked';
-  }
-
   get isNegativeQuantity() {
     return this.code === 'negativeQuantity';
   }
