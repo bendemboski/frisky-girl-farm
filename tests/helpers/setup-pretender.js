@@ -67,7 +67,7 @@ export default function setupPretender(hooks) {
       }
 
       let { ordered } = JSON.parse(requestBody);
-      if (ordered > product.available) {
+      if (product.available !== -1 && ordered > product.available) {
         return [
           409,
           { 'Content-Type': 'application/json' },

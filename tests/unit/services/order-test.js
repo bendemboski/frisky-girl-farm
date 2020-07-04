@@ -50,6 +50,14 @@ module('Unit | Service | order', function(hooks) {
           price: 13.00,
           available: 10,
           ordered: 0
+        },
+        {
+          id: '5',
+          name: 'Kale Starters',
+          imageUrl: 'http://kale-starters.com/image.jpg',
+          price: 4.00,
+          available: -1,
+          ordered: 0
         }
       ];
       setProducts(products);
@@ -85,6 +93,14 @@ module('Unit | Service | order', function(hooks) {
           price: 13.00,
           available: 25,
           ordered: 15
+        },
+        {
+          id: '5',
+          name: 'Kale Starters',
+          imageUrl: 'http://kale-starters.com/image.jpg',
+          price: 4.00,
+          available: -1,
+          ordered: 0
         }
       ];
       setProducts(products);
@@ -129,6 +145,14 @@ module('Unit | Service | order', function(hooks) {
           price: 13.00,
           available: 25,
           ordered: 15
+        },
+        {
+          id: '5',
+          name: 'Kale Starters',
+          imageUrl: 'http://kale-starters.com/image.jpg',
+          price: 4.00,
+          available: -1,
+          ordered: 0
         }
       ];
       setProducts(products);
@@ -139,6 +163,13 @@ module('Unit | Service | order', function(hooks) {
     test('it works', async function(assert) {
       await service.setProductOrder.perform(service.products[0], 3);
       products[0].ordered += 3;
+      assert.deepEqual(service.products, products);
+      assert.equal(this.pretenderState.putProductStub.firstCall.args[0].queryParams.userId, 'ashley@friskygirlfarm.com');
+    });
+
+    test('it works on products with unlimited quantities', async function(assert) {
+      await service.setProductOrder.perform(service.products[3], 2);
+      products[3].ordered += 2;
       assert.deepEqual(service.products, products);
       assert.equal(this.pretenderState.putProductStub.firstCall.args[0].queryParams.userId, 'ashley@friskygirlfarm.com');
     });
@@ -183,6 +214,14 @@ module('Unit | Service | order', function(hooks) {
         price: 13.00,
         available: 30,
         ordered: 0
+      },
+      {
+        id: '5',
+        name: 'Kale Starters',
+        imageUrl: 'http://kale-starters.com/image.jpg',
+        price: 4.00,
+        available: -1,
+        ordered: 0
       }
     ];
     setProducts(products);
@@ -195,5 +234,8 @@ module('Unit | Service | order', function(hooks) {
 
     await service.setProductOrder.perform(service.products[2], 5);
     assert.equal(service.spent, 75.50);
+
+    await service.setProductOrder.perform(service.products[3], 2);
+    assert.equal(service.spent, 83.50);
   });
 });

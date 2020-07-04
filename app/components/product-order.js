@@ -22,7 +22,7 @@ export default Component.extend({
   submit: task(function*(ordered) {
     this.set('availabilityError', null);
 
-    if (ordered > this.product.available) {
+    if (this.product.available !== -1 && ordered > this.product.available) {
       this.set('availabilityError', { available: this.product.available });
       return;
     }
