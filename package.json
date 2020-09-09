@@ -62,7 +62,7 @@
     "eslint-plugin-ember": "^6.1.0",
     "eslint-plugin-turbopatent": "^4.0.0",
     "glob": "^4.0.5",
-    "http-proxy": "^1.1.6",
+    "http-proxy": "^1.18.1",
     "loader.js": "^4.7.0",
     "morgan": "^1.3.2",
     "qunit-dom": "^0.8.0",
