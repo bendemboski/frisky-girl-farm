@@ -14,5 +14,5 @@ function indexToColumn(index) {
 }
 
 module.exports = {
-  indexToColumn
+  indexToColumn,
 };

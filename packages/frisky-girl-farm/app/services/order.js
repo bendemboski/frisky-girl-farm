@@ -9,7 +9,7 @@ export default Service.extend({
   isOrderingOpen: false,
   products: null,
 
-  spent: computed('products.@each.{price,ordered}', function() {
+  spent: computed('products.@each.{price,ordered}', function () {
     let products = this.products || [];
 
     let spent = 0;
@@ -19,17 +19,17 @@ export default Service.extend({
     return spent;
   }),
 
-  loadProducts: task(function*() {
+  loadProducts: task(function* () {
     try {
       this.setProperties({
         isOrderingOpen: true,
-        products: yield this.api.getProducts()
+        products: yield this.api.getProducts(),
       });
     } catch (e) {
       if (e instanceof ApiError && e.isOrdersNotOpen) {
         this.setProperties({
           isOrderingOpen: false,
-          products: null
+          products: null,
         });
       } else {
         throw e;
@@ -42,8 +42,8 @@ export default Service.extend({
   // result in creating two rows for them in the orders sheet. We could probably
   // mitigate this on the server, but just preventing the client from making
   // concurrent order API calls seems like it should be sufficient.
-  setProductOrder: task(function*(product, quantity) {
+  setProductOrder: task(function* (product, quantity) {
     let products = yield this.api.setProductOrder(product.id, quantity);
     this.set('products', products);
-  }).enqueue()
+  }).enqueue(),
 });

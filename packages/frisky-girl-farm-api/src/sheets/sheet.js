@@ -9,11 +9,13 @@ class Sheet {
   }
 
   async getAll({ majorDimension } = {}) {
-    let { data: { values } } = await this._values.get({
+    let {
+      data: { values },
+    } = await this._values.get({
       spreadsheetId: this.spreadsheetId,
       range: this.sheetName,
       majorDimension,
-      valueRenderOption: 'UNFORMATTED_VALUE'
+      valueRenderOption: 'UNFORMATTED_VALUE',
     });
     return values;
   }
@@ -21,15 +23,13 @@ class Sheet {
   async append(range, values) {
     let {
       data: {
-        updates: {
-          updatedRange
-        }
-      }
+        updates: { updatedRange },
+      },
     } = await this._values.append({
       spreadsheetId: this.spreadsheetId,
       range: this._range(range),
       valueInputOption: 'RAW',
-      requestBody: { values: [ values ] }
+      requestBody: { values: [values] },
     });
     return updatedRange.split('!')[1];
   }
@@ -43,14 +43,14 @@ class Sheet {
       spreadsheetId: this.spreadsheetId,
       range: this._range(range),
       valueInputOption: 'RAW',
-      requestBody
+      requestBody,
     });
   }
 
   async clear(range) {
     await this._values.clear({
       spreadsheetId: this.spreadsheetId,
-      range: this._range(range)
+      range: this._range(range),
     });
   }
 

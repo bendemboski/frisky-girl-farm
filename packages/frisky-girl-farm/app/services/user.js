@@ -17,7 +17,7 @@ export default Service.extend({
   //
   // Check if we're logged in (and our login is still valid)
   //
-  checkLoggedIn: task(function*() {
+  checkLoggedIn: task(function* () {
     if (!this.email) {
       return false;
     }
@@ -35,7 +35,7 @@ export default Service.extend({
   //
   // Log in
   //
-  login: task(function*(email) {
+  login: task(function* (email) {
     let data = yield this._fetchData.perform(email);
     if (!data) {
       return false;
@@ -54,11 +54,11 @@ export default Service.extend({
       email: null,
       name: null,
       location: null,
-      balance: null
+      balance: null,
     });
   },
 
-  _fetchData: task(function*(email = this.userEmail) {
+  _fetchData: task(function* (email = this.userEmail) {
     try {
       return yield this.api.getUser(email);
     } catch (e) {
@@ -71,5 +71,5 @@ export default Service.extend({
 
   _setData({ name, location, balance }) {
     this.setProperties({ name, location, balance });
-  }
+  },
 });

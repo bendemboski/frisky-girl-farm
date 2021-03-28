@@ -2,25 +2,23 @@ module.exports = {
   root: true,
   parser: 'babel-eslint',
   parserOptions: {
-    ecmaVersion: 2017
+    ecmaVersion: 2020,
   },
   env: {
-    'es6': true
+    es6: true,
   },
+  plugins: ['prettier', 'node'],
   extends: [
-    'plugin:turbopatent/node'
+    'eslint:recommended',
+    'plugin:node/recommended',
+    'plugin:prettier/recommended',
   ],
   overrides: [
     {
-      files: [
-        'test/**/*.js'
-      ],
+      files: ['test/**/*.js'],
       env: {
-        mocha: true
+        mocha: true,
       },
-      rules: {
-        'node/no-unpublished-require': 'off'
-      }
-    }
-  ]
+    },
+  ],
 };

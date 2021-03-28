@@ -5,8 +5,8 @@ export default Route.extend({
   user: service(),
 
   async redirect() {
-    if (!await this.user.checkLoggedIn.perform()) {
+    if (!(await this.user.checkLoggedIn.perform())) {
       this.transitionTo('login');
     }
-  }
+  },
 });

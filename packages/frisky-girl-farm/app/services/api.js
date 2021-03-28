@@ -2,7 +2,9 @@ import Service, { inject as service } from '@ember/service';
 import ENV from '../config/environment';
 import fetch from 'fetch';
 
-const { api: { host, namespace } } = ENV;
+const {
+  api: { host, namespace },
+} = ENV;
 
 export default Service.extend({
   user: service(),
@@ -21,13 +23,16 @@ export default Service.extend({
   },
 
   async setProductOrder(productId, quantity) {
-    let { products } = await apiFetch(`/products/${productId}?userId=${this.user.email}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ordered: quantity })
-    });
+    let { products } = await apiFetch(
+      `/products/${productId}?userId=${this.user.email}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ordered: quantity }),
+      }
+    );
     return products;
-  }
+  },
 });
 
 export class ApiError extends Error {

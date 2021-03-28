@@ -6,6 +6,10 @@
   "repository": "https://github.com/bendemboski/frisky-girl-farm-api",
   "author": "Ben Demboski <demboskb@gmail.com>",
   "license": "MIT",
+  "files": [
+    "app.js",
+    "src"
+  ],
   "scripts": {
     "test": "mocha",
     "lint": "eslint .",
@@ -31,8 +35,12 @@
     "chai-http": "^4.3.0",
     "dotenv": "^8.2.0",
     "eslint": "^7.15.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
     "mocha": "^8.2.1",
     "nodemon": "^2.0.6",
+    "prettier": "^2.2.1",
     "serverless": "^2.15.0",
     "sinon": "^10.0.0",
     "sinon-chai": "^3.5.0"

@@ -1,16 +1,16 @@
-module.exports = function(deployTarget) {
+module.exports = function () {
   let ENV = {
     build: {
-      environment: 'production'
+      environment: 'production',
     },
     s3: {
       region: 'us-west-2',
-      bucket: 'csa.friskygirlfarm.com'
+      bucket: 'csa.friskygirlfarm.com',
     },
     's3-index': {},
     'revision-data': {
-      'type': 'version-commit'
-    }
+      type: 'version-commit',
+    },
   };
 
   ENV['s3-index'].region = ENV.s3.region;

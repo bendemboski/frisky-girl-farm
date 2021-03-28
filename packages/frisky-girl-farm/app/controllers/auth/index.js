@@ -5,5 +5,5 @@ import { filterBy } from '@ember/object/computed';
 export default Controller.extend({
   order: service(),
 
-  productsOrdered: filterBy('order.products', 'ordered')
+  productsOrdered: filterBy('order.products', 'ordered'),
 });

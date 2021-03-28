@@ -7,5 +7,7 @@ import createUser from './create-user';
 export default function loginUser(props) {
   createUser(props);
   let { email } = props;
-  getContext().owner.lookup('service:local-settings').set('settings.userEmail', email);
+  getContext()
+    .owner.lookup('service:local-settings')
+    .set('settings.userEmail', email);
 }

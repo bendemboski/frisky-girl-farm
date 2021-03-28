@@ -4,7 +4,7 @@ const {
   OrdersNotOpenError,
   NegativeQuantityError,
   ProductNotFoundError,
-  QuantityNotAvailableError
+  QuantityNotAvailableError,
 } = require('./errors');
 
 const sheetName = 'Orders';
@@ -88,7 +88,7 @@ class OrdersSheet extends Sheet {
           imageUrl: column[imagesRowIndex],
           price: column[pricesRowIndex],
           available,
-          ordered
+          ordered,
         };
       }
     });
@@ -115,9 +115,12 @@ class OrdersSheet extends Sheet {
 
     if (userRowIndex !== -1) {
       // Add 1 to row index because the rows in the A1 notation are 1-based
-      await this.update(`${indexToColumn(productId)}${firstUserRowIndex + userRowIndex + 1}`, [ [ quantity ] ]);
+      await this.update(
+        `${indexToColumn(productId)}${firstUserRowIndex + userRowIndex + 1}`,
+        [[quantity]]
+      );
     } else {
-      let row = [ userId, ...Object.keys(products).map(() => 0) ];
+      let row = [userId, ...Object.keys(products).map(() => 0)];
       row[productId] = quantity;
       await this.append(`A${firstUserRowIndex + 1}`, row);
     }

@@ -24,12 +24,12 @@ module.exports = function (environment) {
 
     localSettings: {
       serializer: 'json',
-      adapter: 'local-storage'
+      adapter: 'local-storage',
     },
 
     api: {
       host: 'https://uh7v0bgk40.execute-api.us-west-2.amazonaws.com',
-      namespace: 'prod'
+      namespace: 'prod',
     },
   };
 

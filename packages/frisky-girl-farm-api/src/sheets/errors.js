@@ -1,5 +1,4 @@
-class SheetsError extends Error {
-}
+class SheetsError extends Error {}
 
 function makeError(statusCode, code) {
   class Err extends SheetsError {
@@ -26,5 +25,5 @@ module.exports = {
   NegativeQuantityError,
   ProductNotFoundError,
   QuantityNotAvailableError,
-  UnknownUserError
+  UnknownUserError,
 };

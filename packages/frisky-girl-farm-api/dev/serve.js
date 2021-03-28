@@ -1,8 +1,7 @@
-
 const buildApp = require('../src/build-app');
 const createSpreadsheet = require('./create-spreadsheet');
 
-let [ , , stage = 'staging' ] = process.argv;
+let [, , stage = 'staging'] = process.argv;
 
 console.log(`Running against stage: ${stage}`); // eslint-disable-line no-console
 

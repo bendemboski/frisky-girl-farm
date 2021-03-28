@@ -16,6 +16,6 @@ export default Component.extend({
     logout() {
       this.user.logout();
       this.router.transitionTo('login');
-    }
-  }
+    },
+  },
 });

@@ -3,10 +3,10 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-module('Integration | Helper | currency', function(hooks) {
+module('Integration | Helper | currency', function (hooks) {
   setupRenderingTest(hooks);
 
-  test('it works', async function(assert) {
+  test('it works', async function (assert) {
     this.set('amount', 0);
 
     await render(hbs`{{currency this.amount}}`);

@@ -12,14 +12,15 @@ export default Component.extend({
     set(key, value) {
       this.set('availabilityError', null);
       return parseInt(value, 10) || 0;
-    }
+    },
   }),
 
   didReceiveAttrs() {
+    this._super();
     this.set('ordered', this.product.ordered);
   },
 
-  submit: task(function*(ordered) {
+  submit: task(function* (ordered) {
     this.set('availabilityError', null);
 
     if (this.product.available !== -1 && ordered > this.product.available) {
@@ -36,5 +37,5 @@ export default Component.extend({
         throw e;
       }
     }
-  })
+  }),
 });

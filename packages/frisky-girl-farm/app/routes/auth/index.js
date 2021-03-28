@@ -6,5 +6,5 @@ export default Route.extend({
 
   async afterModel() {
     await this.order.loadProducts.perform();
-  }
+  },
 });

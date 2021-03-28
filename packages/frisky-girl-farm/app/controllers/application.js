@@ -12,6 +12,6 @@ export default Controller.extend({
     logout() {
       this.user.logout();
       this.router.transitionTo('login');
-    }
-  }
+    },
+  },
 });

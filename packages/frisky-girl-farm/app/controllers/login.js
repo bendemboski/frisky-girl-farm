@@ -11,13 +11,16 @@ export default Controller.extend({
     this.set('formState', {});
   },
 
-  login: task(function*({ email }) {
+  login: task(function* ({ email }) {
     this.set('formState.error', '');
 
     if (yield this.user.login.perform(email)) {
       yield this.router.transitionTo('auth.index');
     } else {
-      this.set('formState.error', 'We do not recognize that email address. Please ensure you are using the same email that you registered with.');
+      this.set(
+        'formState.error',
+        'We do not recognize that email address. Please ensure you are using the same email that you registered with.'
+      );
     }
-  })
+  }),
 });

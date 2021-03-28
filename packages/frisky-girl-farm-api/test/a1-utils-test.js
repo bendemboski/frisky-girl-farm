@@ -2,9 +2,9 @@ require('./support/setup');
 const { expect } = require('chai');
 const { indexToColumn } = require('../src/sheets/a1-utils');
 
-describe('a1 utils', function() {
-  describe('indexToColumn', function() {
-    it('works', function() {
+describe('a1 utils', function () {
+  describe('indexToColumn', function () {
+    it('works', function () {
       expect(indexToColumn(0)).to.equal('A');
       expect(indexToColumn(5)).to.equal('F');
       expect(indexToColumn(25)).to.equal('Z');
