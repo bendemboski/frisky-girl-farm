@@ -52,22 +52,18 @@
             </small>
           </div>
           <BsButton
-            @buttonType="cancel"
-            @disabled={{form.isSubmitting}}
+            @type="secondary"
+            disabled={{form.isSubmitting}}
             @onClick={{this.resetOrdered}}
           >
             Reset
           </BsButton>
-          <BsButton
-            @buttonType="submit"
-            @type="primary"
-            @disabled={{form.isSubmitting}}
-          >
+          <form.submitButton>
             Save
             {{#if form.isSubmitting}}
               {{fa-icon "spinner" spin=true}}
             {{/if}}
-          </BsButton>
+          </form.submitButton>
         </div>
       {{/if}}
     </BsForm>

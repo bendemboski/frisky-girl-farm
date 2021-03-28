@@ -13,20 +13,16 @@
         <form.element
           @controlType="email"
           @label="Email address"
-          @placeholder="Enter email"
+          placeholder="Enter email"
           @property="email"
           @customError={{formState.error}}
         />
-        <BsButton
-          @buttonType="submit"
-          @type="primary"
-          @disabled={{form.isSubmitting}}
-        >
+        <form.submitButton>
           Login
           {{#if form.isSubmitting}}
             {{fa-icon "spinner" spin=true}}
           {{/if}}
-        </BsButton>
+        </form.submitButton>
       </BsForm>
     {{/let}}
   </div>

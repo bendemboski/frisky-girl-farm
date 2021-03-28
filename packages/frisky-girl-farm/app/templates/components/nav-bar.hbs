@@ -1,4 +1,4 @@
-<BsNavbar @position="fixed-top" @type="default" as |navbar|>
+<BsNavbar @position="fixed-top" as |navbar|>
   <navbar.toggle/>
   <a class="navbar-brand" href="#">Frisky Girl Farm</a>
   <navbar.content>
@@ -21,7 +21,7 @@
           </a>
           <BsPopover
             @placement="bottom"
-            @class="mw-100"
+            class="mw-100"
             @onShow={{fn (mut this.orderPopoverShown) true}}
             @onHide={{fn (mut this.orderPopoverShown) false}}
             as |po|
