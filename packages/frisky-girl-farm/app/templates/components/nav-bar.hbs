@@ -26,7 +26,7 @@
             @onHide={{action (mut this.orderPopoverShown) false}}
             as |po|
           >
-            <ClickOutside @action={{po.close}} data-test-order-popover>
+            <div {{on-click-outside po.close}} data-test-order-popover>
               {{#if this.order.isOrderingOpen}}
                 {{#if this.productsOrdered}}
                   {{#each this.productsOrdered as |product|}}
@@ -44,7 +44,7 @@
               {{else}}
                 Ordering is not open
               {{/if}}
-            </ClickOutside>
+            </div>
           </BsPopover>          
         </nav.item>
 

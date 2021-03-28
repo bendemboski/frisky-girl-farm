@@ -18,7 +18,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",
-    "googleapis": "^66.0.0",
+    "googleapis": "^68.0.0",
     "serverless-http": "^2.6.0"
   },
   "peerDependencies": {
@@ -31,11 +31,10 @@
     "chai-http": "^4.3.0",
     "dotenv": "^8.2.0",
     "eslint": "^7.15.0",
-    "eslint-plugin-turbopatent": "^6.0.0",
     "mocha": "^8.2.1",
     "nodemon": "^2.0.6",
     "serverless": "^2.15.0",
-    "sinon": "^9.2.2",
+    "sinon": "^10.0.0",
     "sinon-chai": "^3.5.0"
   }
 }
