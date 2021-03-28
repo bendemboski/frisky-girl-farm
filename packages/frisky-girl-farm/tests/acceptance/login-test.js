@@ -10,7 +10,11 @@ module('Acceptance | login', function (hooks) {
   setupPretender(hooks);
 
   test('it is shown when not logged in', async function (assert) {
-    await visit('/');
+    try {
+      await visit('/');
+    } catch (e) {
+      // https://github.com/emberjs/ember-test-helpers/issues/332
+    }
     assert.equal(currentURL(), '/login');
   });
 
@@ -32,7 +36,11 @@ module('Acceptance | login', function (hooks) {
       location: 'Wallingford',
       balance: 85.0,
     });
-    await visit('/');
+    try {
+      await visit('/');
+    } catch (e) {
+      // https://github.com/emberjs/ember-test-helpers/issues/332
+    }
 
     await fillIn('input[type="email"]', 'ashley@friskygirlfarm.com');
     await click('[type="submit"]');
@@ -45,7 +53,11 @@ module('Acceptance | login', function (hooks) {
   });
 
   test('it handles login failures', async function (assert) {
-    await visit('/');
+    try {
+      await visit('/');
+    } catch (e) {
+      // https://github.com/emberjs/ember-test-helpers/issues/332
+    }
 
     await fillIn('input[type="email"]', 'ashley@friskygirlfarm.com');
     await click('[type="submit"]');

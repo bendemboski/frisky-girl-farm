@@ -10,7 +10,11 @@ module('Acceptance | navbar', function (hooks) {
   setupPretender(hooks);
 
   test('it renders when not logged in', async function (assert) {
-    await visit('/');
+    try {
+      await visit('/');
+    } catch (e) {
+      // https://github.com/emberjs/ember-test-helpers/issues/332
+    }
     assert.dom('[data-test-username]').doesNotExist();
     assert.dom('[data-test-balance]').doesNotExist();
     assert.dom('[data-test-order-trigger]').doesNotExist();
