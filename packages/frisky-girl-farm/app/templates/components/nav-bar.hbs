@@ -17,7 +17,7 @@
         <nav.item>
           <a href="#" role="button" class="nav-link" data-test-order-trigger>
             Your Order
-            {{fa-icon (if this.orderPopoverShown "caret-up" "caret-down")}}
+            <FaIcon @icon={{if this.orderPopoverShown "caret-up" "caret-down"}}/>
           </a>
           <BsPopover
             @placement="bottom"

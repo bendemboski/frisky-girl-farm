@@ -28,6 +28,8 @@
   "devDependencies": {
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.2.0",
+    "@fortawesome/ember-fontawesome": "^0.2.3",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@glimmer/component": "^1.0.3",
     "@glimmer/tracking": "^1.0.3",
     "babel-eslint": "^10.1.0",
@@ -52,7 +54,6 @@
     "ember-data": "~3.25.0",
     "ember-export-application-global": "^2.0.1",
     "ember-fetch": "^8.0.4",
-    "ember-font-awesome": "^4.0.0-rc.4",
     "ember-load-initializers": "^2.1.2",
     "ember-local-settings": "^2.0.2",
     "ember-math-helpers": "^2.8.1",

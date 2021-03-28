@@ -61,7 +61,7 @@
           <form.submitButton>
             Save
             {{#if form.isSubmitting}}
-              {{fa-icon "spinner" spin=true}}
+              <FaIcon @icon="spinner" @spin={{true}}/>
             {{/if}}
           </form.submitButton>
         </div>
