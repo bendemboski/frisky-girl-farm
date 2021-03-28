@@ -6,12 +6,12 @@ const {
   api: { host, namespace },
 } = ENV;
 
-export default Service.extend({
-  user: service(),
+export default class ApiService extends Service {
+  @service('user') user;
 
   async getUser(email) {
     return await apiFetch(`/users/${email}`);
-  },
+  }
 
   async getProducts() {
     let relUrl = '/products';
@@ -20,7 +20,7 @@ export default Service.extend({
     }
     let { products } = await apiFetch(relUrl);
     return products;
-  },
+  }
 
   async setProductOrder(productId, quantity) {
     let { products } = await apiFetch(
@@ -32,8 +32,8 @@ export default Service.extend({
       }
     );
     return products;
-  },
-});
+  }
+}
 
 export class ApiError extends Error {
   constructor(code, extra, ...args) {

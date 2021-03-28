@@ -22,8 +22,8 @@
           <BsPopover
             @placement="bottom"
             @class="mw-100"
-            @onShow={{action (mut this.orderPopoverShown) true}}
-            @onHide={{action (mut this.orderPopoverShown) false}}
+            @onShow={{fn (mut this.orderPopoverShown) true}}
+            @onHide={{fn (mut this.orderPopoverShown) false}}
             as |po|
           >
             <div {{on-click-outside po.close}} data-test-order-popover>
@@ -49,7 +49,15 @@
         </nav.item>
 
         <nav.item>
-          <a href="#" role="button" class="nav-link" onclick={{action "logout"}} data-test-logout>Sign out</a>
+          <a
+            href="#"
+            role="button"
+            class="nav-link"
+            {{on "click" this.logout}}
+            data-test-logout
+          >
+            Sign out
+          </a>
         </nav.item>
       </navbar.nav>
     {{/if}}

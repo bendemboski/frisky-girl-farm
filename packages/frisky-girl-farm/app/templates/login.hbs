@@ -3,29 +3,31 @@
     <div class="card-header">
       Sign in
     </div>
-    <BsForm
-      class="card-body"
-      @model={{this.formState}}
-      @onSubmit={{perform this.login}}
-      as |form|
-    >
-      <form.element
-        @controlType="email"
-        @label="Email address"
-        @placeholder="Enter email"
-        @property="email"
-        @customError={{this.formState.error}}
-      />
-      <BsButton
-        @buttonType="submit"
-        @type="primary"
-        @disabled={{form.isSubmitting}}
+    {{#let (this.createFormState) as |formState|}}
+      <BsForm
+        class="card-body"
+        @model={{formState}}
+        @onSubmit={{perform this.login formState}}
+        as |form|
       >
-        Login
-        {{#if form.isSubmitting}}
-          {{fa-icon "spinner" spin=true}}
-        {{/if}}
-      </BsButton>
-    </BsForm>
+        <form.element
+          @controlType="email"
+          @label="Email address"
+          @placeholder="Enter email"
+          @property="email"
+          @customError={{formState.error}}
+        />
+        <BsButton
+          @buttonType="submit"
+          @type="primary"
+          @disabled={{form.isSubmitting}}
+        >
+          Login
+          {{#if form.isSubmitting}}
+            {{fa-icon "spinner" spin=true}}
+          {{/if}}
+        </BsButton>
+      </BsForm>
+    {{/let}}
   </div>
 </div>

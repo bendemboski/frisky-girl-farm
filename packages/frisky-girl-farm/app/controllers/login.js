@@ -1,26 +1,29 @@
 import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
+import { helper } from '@ember/component/helper';
 
-export default Controller.extend({
-  user: service(),
-  router: service(),
+class FormState {
+  @tracked email;
+  @tracked error;
+}
 
-  setup() {
-    this._super(...arguments);
-    this.set('formState', {});
-  },
+export default class LoginController extends Controller {
+  @service('user') user;
+  @service('router') router;
 
-  login: task(function* ({ email }) {
-    this.set('formState.error', '');
+  createFormState = helper(() => new FormState());
 
-    if (yield this.user.login.perform(email)) {
+  @task
+  *login(formState) {
+    formState.error = '';
+
+    if (yield this.user.login.perform(formState.email)) {
       yield this.router.transitionTo('auth.index');
     } else {
-      this.set(
-        'formState.error',
-        'We do not recognize that email address. Please ensure you are using the same email that you registered with.'
-      );
+      formState.error =
+        'We do not recognize that email address. Please ensure you are using the same email that you registered with.';
     }
-  }),
-});
+  }
+}

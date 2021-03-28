@@ -1,23 +1,25 @@
 import Service, { inject as service } from '@ember/service';
-import { alias, bool } from '@ember/object/computed';
+import { tracked } from '@glimmer/tracking';
+import { alias, bool } from 'macro-decorators';
 import { task } from 'ember-concurrency';
 import { ApiError } from './api';
 
-export default Service.extend({
-  localSettings: service(),
-  api: service(),
+export default class UserService extends Service {
+  @service('local-settings') localSettings;
+  @service('api') api;
 
-  isLoggedIn: bool('email'),
+  @bool('email') isLoggedIn;
 
-  email: alias('localSettings.settings.userEmail'),
-  name: null,
-  location: null,
-  balance: null,
+  @alias('localSettings.settings.userEmail') email;
+  @tracked name;
+  @tracked location;
+  @tracked balance;
 
   //
   // Check if we're logged in (and our login is still valid)
   //
-  checkLoggedIn: task(function* () {
+  @task
+  *checkLoggedIn() {
     if (!this.email) {
       return false;
     }
@@ -30,35 +32,35 @@ export default Service.extend({
 
     this._setData(data);
     return true;
-  }),
+  }
 
   //
   // Log in
   //
-  login: task(function* (email) {
+  @task
+  *login(email) {
     let data = yield this._fetchData.perform(email);
     if (!data) {
       return false;
     }
 
     this._setData(data);
-    this.set('email', email);
+    this.email = email;
     return true;
-  }),
+  }
 
   //
   // Log out
   //
   logout() {
-    this.setProperties({
-      email: null,
-      name: null,
-      location: null,
-      balance: null,
-    });
-  },
+    this.email = null;
+    this.name = null;
+    this.location = null;
+    this.balance = null;
+  }
 
-  _fetchData: task(function* (email = this.userEmail) {
+  @task
+  *_fetchData(email = this.userEmail) {
     try {
       return yield this.api.getUser(email);
     } catch (e) {
@@ -67,9 +69,11 @@ export default Service.extend({
       }
       throw e;
     }
-  }),
+  }
 
   _setData({ name, location, balance }) {
-    this.setProperties({ name, location, balance });
-  },
-});
+    this.name = name;
+    this.location = location;
+    this.balance = balance;
+  }
+}

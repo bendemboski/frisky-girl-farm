@@ -1,21 +1,20 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
-import { readOnly, filterBy } from '@ember/object/computed';
+import { reads, filterBy } from 'macro-decorators';
+import { action } from '@ember/object';
 
-export default Component.extend({
-  tagName: '',
+export default class NavBar extends Component {
+  @service('user') user;
+  @service('order') order;
+  @service('router') router;
 
-  user: service(),
-  order: service(),
-  router: service(),
+  @reads('user.isLoggedIn') isLoggedIn;
+  @filterBy('order.products', 'ordered') productsOrdered;
 
-  isLoggedIn: readOnly('user.isLoggedIn'),
-  productsOrdered: filterBy('order.products', 'ordered'),
-
-  actions: {
-    logout() {
-      this.user.logout();
-      this.router.transitionTo('login');
-    },
-  },
-});
+  @action
+  logout(e) {
+    e.preventDefault();
+    this.user.logout();
+    this.router.transitionTo('login');
+  }
+}

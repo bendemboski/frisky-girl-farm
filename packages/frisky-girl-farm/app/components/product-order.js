@@ -1,30 +1,33 @@
-import Component from '@ember/component';
-import { computed } from '@ember/object';
+import Component from '@glimmer/component';
+import { reads } from 'macro-decorators';
+import { tracked } from '@glimmer/tracking';
+import { localCopy } from 'tracked-toolbox';
+import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
 
-export default Component.extend({
-  tagName: '',
+export default class ProductOrder extends Component {
+  @reads('args.product') product;
 
-  ordered: computed({
-    get() {
-      return null;
-    },
-    set(key, value) {
-      this.set('availabilityError', null);
-      return parseInt(value, 10) || 0;
-    },
-  }),
+  @localCopy('product.ordered') ordered;
+  @tracked availabilityError;
 
-  didReceiveAttrs() {
-    this._super();
-    this.set('ordered', this.product.ordered);
-  },
+  @action
+  setOrdered(e) {
+    this.availabilityError = null;
+    this.ordered = parseInt(e.target.value, 10) || 0;
+  }
 
-  submit: task(function* (ordered) {
-    this.set('availabilityError', null);
+  @action
+  resetOrdered() {
+    this.ordered = this.product.ordered;
+  }
+
+  @task
+  *submit(ordered) {
+    this.availabilityError = null;
 
     if (this.product.available !== -1 && ordered > this.product.available) {
-      this.set('availabilityError', { available: this.product.available });
+      this.availabilityError = { available: this.product.available };
       return;
     }
 
@@ -32,10 +35,10 @@ export default Component.extend({
       yield this.setOrder(ordered);
     } catch (e) {
       if (e.isQuantityNotAvailable) {
-        this.set('availabilityError', { available: e.extra.available });
+        this.availabilityError = { available: e.extra.available };
       } else {
         throw e;
       }
     }
-  }),
-});
+  }
+}

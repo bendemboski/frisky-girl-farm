@@ -1,17 +1,10 @@
 import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
-import { readOnly } from '@ember/object/computed';
+import { reads } from 'macro-decorators';
 
-export default Controller.extend({
-  user: service(),
-  router: service(),
+export default class ApplicationController extends Controller {
+  @service('user') user;
+  @service('router') router;
 
-  isLoggedIn: readOnly('user.isLoggedIn'),
-
-  actions: {
-    logout() {
-      this.user.logout();
-      this.router.transitionTo('login');
-    },
-  },
-});
+  @reads('user.isLoggedIn') isLoggedIn;
+}
