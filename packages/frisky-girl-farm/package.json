@@ -14,16 +14,18 @@
     "build": "ember build",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
+    "lint": "yarn lint:js",
     "start": "ember serve",
     "test": "ember test",
-    "deploy": "AWS_PROFILE=friskygirl ember deploy",
-    "list-revisions": "AWS_PROFILE=friskygirl ember deploy:list",
-    "activate": "AWS_PROFILE=friskygirl ember deploy:activate"
+    "deploy": "dotenv ember deploy",
+    "list-revisions": "dotenv ember deploy:list",
+    "activate": "dotenv ember deploy:activate"
   },
   "devDependencies": {
     "@ember/optional-features": "^0.7.0",
     "bootstrap": "^4.0.0",
     "broccoli-asset-rev": "^3.0.0",
+    "dotenv": "^8.2.0",
     "ember-ajax": "^4.0.1",
     "ember-array-helper": "^5.0.0",
     "ember-auto-import": "^1.2.19",

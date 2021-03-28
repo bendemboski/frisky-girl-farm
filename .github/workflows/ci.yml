@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: '*'
+  schedule:
+    - cron: '0 3 * * *' # daily, at 3am
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+      AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint
+
+      - name: Test backend
+        run: yarn test
+        working-directory: packages/frisky-girl-farm-api
+
+      - name: Test frontend
+        run: yarn test
+        working-directory: packages/frisky-girl-farm
+
+      - name: Deploy backend
+        if: success() && github.ref == 'refs/heads/main'
+        run: echo ${{secrets.GOOGLE_SHEETS_CONFIG}} | base64 -d > config.prod.json && yarn deploy
+        working-directory: packages/frisky-girl-farm-api
+
+      - name: Deploy frontend
+        if: success() && github.ref == 'refs/heads/main'
+        run: yarn deploy production
+        working-directory: packages/frisky-girl-farm

@@ -83,13 +83,13 @@ be renamed to anything to close ordering.
 
 ### AWS
 
-Deploying master builds from GitHub actionds requires AWS credentials with
-permissions to deploy a Serverless AWS Node.js project. The `AWS_CREDENTIALS`
-GitHub repository secret contains an `~/.aws/credentials` file with credentials
-for a `friskygirl` user that must have the necessary permissions to deploy a
-Serverless AWS Node.js project.
+Deployments make use of the AWS SDK for Node.js, so it must have access to
+credentials with permissions to deploy a Serverless AWS Node.js project,
+either in the environment or `~/.aws/credentials`. The GitHub action that
+deploys `main` builds expects them to be configured in the environment via
+GitHub repository/environment secrets.
 
-When deploying manually, you just need to assume role with the proper
+When deploying manually, you just need to assume a role with the proper
 permissions per standard Serverless requirements.
 
 ### Google Sheets
@@ -108,6 +108,6 @@ Google API user with write access to the spreadsheet. Each stage (e.g. `stage`,
 }
 ```
 
-When GitHub actions deploys a successful master build it deploys it to the
+When GitHub actions deploys a successful a `main` build it deploys it to the
 `prod` stage, so the `GOOGLE_SHEETS_CONFIG` repository secret contains the
-`prod` deployment info.
+`prod` deployment info (base64-encoded).
