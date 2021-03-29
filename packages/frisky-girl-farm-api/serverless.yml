@@ -2,10 +2,13 @@ service: frisky-girl-farm-api
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   stage: ${opt:stage, 'prod'}
   region: us-west-2
   timeout: 30
+  # This will become the default in serverless v3, and can be removed at that
+  # point
+  lambdaHashingVersion: 20201221
   environment:
     GOOGLE_CLIENT_EMAIL: ${file(config.${self:provider.stage}.json):email}
     GOOGLE_CLIENT_PRIVATE_KEY: ${file(config.${self:provider.stage}.json):privateKey}
@@ -24,3 +27,6 @@ functions:
           path: /{proxy+}
           method: ANY
           cors: true
+
+plugins:
+  - serverless-plugin-monorepo
