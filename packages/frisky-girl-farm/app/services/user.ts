@@ -2,29 +2,33 @@ import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { alias, bool } from 'macro-decorators';
 import { task } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
 import { ApiError } from './api';
 
+import ApiService from './api';
+import { User } from '../types';
+
 export default class UserService extends Service {
-  @service('local-settings') localSettings;
-  @service('api') api;
+  @service declare localSettings: any;
+  @service declare api: ApiService;
 
-  @bool('email') isLoggedIn;
+  @bool('email') declare isLoggedIn: boolean;
 
-  @alias('localSettings.settings.userEmail') email;
-  @tracked name;
-  @tracked location;
-  @tracked balance;
+  @alias('localSettings.settings.userEmail') declare email: string | null;
+  @tracked name: string | null = null;
+  @tracked location: string | null = null;
+  @tracked balance: number | null = null;
 
   //
   // Check if we're logged in (and our login is still valid)
   //
   @task
-  *checkLoggedIn() {
+  async checkLoggedIn() {
     if (!this.email) {
       return false;
     }
 
-    let data = yield this._fetchData.perform(this.email);
+    let data = await taskFor(this._fetchData).perform(this.email);
     if (!data) {
       this.logout();
       return false;
@@ -38,8 +42,8 @@ export default class UserService extends Service {
   // Log in
   //
   @task
-  *login(email) {
-    let data = yield this._fetchData.perform(email);
+  async login(email: string) {
+    let data = await taskFor(this._fetchData).perform(email);
     if (!data) {
       return false;
     }
@@ -60,9 +64,9 @@ export default class UserService extends Service {
   }
 
   @task
-  *_fetchData(email = this.userEmail) {
+  async _fetchData(email: string) {
     try {
-      return yield this.api.getUser(email);
+      return await this.api.getUser(email);
     } catch (e) {
       if (e instanceof ApiError && e.isUnknownUser) {
         return null;
@@ -71,7 +75,7 @@ export default class UserService extends Service {
     }
   }
 
-  _setData({ name, location, balance }) {
+  _setData({ name, location, balance }: User) {
     this.name = name;
     this.location = location;
     this.balance = balance;

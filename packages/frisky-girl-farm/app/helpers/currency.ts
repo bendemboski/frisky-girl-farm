@@ -1,6 +1,6 @@
 import { helper } from '@ember/component/helper';
 
-export function currency([amount]) {
+export function currency([amount]: [number]) {
   if (amount >= 0) {
     return `$${amount.toFixed(2)}`;
   } else {

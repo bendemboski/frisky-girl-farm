@@ -1,13 +1,16 @@
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { task } from 'ember-concurrency';
+import { task, enqueueTask } from 'ember-concurrency';
 import { ApiError } from './api';
 
+import ApiService from './api';
+import { ProductOrder } from '../types';
+
 export default class OrderService extends Service {
-  @service('api') api;
+  @service declare api: ApiService;
 
   @tracked isOrderingOpen = false;
-  @tracked products = null;
+  @tracked products: ProductOrder[] | null = null;
 
   get spent() {
     let products = this.products || [];
@@ -20,10 +23,10 @@ export default class OrderService extends Service {
   }
 
   @task
-  *loadProducts() {
+  async loadProducts() {
     try {
       this.isOrderingOpen = true;
-      this.products = yield this.api.getProducts();
+      this.products = await this.api.getProducts();
     } catch (e) {
       if (e instanceof ApiError && e.isOrdersNotOpen) {
         this.isOrderingOpen = false;
@@ -39,8 +42,8 @@ export default class OrderService extends Service {
   // result in creating two rows for them in the orders sheet. We could probably
   // mitigate this on the server, but just preventing the client from making
   // concurrent order API calls seems like it should be sufficient.
-  @task({ enqueue: true })
-  *setProductOrder(product, quantity) {
-    this.products = yield this.api.setProductOrder(product.id, quantity);
+  @enqueueTask
+  async setProductOrder(product: ProductOrder, quantity: number) {
+    this.products = await this.api.setProductOrder(product.id, quantity);
   }
 }

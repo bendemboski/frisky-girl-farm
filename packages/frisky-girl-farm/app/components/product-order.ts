@@ -1,20 +1,28 @@
 import Component from '@glimmer/component';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
+// @ts-expect-error
 import { localCopy } from 'tracked-toolbox';
 import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
 
-export default class ProductOrder extends Component {
-  @reads('args.product') product;
+import { ProductOrder } from '../types';
 
-  @localCopy('product.ordered') ordered;
-  @tracked availabilityError;
+interface AvailabilityError {
+  available: number;
+}
+
+export default class ProductOrderComponent extends Component {
+  @reads('args.product') declare product: ProductOrder;
+  @reads('args.setOrder') declare setOrder: (count: number) => Promise<void>;
+
+  @localCopy('product.ordered') declare ordered: number;
+  @tracked availabilityError: AvailabilityError | null = null;
 
   @action
-  setOrdered(e) {
+  setOrdered(e: InputEvent) {
     this.availabilityError = null;
-    this.ordered = parseInt(e.target.value, 10) || 0;
+    this.ordered = parseInt((e.target as HTMLInputElement).value, 10) || 0;
   }
 
   @action
@@ -23,7 +31,7 @@ export default class ProductOrder extends Component {
   }
 
   @task
-  *submit(ordered) {
+  async submit(ordered: number) {
     this.availabilityError = null;
 
     if (this.product.available !== -1 && ordered > this.product.available) {
@@ -32,7 +40,7 @@ export default class ProductOrder extends Component {
     }
 
     try {
-      yield this.setOrder(ordered);
+      await this.setOrder(ordered);
     } catch (e) {
       if (e.isQuantityNotAvailable) {
         this.availabilityError = { available: e.extra.available };

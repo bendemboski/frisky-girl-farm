@@ -2,14 +2,21 @@ import Service, { inject as service } from '@ember/service';
 import ENV from '../config/environment';
 import fetch from 'fetch';
 
+import UserService from './user';
+import { User, ProductOrder } from '../types';
+
 const {
   api: { host, namespace },
 } = ENV;
 
-export default class ApiService extends Service {
-  @service('user') user;
+interface ProductsResponse {
+  products: ProductOrder[];
+}
 
-  async getUser(email) {
+export default class ApiService extends Service {
+  @service declare user: UserService;
+
+  async getUser(email: string): Promise<User> {
     return await apiFetch(`/users/${email}`);
   }
 
@@ -18,12 +25,12 @@ export default class ApiService extends Service {
     if (this.user.isLoggedIn) {
       relUrl = `${relUrl}?userId=${this.user.email}`;
     }
-    let { products } = await apiFetch(relUrl);
-    return products;
+    let data: ProductsResponse = await apiFetch(relUrl);
+    return data.products;
   }
 
-  async setProductOrder(productId, quantity) {
-    let { products } = await apiFetch(
+  async setProductOrder(productId: string, quantity: number) {
+    let data: ProductsResponse = await apiFetch(
       `/products/${productId}?userId=${this.user.email}`,
       {
         method: 'PUT',
@@ -31,13 +38,16 @@ export default class ApiService extends Service {
         body: JSON.stringify({ ordered: quantity }),
       }
     );
-    return products;
+    return data.products;
   }
 }
 
 export class ApiError extends Error {
-  constructor(code, extra, ...args) {
-    super(...args);
+  code: string;
+  extra: Object;
+
+  constructor(code: string, extra: Object, message?: string) {
+    super(message);
     this.code = code;
     this.extra = extra;
     Error.captureStackTrace(this, ApiError);
@@ -64,7 +74,7 @@ export class ApiError extends Error {
   }
 }
 
-async function apiFetch(relUrl, options) {
+async function apiFetch(relUrl: string, options?: Object): Promise<any> {
   let url;
   if (host) {
     url = `${host}`;
