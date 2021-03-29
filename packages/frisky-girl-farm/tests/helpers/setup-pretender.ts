@@ -1,24 +1,45 @@
 import Pretender from 'pretender';
 import sinon from 'sinon';
+import { getContext } from '@ember/test-helpers';
+
+import { User, ProductOrder } from 'frisky-girl-farm/types';
+
+export class PretenderState {
+  users: Record<string, User> = {};
+  products: ProductOrder[] | null = null;
+  getUserStub = sinon.stub();
+  getProductsStub = sinon.stub();
+  putProductStub = sinon.stub();
+}
+
+class TestState {
+  pretender = new Pretender();
+  pretenderState = new PretenderState();
+}
+
+const state: WeakMap<Object, TestState> = new WeakMap();
+
+function getPretender(): Pretender {
+  return state.get(getContext())!.pretender;
+}
+
+export function getPretenderState(): PretenderState {
+  return state.get(getContext())!.pretenderState;
+}
 
 //
 // Sets up a test module to use a Pretender server
 //
-export default function setupPretender(hooks) {
+export default function setupPretender(hooks: NestedHooks) {
   hooks.beforeEach(function () {
-    this.pretender = new Pretender();
-    this.pretenderState = {
-      users: {},
-      products: null,
-      getUserStub: sinon.stub(),
-      getProductsStub: sinon.stub(),
-      putProductStub: sinon.stub(),
-    };
+    state.set(getContext(), new TestState());
 
-    this.pretender.get(
+    let pretender = getPretender();
+    let pretenderState = getPretenderState();
+    pretender.get(
       `/users/:email`,
-      this.pretenderState.getUserStub.callsFake(({ params: { email } }) => {
-        let user = this.pretenderState.users[email];
+      pretenderState.getUserStub.callsFake(({ params: { email } }) => {
+        let user = pretenderState.users[email];
         if (user) {
           return [
             200,
@@ -35,14 +56,14 @@ export default function setupPretender(hooks) {
       })
     );
 
-    this.pretender.get(
+    pretender.get(
       '/products',
-      this.pretenderState.getProductsStub.callsFake(() => {
-        if (this.pretenderState.products) {
+      pretenderState.getProductsStub.callsFake(() => {
+        if (pretenderState.products) {
           return [
             200,
             { 'Content-Type': 'application/json' },
-            JSON.stringify({ products: this.pretenderState.products }),
+            JSON.stringify({ products: pretenderState.products }),
           ];
         } else {
           return [
@@ -54,11 +75,11 @@ export default function setupPretender(hooks) {
       })
     );
 
-    this.pretender.put(
+    pretender.put(
       '/products/:id',
-      this.pretenderState.putProductStub.callsFake(
+      pretenderState.putProductStub.callsFake(
         ({ params: { id: productId }, requestBody }) => {
-          if (!this.pretenderState.products) {
+          if (!pretenderState.products) {
             return [
               404,
               { 'Content-Type': 'application/json' },
@@ -66,7 +87,7 @@ export default function setupPretender(hooks) {
             ];
           }
 
-          let product = this.pretenderState.products.find(
+          let product = pretenderState.products.find(
             ({ id }) => id === productId
           );
           if (!product) {
@@ -93,7 +114,7 @@ export default function setupPretender(hooks) {
           return [
             200,
             { 'Content-Type': 'application/json' },
-            JSON.stringify({ products: this.pretenderState.products }),
+            JSON.stringify({ products: pretenderState.products }),
           ];
         }
       )
@@ -101,6 +122,6 @@ export default function setupPretender(hooks) {
   });
 
   hooks.afterEach(function () {
-    this.pretender.shutdown();
+    getPretender().shutdown();
   });
 }

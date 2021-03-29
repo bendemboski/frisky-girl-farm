@@ -1,15 +1,21 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import setupPretender from '../../helpers/setup-pretender';
+import setupPretender, {
+  getPretenderState,
+} from '../../helpers/setup-pretender';
 import loginUser from '../../helpers/login-user';
 import setProducts from '../../helpers/set-products';
+import { taskFor } from 'ember-concurrency-ts';
+
+import OrderService from 'frisky-girl-farm/services/order';
+import { ProductOrder } from 'frisky-girl-farm/types';
 
 module('Unit | Service | order', function (hooks) {
   setupTest(hooks);
   setupPretender(hooks);
 
-  let localSettings;
-  let service;
+  let localSettings: any;
+  let service: OrderService;
 
   hooks.beforeEach(function () {
     localSettings = this.owner.lookup('service:local-settings');
@@ -25,7 +31,7 @@ module('Unit | Service | order', function (hooks) {
 
   module('loadProducts', function () {
     test('it works when not logged in', async function (assert) {
-      localSettings.set('settings.userEmail', null);
+      localSettings!.set('settings.userEmail', null);
       let products = [
         {
           id: '2',
@@ -62,11 +68,11 @@ module('Unit | Service | order', function (hooks) {
       ];
       setProducts(products);
 
-      await service.loadProducts.perform();
+      await taskFor(service.loadProducts).perform();
       assert.ok(service.isOrderingOpen);
       assert.deepEqual(service.products, products);
       assert.notOk(
-        this.pretenderState.getProductsStub.firstCall.args[0].queryParams.userId
+        getPretenderState().getProductsStub.firstCall.args[0].queryParams.userId
       );
     });
 
@@ -107,24 +113,24 @@ module('Unit | Service | order', function (hooks) {
       ];
       setProducts(products);
 
-      await service.loadProducts.perform();
+      await taskFor(service.loadProducts).perform();
       assert.ok(service.isOrderingOpen);
       assert.deepEqual(service.products, products);
       assert.equal(
-        this.pretenderState.getProductsStub.firstCall.args[0].queryParams
+        getPretenderState().getProductsStub.firstCall.args[0].queryParams
           .userId,
         'ashley@friskygirlfarm.com'
       );
     });
 
     test('it works when ordering is not open', async function (assert) {
-      await service.loadProducts.perform();
+      await taskFor(service.loadProducts).perform();
       assert.notOk(service.isOrderingOpen);
     });
   });
 
   module('setProductOrder', function (hooks) {
-    let products;
+    let products: ProductOrder[];
 
     hooks.beforeEach(async function () {
       products = [
@@ -163,25 +169,25 @@ module('Unit | Service | order', function (hooks) {
       ];
       setProducts(products);
 
-      await service.loadProducts.perform();
+      await taskFor(service.loadProducts).perform();
     });
 
     test('it works', async function (assert) {
-      await service.setProductOrder.perform(service.products[0], 3);
+      await taskFor(service.setProductOrder).perform(service.products![0], 3);
       products[0].ordered += 3;
       assert.deepEqual(service.products, products);
       assert.equal(
-        this.pretenderState.putProductStub.firstCall.args[0].queryParams.userId,
+        getPretenderState().putProductStub.firstCall.args[0].queryParams.userId,
         'ashley@friskygirlfarm.com'
       );
     });
 
     test('it works on products with unlimited quantities', async function (assert) {
-      await service.setProductOrder.perform(service.products[3], 2);
+      await taskFor(service.setProductOrder).perform(service.products![3], 2);
       products[3].ordered += 2;
       assert.deepEqual(service.products, products);
       assert.equal(
-        this.pretenderState.putProductStub.firstCall.args[0].queryParams.userId,
+        getPretenderState().putProductStub.firstCall.args[0].queryParams.userId,
         'ashley@friskygirlfarm.com'
       );
     });
@@ -189,7 +195,10 @@ module('Unit | Service | order', function (hooks) {
     test('it errors when the quantity is not available', async function (assert) {
       let error;
       try {
-        await service.setProductOrder.perform(service.products[2], 50);
+        await taskFor(service.setProductOrder).perform(
+          service.products![2],
+          50
+        );
       } catch (e) {
         error = e;
       }
@@ -237,16 +246,16 @@ module('Unit | Service | order', function (hooks) {
     ];
     setProducts(products);
 
-    await service.loadProducts.perform();
+    await taskFor(service.loadProducts).perform();
     assert.equal(service.spent, 0);
 
-    await service.setProductOrder.perform(service.products[0], 3);
+    await taskFor(service.setProductOrder).perform(service.products![0], 3);
     assert.equal(service.spent, 10.5);
 
-    await service.setProductOrder.perform(service.products[2], 5);
+    await taskFor(service.setProductOrder).perform(service.products![2], 5);
     assert.equal(service.spent, 75.5);
 
-    await service.setProductOrder.perform(service.products[3], 2);
+    await taskFor(service.setProductOrder).perform(service.products![3], 2);
     assert.equal(service.spent, 83.5);
   });
 });

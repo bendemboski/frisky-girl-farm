@@ -74,7 +74,7 @@ export class ApiError extends Error {
   }
 }
 
-async function apiFetch(relUrl: string, options?: Object): Promise<any> {
+async function apiFetch(relUrl: string, options?: RequestInit): Promise<any> {
   let url;
   if (host) {
     url = `${host}`;
