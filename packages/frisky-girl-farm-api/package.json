@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Frisky Girl Farm API server",
   "main": "src/index.js",
-  "repository": "https://github.com/bendemboski/frisky-girl-farm-api",
+  "repository": "https://github.com/bendemboski/frisky-girl-farm",
   "author": "Ben Demboski <demboskb@gmail.com>",
   "license": "MIT",
   "files": [

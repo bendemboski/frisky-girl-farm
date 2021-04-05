@@ -1,0 +1,30 @@
+{
+  "name": "frisky-girl-farm-admin",
+  "version": "1.0.0",
+  "description": "Google App Scripts for Frisky Girl Farm Admin ",
+  "main": "src/index.js",
+  "repository": "https://github.com/bendemboski/frisky-girl-farm",
+  "author": "Ben Demboski <demboskb@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "deploy": "clasp push",
+    "lint": "eslint ."
+  },
+  "private": true,
+  "devDependencies": {
+    "@google/clasp": "^2.3.0",
+    "@types/google-apps-script": "^1.0.30",
+    "@typescript-eslint/eslint-plugin": "^4.20.0",
+    "@typescript-eslint/parser": "^4.20.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.23.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-googleappsscript": "^1.0.3",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "^2.2.1",
+    "typescript": "^3.8.2"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}
