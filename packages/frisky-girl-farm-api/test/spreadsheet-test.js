@@ -16,6 +16,7 @@ describe('Spreadsheet', function () {
   beforeEach(function () {
     client = new MockSheetsClient();
 
+    client.setLocations();
     client.setUsers();
     client.setOrders(
       [7, 3, 5],
@@ -31,6 +32,20 @@ describe('Spreadsheet', function () {
 
   afterEach(function () {
     sinon.restore();
+  });
+
+  it('getLocations', async function () {
+    expect(await spreadsheet.getLocations()).to.deep.equal([
+      {
+        name: 'Wallingford',
+        pickupInstructions:
+          'Come for the veggies, stay for the neighborhood character',
+      },
+      {
+        name: 'Lake City',
+        pickupInstructions: 'Like a city, but also a lake',
+      },
+    ]);
   });
 
   describe('getUser', function () {
@@ -50,6 +65,14 @@ describe('Spreadsheet', function () {
         spreadsheet.getUser('becky@friskygirlfarm.com')
       ).to.eventually.be.rejectedWith(UnknownUserError);
     });
+  });
+
+  it('getUsers', async function () {
+    expect(
+      (await spreadsheet.getUsers(['ellen@friskygirlfarm.com'])).map(
+        (u) => u.email
+      )
+    ).to.deep.equal(['ellen@friskygirlfarm.com']);
   });
 
   describe('getProducts', function () {
@@ -115,5 +138,23 @@ describe('Spreadsheet', function () {
         spreadsheet.setProductOrder('ashley@friskygirlfarm.com', 3, 1)
       ).to.eventually.be.rejectedWith(OrdersNotOpenError);
     });
+  });
+
+  it('getOrdersSheet', async function () {
+    let sheet = spreadsheet.getOrdersSheet('Orders 6-25');
+
+    client.setOrders(
+      'Orders 6-25',
+      [1, 0, 1],
+      ['hasorder@friskygirlfarm.com', 0, 0, 1],
+      ['hasnoorder@friskygirlfarm.com', 0, 0, 0],
+      ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
+    );
+
+    let ret = await sheet.getUsersWithOrders();
+    expect(ret).to.deep.equal([
+      'hasorder@friskygirlfarm.com',
+      'alsohasorder@friskygirlfarm.com',
+    ]);
   });
 });

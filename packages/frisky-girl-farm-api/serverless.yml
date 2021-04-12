@@ -13,6 +13,15 @@ provider:
     GOOGLE_CLIENT_EMAIL: ${file(config.${self:provider.stage}.json):email}
     GOOGLE_CLIENT_PRIVATE_KEY: ${file(config.${self:provider.stage}.json):privateKey}
     GOOGLE_SPREADSHEET_ID: ${file(config.${self:provider.stage}.json):spreadsheetId}
+    REGION:
+      Ref: AWS::Region
+  iam:
+    role:
+      statements:
+        - Effect: 'Allow'
+          Action:
+            - 'ses:SendBulkTemplatedEmail'
+          Resource: '*'
 
 functions:
   app:
@@ -30,3 +39,8 @@ functions:
 
 plugins:
   - serverless-plugin-monorepo
+  - '@haftahave/serverless-ses-template'
+
+custom:
+  sesTemplates:
+    configFile: ./ses-email-templates/index.js

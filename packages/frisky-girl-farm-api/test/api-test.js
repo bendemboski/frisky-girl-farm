@@ -9,6 +9,14 @@ const Spreadsheet = require('../src/sheets/spreadsheet');
 describe('API', function () {
   let client;
   let api;
+  let sendEmailsStub;
+
+  class SESStub {
+    sendBulkTemplatedEmail(...args) {
+      return { promise: () => sendEmailsStub(...args) };
+    }
+  }
+  const awsFactory = () => ({ SES: SESStub });
 
   beforeEach(function () {
     client = new MockSheetsClient();
@@ -21,8 +29,10 @@ describe('API', function () {
           client,
         });
         return spreadsheet;
-      })
+      }, awsFactory)
     );
+
+    sendEmailsStub = sinon.stub();
   });
 
   afterEach(function () {
@@ -335,6 +345,139 @@ describe('API', function () {
         code: 'quantityNotAvailable',
         extra: { available: 2 },
       });
+    });
+  });
+
+  describe('POST /admin/confirmation-emails', function () {
+    let getByDataFilterStub;
+
+    beforeEach(function () {
+      getByDataFilterStub = sinon.stub();
+      client.spreadsheets.getByDataFilter = getByDataFilterStub;
+    });
+
+    function stubSheets(sheets) {
+      getByDataFilterStub.resolves({ data: { sheets } });
+    }
+
+    it('it works', async function () {
+      stubSheets([
+        {
+          properties: { title: 'Orders 4-20' },
+          developerMetadata: [{ metadataKey: 'orderSheet' }],
+        },
+      ]);
+
+      client.setUsers([
+        [
+          'herbie@friskygirlfarm.com',
+          'Herb Dog',
+          'Lake City',
+          35.0,
+          100.0,
+          65.0,
+        ],
+      ]);
+      client.setLocations();
+      client.setOrders(
+        'Orders 4-20',
+        [1, 0, 1],
+        ['ashley@friskygirlfarm.com', 0, 0, 1],
+        ['ellen@friskygirlfarm.com', 0, 0, 0],
+        ['herbie@friskygirlfarm.com', 1, 0, 1]
+      );
+
+      sendEmailsStub.resolves({
+        Status: [{ Status: 'Success' }, { Status: 'Success' }],
+      });
+
+      let res = await api
+        .post('/admin/confirmation-emails')
+        .send({ sheetId: 'sheet123' });
+      expect(res).to.have.status(200);
+      expect(res.body).to.deep.equal({ failedSends: [] });
+
+      expect(getByDataFilterStub).to.have.been.calledOnce;
+      expect(getByDataFilterStub).to.have.been.calledWithMatch({
+        spreadsheetId: 'ssid',
+        resource: {
+          dataFilters: [{ gridRange: { sheetId: 'sheet123' } }],
+        },
+      });
+
+      expect(sendEmailsStub).to.have.been.calledOnce;
+      expect(sendEmailsStub).to.have.been.calledWithMatch({
+        Source: 'friskygirlfarm@gmail.com',
+        Template: 'order_confirmation',
+        ConfigurationSetName: 'default',
+        Destinations: [
+          {
+            Destination: { ToAddresses: ['ashley@friskygirlfarm.com'] },
+            ReplacementTemplateData: JSON.stringify({
+              pickupInstructions:
+                'Come for the veggies, stay for the neighborhood character',
+            }),
+          },
+          {
+            Destination: { ToAddresses: ['herbie@friskygirlfarm.com'] },
+            ReplacementTemplateData: JSON.stringify({
+              pickupInstructions: 'Like a city, but also a lake',
+            }),
+          },
+        ],
+      });
+    });
+
+    it('it reports send errors', async function () {
+      stubSheets([
+        {
+          properties: { title: 'Orders 4-20' },
+          developerMetadata: [{ metadataKey: 'orderSheet' }],
+        },
+      ]);
+
+      client.setLocations();
+      client.setOrders(
+        'Orders 4-20',
+        [1, 0, 1],
+        ['ashley@friskygirlfarm.com', 0, 0, 1],
+        ['ellen@friskygirlfarm.com', 1, 0, 0]
+      );
+
+      sendEmailsStub.resolves({
+        Status: [{ Status: 'MessageRejected' }, { Status: 'MessageRejected' }],
+      });
+
+      let res = await api
+        .post('/admin/confirmation-emails')
+        .send({ sheetId: 'sheet123' });
+      expect(res).to.have.status(200);
+      expect(res.body).to.deep.equal({
+        failedSends: ['ellen@friskygirlfarm.com', 'ashley@friskygirlfarm.com'],
+      });
+    });
+
+    it('it fails if the sheet id is not specified', async function () {
+      let res = await api.post('/admin/confirmation-emails').send();
+      expect(res).to.have.status(400);
+    });
+
+    it('it fails if the sheet is not found', async function () {
+      stubSheets([]);
+
+      let res = await api
+        .post('/admin/confirmation-emails')
+        .send({ sheetId: 'notfound' });
+      expect(res).to.have.status(400);
+    });
+
+    it('it fails if the sheet id is not an orders sheet', async function () {
+      stubSheets([{ properties: { title: 'Orders 4-20' } }]);
+
+      let res = await api
+        .post('/admin/confirmation-emails')
+        .send({ sheetId: 'notfound' });
+      expect(res).to.have.status(400);
     });
   });
 });

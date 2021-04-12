@@ -48,11 +48,46 @@ class MockSheetsClient {
       });
   }
 
+  setLocations() {
+    this.spreadsheets.values.get = this.spreadsheets.values.get || sinon.stub();
+
+    this.spreadsheets.values.get
+      .withArgs({
+        spreadsheetId: 'ssid',
+        range: 'Locations',
+        majorDimension: 'ROWS',
+        valueRenderOption: 'UNFORMATTED_VALUE',
+      })
+      .resolves({
+        data: {
+          values: [
+            ['Name', 'Pickup day', 'Harvest day', 'Email instructions'],
+            [
+              'Wallingford',
+              'Saturday',
+              'Friday',
+              'Come for the veggies, stay for the neighborhood character',
+            ],
+            ['Lake City', 'Tuesday', 'Monday', 'Like a city, but also a lake'],
+          ],
+        },
+      });
+  }
+
   setNoOrders() {
     this._stubGetOrders().rejects({ code: 400 });
   }
 
-  setOrders(totals, ...users) {
+  setOrders(...args) {
+    let sheetName;
+    let totals;
+    let users;
+    if (typeof args[0] === 'string') {
+      [sheetName, totals, ...users] = args;
+    } else {
+      [totals, ...users] = args;
+    }
+
     let ordered = [0, 0, 0];
     users.forEach((orders) => {
       ordered[0] += orders[1] || 0;
@@ -91,10 +126,55 @@ class MockSheetsClient {
         ],
       },
     });
+
+    this._stubGetOrders({ sheetName, majorDimension: 'ROWS' }).resolves({
+      data: {
+        values: [
+          ['', 'Lettuce', 'Kale', 'Spicy Greens'],
+          ['price', 0.15, 0.85, 15.0],
+          [
+            'image',
+            'http://lettuce.com/image.jpg',
+            'http://kale.com/image.jpg',
+            'http://spicy-greens.com/image.jpg',
+          ],
+          ['total', ...totals],
+          ['ordered', ...ordered],
+          ...users,
+        ],
+      },
+    });
   }
 
-  resetOrders() {
-    this._stubGetOrders().resetBehavior();
+  resetOrders(sheetName) {
+    this._stubGetOrders(sheetName).resetBehavior();
+  }
+
+  setPastOrders(sheetName, totals, ...users) {
+    let ordered = [0, 0, 0];
+    users.forEach((orders) => {
+      ordered[0] += orders[1] || 0;
+      ordered[1] += orders[2] || 0;
+      ordered[2] += orders[3] || 0;
+    });
+
+    this._stubGetOrders({ sheetName, majorDimension: 'ROWS' }).resolves({
+      data: {
+        values: [
+          ['', 'Lettuce', 'Kale', 'Spicy Greens'],
+          ['price', 0.15, 0.85, 15.0],
+          [
+            'image',
+            'http://lettuce.com/image.jpg',
+            'http://kale.com/image.jpg',
+            'http://spicy-greens.com/image.jpg',
+          ],
+          ['total', ...totals],
+          ['ordered', ...ordered],
+          ...users,
+        ],
+      },
+    });
   }
 
   stubAppendOrder() {
@@ -118,13 +198,13 @@ class MockSheetsClient {
       .resolves();
   }
 
-  _stubGetOrders() {
+  _stubGetOrders({ sheetName = 'Orders', majorDimension = 'COLUMNS' } = {}) {
     this.spreadsheets.values.get = this.spreadsheets.values.get || sinon.stub();
 
     return this.spreadsheets.values.get.withArgs({
       spreadsheetId: 'ssid',
-      range: 'Orders',
-      majorDimension: 'COLUMNS',
+      range: sheetName,
+      majorDimension,
       valueRenderOption: 'UNFORMATTED_VALUE',
     });
   }
