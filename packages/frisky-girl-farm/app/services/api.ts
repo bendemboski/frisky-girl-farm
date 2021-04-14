@@ -23,7 +23,7 @@ export default class ApiService extends Service {
   async getProducts() {
     let relUrl = '/products';
     if (this.user.isLoggedIn) {
-      relUrl = `${relUrl}?userId=${this.user.email}`;
+      relUrl = `${relUrl}?${this.authQueryParam}`;
     }
     let data: ProductsResponse = await apiFetch(relUrl);
     return data.products;
@@ -31,7 +31,7 @@ export default class ApiService extends Service {
 
   async setProductOrder(productId: string, quantity: number) {
     let data: ProductsResponse = await apiFetch(
-      `/products/${productId}?userId=${this.user.email}`,
+      `/products/${productId}?${this.authQueryParam}`,
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -39,6 +39,10 @@ export default class ApiService extends Service {
       }
     );
     return data.products;
+  }
+
+  get authQueryParam() {
+    return `userId=${encodeURIComponent(this.user.email!)}`;
   }
 }
 
