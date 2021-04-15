@@ -2,9 +2,7 @@
  * Card action handler function to generate the harvest lists (as new sheets)
  * based off of the active orders sheet
  */
-function generateHarvestLists():
-  | GoogleAppsScript.Card_Service.ActionResponse
-  | undefined {
+function generateHarvestLists() {
   let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   let orderSheet = spreadsheet.getActiveSheet();
   if (!isOrderSheet(orderSheet)) {
@@ -69,11 +67,11 @@ function generateOneHarvestList(
   newSheet.autoResizeColumns(1, 1);
 
   // Packing slips
-  let packingSlips = Object.entries(users)
-    .map(function ([name, { location, quantities }]) {
+  let packingSlips = users
+    .map(({ name, location, quantities }) => {
       let lines = [`${name} (${location})`];
-      Object.keys(quantities).forEach(function (productName) {
-        lines.push(quantities[productName] + ' ' + productName);
+      Object.entries(quantities).forEach((productName, quantity) => {
+        lines.push(`${quantity} ${productName}`);
       });
       return lines.join('\n');
     })

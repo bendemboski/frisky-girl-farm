@@ -17,7 +17,7 @@ function prepareNewWeek() {
   templateSheet!.activate();
   let orderSheet = spreadsheet.duplicateActiveSheet();
   orderSheet.setName('Orders (pending)');
-  orderSheet.addDeveloperMetadata('orderSheet');
+  orderSheet.addDeveloperMetadata('orderSheet', new Date().toISOString());
 
   return createNotificationResponse(
     'New week created. Set product availability in "Orders (pending)" sheet and then open orders when ready.'

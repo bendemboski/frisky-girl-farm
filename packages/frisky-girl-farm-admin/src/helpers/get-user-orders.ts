@@ -14,7 +14,9 @@ interface UserInfo {
 /**
  * A user's order info -- location and counts of products ordered
  */
-interface UserOrderInfo {
+interface UserOrderInfo extends UserInfo {
+  email: string;
+  name: string;
   location: string;
   quantities: ProductCounts;
 }
@@ -45,21 +47,27 @@ type HarvestQuantities = [string, number];
 //
 // `users` is
 //
-// {
-//   <userName>: {
+// [
+//   {
+//     email: <userEmail>,
+//     name: <userName>,
 //     location: <userLocation>,
-//     quantities: {
-//       <productName>: <quantityOrdered>,
-//       <productName>: <quantityOrdered>,
-//       ...
+//       quantities: {
+//         <productName>: <quantityOrdered>,
+//         <productName>: <quantityOrdered>,
+//         ...
+//       }
 //     }
 //   },
-//   <userName>: {
+//   {
+//     email: <userEmail>,
+//     name: <userName>,
 //     location: <userLocation>,
-//     quantities: {
-//       <productName>: <quantityOrdered>,
-//       <productName>: <quantityOrdered>,
-//       ...
+//       quantities: {
+//         <productName>: <quantityOrdered>,
+//         <productName>: <quantityOrdered>,
+//         ...
+//       }
 //     }
 //   },
 //   ...
@@ -94,7 +102,7 @@ function getUserOrders(
     });
 
   let productHash: ProductCounts = {};
-  let users: Record<string, UserOrderInfo> = {};
+  let users: UserOrderInfo[] = [];
   let values = orderSheet.getDataRange().getValues();
 
   // Save off the row with all the product names, removing the first blank cell
@@ -102,7 +110,8 @@ function getUserOrders(
   values.slice(5).forEach(function (row) {
     // The first column is the user id, so check to see if it's in our list
     // of users for this harvest/location
-    let info = userInfo[row[0]];
+    let email = row[0];
+    let info = userInfo[email];
     if (!info) {
       // User not picking up on this day
       return;
@@ -121,7 +130,12 @@ function getUserOrders(
 
     // Make sure the user has ordered something
     if (Object.keys(quantities).length > 0) {
-      users[info.name] = { location: info.location, quantities: quantities };
+      users.push({
+        email,
+        name: info.name,
+        location: info.location,
+        quantities,
+      });
     }
   });
 

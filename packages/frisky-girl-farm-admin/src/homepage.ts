@@ -83,5 +83,22 @@ function createHomepageCard() {
           )
         )
     )
+    .addSection(
+      CardService.newCardSection()
+        .addWidget(
+          CardService.newTextButton()
+            .setText('Send confirmation emails')
+            .setOnClickAction(
+              CardService.newAction().setFunctionName(
+                sendConfirmationEmails.name
+              )
+            )
+        )
+        .addWidget(
+          CardService.newTextParagraph().setText(
+            'Send confirmation emails to all users that have ordered anything on the currently-active orders sheet'
+          )
+        )
+    )
     .build();
 }
