@@ -13,9 +13,9 @@
   "scripts": {
     "test": "mocha",
     "lint": "eslint .",
-    "serve": "dotenv nodemon ./dev/serve.js",
-    "serve-inspect": "dotenv nodemon --inspect ./dev/serve.js",
-    "deploy": "dotenv sls deploy"
+    "serve": "dotenv -- nodemon ./dev/serve.js",
+    "serve-inspect": "dotenv -- nodemon --inspect ./dev/serve.js",
+    "deploy": "dotenv -- sls deploy"
   },
   "private": false,
   "dependencies": {
