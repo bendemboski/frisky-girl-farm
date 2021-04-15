@@ -1,5 +1,20 @@
 'use strict';
 
+const apiConfigs = {
+  prod: {
+    host: 'https://uh7v0bgk40.execute-api.us-west-2.amazonaws.com',
+    namespace: 'prod',
+  },
+  staging: {
+    host: 'https://yukpp0dfe2.execute-api.us-west-2.amazonaws.com',
+    namespace: 'staging',
+  },
+  local: {
+    host: 'http://localhost:3000',
+    namespace: '',
+  },
+};
+
 module.exports = function (environment) {
   let ENV = {
     modulePrefix: 'frisky-girl-farm',
@@ -27,10 +42,7 @@ module.exports = function (environment) {
       adapter: 'local-storage',
     },
 
-    api: {
-      host: 'https://uh7v0bgk40.execute-api.us-west-2.amazonaws.com',
-      namespace: 'prod',
-    },
+    api: apiConfigs.prod,
   };
 
   if (environment === 'development') {
@@ -40,8 +52,11 @@ module.exports = function (environment) {
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
 
-    ENV.api.host = 'http://localhost:3000';
-    ENV.api.namespace = '';
+    ENV.api = apiConfigs.local;
+  }
+
+  if (process.env.FRISKY_GIRL_API) {
+    ENV.api = apiConfigs[process.env.FRISKY_GIRL_API];
   }
 
   if (environment === 'test') {
