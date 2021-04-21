@@ -27,6 +27,11 @@ jobs:
         run: yarn test
         working-directory: packages/frisky-girl-farm
 
+      - name: Deploy admin
+        if: success() && github.ref == 'refs/heads/main'
+        run: echo ${{secrets.CLASP_OAUTH_CREDENTIALS}} > creds.json && yarn clasp login --creds creds.json && yarn deploy
+        working-directory: packages/frisky-girl-farm-admin
+
       - name: Deploy backend
         if: success() && github.ref == 'refs/heads/main'
         run: echo ${{secrets.GOOGLE_SHEETS_CONFIG}} | base64 -d > config.prod.json && yarn deploy
@@ -34,5 +39,5 @@ jobs:
 
       - name: Deploy frontend
         if: success() && github.ref == 'refs/heads/main'
-        run: yarn deploy production
+        run: yarn deploy --activate production
         working-directory: packages/frisky-girl-farm
