@@ -8,7 +8,7 @@ function onHomepage() {
 }
 
 const friskyGirlLogo =
-  'https://static.wixstatic.com/media/9a6d40_54160342452f4503af1bac600299f659~mv2.jpg/v1/fill/w_342,h_344,al_c,q_80,usm_0.66_1.00_0.01/frisky%20girl%20farm.webp';
+  'https://github.com/bendemboski/frisky-girl-farm/blob/13e9440008dbdc6228dc47d5c409da6db9f35c80/assets/logo-344.webp?raw=true';
 
 /**
  * Create our homepage card, including the proper buttons for the state of the

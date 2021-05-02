@@ -17,7 +17,7 @@ module.exports = async () => [
       ...orderConfirmationLines.map((line) => `<p>${line}</p>`),
       '<p>Cheers,<br>Ellen and Ashley</p>',
       '<p></p>',
-      '<p><img src="https://static.wixstatic.com/media/9a6d40_54160342452f4503af1bac600299f659~mv2.jpg" width="96" height="96"></p>',
+      '<p><img src="https://github.com/bendemboski/frisky-girl-farm/blob/13e9440008dbdc6228dc47d5c409da6db9f35c80/assets/logo-120.png?raw=true" width="96" height="96"></p>',
       '<p><a href="https://www.friskygirlfarm.com/">FriskyGirlFarm.com</a><br><a href="tel:2064808246">206.480.8246</a></p>',
     ].join(''),
     text: [
