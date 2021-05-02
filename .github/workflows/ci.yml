@@ -29,7 +29,7 @@ jobs:
 
       - name: Deploy admin
         if: success() && github.ref == 'refs/heads/main'
-        run: echo ${{secrets.CLASP_OAUTH_CREDENTIALS}} > creds.json && yarn clasp login --creds creds.json && yarn deploy
+        run: echo ${{secrets.CLASP_OAUTH_CREDENTIALS}} | base64 -d > creds.json && yarn clasp login --creds creds.json && yarn deploy
         working-directory: packages/frisky-girl-farm-admin
 
       - name: Deploy backend

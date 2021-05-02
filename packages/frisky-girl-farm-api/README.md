@@ -6,19 +6,6 @@ API server for Frisky Girl Farm CSA website
 
 This project implements the API server, which is an Express app that uses a Google Sheets spreadsheet as its backend storage. It's set up to run in AWS Lambda and to deploy via Serverless, but should be runnable in any deplyment environment that supports Node.js.
 
-## Deployment Setup
-
-To set this up to deploy and run, perform the following steps:
-
-1. Create a [Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) with access to Google Sheets
-2. Create a [service account](https://cloud.google.com/iam/docs/creating-managing-service-accounts) within the project with an editor or owner role
-3. Create a [service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) for the service account.
-4. Extract the `private_key` and `client_email` fields from the downloaded service account key file and put them in a `config.<stage>.json` file (see [Build credentials](#build-credentials) section).
-5. [Enable](https://console.developers.google.com/flows/enableapi?apiid=sheets.googleapis.com) the Google Sheets API for your project.
-6. Using any user account, create a new Google Sheets spreadsheet
-7. Invite the service account to the spreadsheet as an editor, as you would invite any user, but using the `client_email` from step 4.
-8. Copy the ID of the spreadsheet from its URL (`https://docs.google.com/spreadsheets/d/<id>/edit`) it put it in the `config.<stage>.json` file (see [Build credentials](#build-credentials) section).
-
 ## Spreadsheet format
 
 The API server looks for several sheets in the spreadsheet, identified by name. Any other sheets will be ignored. A minimal template spreadsheet can be found [here](https://docs.google.com/spreadsheets/d/1gdw6m-eWT3OZ2dzEztGnws8m76nI2yKwSddvowNlQCs/edit#gid=1406465942).

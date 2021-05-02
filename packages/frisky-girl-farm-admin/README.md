@@ -14,3 +14,7 @@ This project is set up to use [clasp](https://github.com/google/clasp), which is
 * `yarn clasp push` -- push local code to the workspace addon
 
 Successful CI `main` builds auto-deploy using OAuth credentials configured in the `CLASP_OAUTH_CREDENTIALS` GitHub repository secret.
+
+## Running the addon
+
+Because the addon is unpublished, to run it, users need to be added to the Google Cloud Project as test users. Go to the [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent) settings for the project and add the user as a test user. Share the app scripts project with them (if needed), and then they can follow the instructions to [install the unpublished addon](https://developers.google.com/workspace/add-ons/how-tos/testing-gsuite-addons#install_an_unpublished_add-on). Then they can go into a spreadsheet, and will see the addon in the right side bar and can open, authorize, and start using it.

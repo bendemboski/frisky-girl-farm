@@ -1,6 +1,6 @@
 # Frisky Girl Farm CSA Website
 
-![Frisky Girl Farm](https://static.wixstatic.com/media/9a6d40_54160342452f4503af1bac600299f659~mv2.jpg/v1/fill/w_342,h_344,al_c,q_80,usm_0.66_1.00_0.01/frisky%20girl%20farm.webp)
+![Frisky Girl Farm](/assets/logo-344.webp?raw=true)
 
 ## Architecture
 
@@ -45,3 +45,25 @@ So, there is currently no way to test changes to the admin scripts workspace add
 ## Deployment
 
 Because this is such a small-scale project right now and everything can be tested manually locally/in the staging environments (except the admin scripts which are only used by the farmers), successful `main` branch CI builds automatically deploy to production. For manual deployment information, check the READMEs of each package.
+
+## CI/Deployment setup
+
+First, set up the Google cloud project and spreadsheet that will be used for the backend storage:
+
+1. Create a [Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) with access to Google Sheets
+2. Create a [service account](https://cloud.google.com/iam/docs/creating-managing-service-accounts) within the project with an editor or owner role. This will be used by the API server to access the spreadsheet used as its backend storage.
+3. Create a [service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) for the service account (this will download a credentials file that you'll need in later steps).
+6. [Enable](https://console.developers.google.com/flows/enableapi?apiid=sheets.googleapis.com) the Google Sheets API for your project.
+7. Using any user account, make a copy of [this spreadsheet template](https://docs.google.com/spreadsheets/d/1gdw6m-eWT3OZ2dzEztGnws8m76nI2yKwSddvowNlQCs/edit#gid=1406465942)
+8.  Invite the service account to the spreadsheet as an editor, as you would invite any user, but using the `client_email` from the downloaded credentials file from step 3.
+9.  Copy the ID of the spreadsheet from its URL (`https://docs.google.com/spreadsheets/d/<id>/edit`) and add it to the downloaded credentials file from step 3 under the JSON key `spreadsheet_id`.
+10. Base64-encode the downloaded credentials file (`base64 <path to file>`) and set it as the value of the `GOOGLE_SHEETS_CONFIG` GitHub repository secrent in this repository.
+11. Copy the downloaded credentials file to [packages/frisky-girl-farm-api/config.prod.json] to enable manual deployments.
+
+Next, set up the admin Google workspace addon:
+
+1. Create an [OAuth client](https://support.google.com/cloud/answer/6158849?hl=en). This will require setting up the OAuth consent screen -- name the app `Frisky Girl Farm Admin` and use [assets/logo-120.png] as the app logo. The other steps (scopes, test users, etc.) can be skipped for now. Then actually create the OAuth client as a Desktop Client, set the name to `CI clasp deployment`, and download the credentials file.
+2. Base64-encode the credentials file (`base64 <path to file>`) and set it as the value of the `CLASP_OAUTH_CREDENTIALS` GitHub repository secret in this repository.
+3. Create a [standalone Google app scripts project](https://script.google.com/create).
+4. In the project settings, change the Google Cloud Platform Project to the one you created above.
+5. Get the [script id](https://github.com/google/clasp#scriptid-required) from the Google app scripts project and put it in [packages/frisky-girl-admin/.clasp.json] under the `scriptId` key.

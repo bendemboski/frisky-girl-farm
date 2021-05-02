@@ -10,9 +10,9 @@ provider:
   # point
   lambdaHashingVersion: 20201221
   environment:
-    GOOGLE_CLIENT_EMAIL: ${file(config.${self:provider.stage}.json):email}
-    GOOGLE_CLIENT_PRIVATE_KEY: ${file(config.${self:provider.stage}.json):privateKey}
-    GOOGLE_SPREADSHEET_ID: ${file(config.${self:provider.stage}.json):spreadsheetId}
+    GOOGLE_CLIENT_EMAIL: ${file(config.${self:provider.stage}.json):client_email}
+    GOOGLE_CLIENT_PRIVATE_KEY: ${file(config.${self:provider.stage}.json):private_key}
+    GOOGLE_SPREADSHEET_ID: ${file(config.${self:provider.stage}.json):spreadsheet_id}
     REGION:
       Ref: AWS::Region
   iam:
