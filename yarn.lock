@@ -947,6 +947,11 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
+"@connected-home/serverless-plugin-stringify-variables@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@connected-home/serverless-plugin-stringify-variables/-/serverless-plugin-stringify-variables-1.0.1.tgz#b38dd0d707ac48967f680d7113fe051f47038564"
+  integrity sha512-iXM0LlJp7eF5zx6l13NuL/NG/XTaI/qtv8n2sQLYCX6q8qBHSzuhTp53s6bkXuNGPoF5858zn7B2nYw/2DJ25g==
+
 "@ember-data/adapter@3.25.0":
   version "3.25.0"
   resolved "https://registry.yarnpkg.com/@ember-data/adapter/-/adapter-3.25.0.tgz#1138098a2d6633be0bc96181eb796465d7290860"

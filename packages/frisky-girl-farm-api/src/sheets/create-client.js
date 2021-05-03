@@ -3,11 +3,14 @@ const { google } = require('googleapis');
 const scopes = ['https://www.googleapis.com/auth/spreadsheets'];
 
 // Create an authenticated Google sheets API client
-async function createClient({ email, key } = {}) {
-  let jwtClient = new google.auth.JWT(email, null, key, scopes);
-  await jwtClient.authorize();
+async function createClient(configPath) {
+  let auth = new google.auth.GoogleAuth({
+    keyFile: configPath,
+    scopes,
+  });
+
   return google.sheets({
-    auth: jwtClient,
+    auth,
     version: 'v4',
   });
 }
