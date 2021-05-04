@@ -62,8 +62,9 @@ First, set up the Google cloud project and spreadsheet that will be used for the
 
 Next, set up the admin Google workspace addon:
 
-1. Create an [OAuth client](https://support.google.com/cloud/answer/6158849?hl=en). This will require setting up the OAuth consent screen -- name the app `Frisky Girl Farm Admin` and use [assets/logo-120.png] as the app logo. The other steps (scopes, test users, etc.) can be skipped for now. Then actually create the OAuth client as a Desktop Client, set the name to `CI clasp deployment`, and download the credentials file.
-2. Base64-encode the credentials file (`base64 <path to file>`) and set it as the value of the `CLASP_OAUTH_CREDENTIALS` GitHub repository secret in this repository.
-3. Create a [standalone Google app scripts project](https://script.google.com/create).
-4. In the project settings, change the Google Cloud Platform Project to the one you created above.
-5. Get the [script id](https://github.com/google/clasp#scriptid-required) from the Google app scripts project and put it in [packages/frisky-girl-admin/.clasp.json] under the `scriptId` key.
+1. Create an [OAuth client](https://support.google.com/cloud/answer/6158849?hl=en). This will require setting up the OAuth consent screen -- name the app `Frisky Girl Farm Admin` and use [assets/logo-120.png] as the app logo. The other steps (scopes, test users, etc.) can be skipped for now.
+2. Create a [standalone Google app scripts project](https://script.google.com/create).
+3. In the project settings, change the Google Cloud Platform Project to the one you created above.
+4. Get the [script id](https://github.com/google/clasp#scriptid-required) from the Google app scripts project and put it in [packages/frisky-girl-admin/.clasp.json] under the `scriptId` key.
+5. From `/packages/frisky-girl-farm-admin`, run `yarn clasp login` and log authorize `clasp` with your Google account that has access to the scripts project.
+6. Base64-encode the generated credentials file, `base64 ~/.clasprc.json`) and set it as the value of the `CLASP_OAUTH_CREDENTIALS` GitHub repository secret in this repository, so CI can deploy the admin scripts on your behalf.
