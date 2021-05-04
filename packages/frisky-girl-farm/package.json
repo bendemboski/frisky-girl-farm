@@ -21,9 +21,9 @@
     "start": "ember serve",
     "test": "npm-run-all lint test:*",
     "test:ember": "ember test",
-    "deploy": "dotenv ember deploy",
-    "list-revisions": "dotenv ember deploy:list",
-    "activate": "dotenv ember deploy:activate"
+    "deploy": "dotenv -- ember deploy",
+    "list-revisions": "dotenv -- ember deploy:list",
+    "activate": "dotenv -- ember deploy:activate"
   },
   "devDependencies": {
     "@ember/optional-features": "^2.0.0",

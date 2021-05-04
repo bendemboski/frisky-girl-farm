@@ -1,6 +1,7 @@
 const sls = require('serverless-http');
 const createClient = require('./src/sheets/create-client');
 const Spreadsheet = require('./src/sheets/spreadsheet');
+const AWS = require('aws-sdk');
 const buildApp = require('./src/build-app');
 
 module.exports = {
@@ -13,7 +14,8 @@ module.exports = {
             email: process.env.GOOGLE_CLIENT_EMAIL,
             key: process.env.GOOGLE_CLIENT_PRIVATE_KEY,
           }),
-        })
+        }),
+      () => AWS
     )
   ),
 };

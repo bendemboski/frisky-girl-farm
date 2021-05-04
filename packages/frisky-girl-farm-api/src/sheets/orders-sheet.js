@@ -7,7 +7,7 @@ const {
   QuantityNotAvailableError,
 } = require('./errors');
 
-const sheetName = 'Orders';
+const ordersSheetName = 'Orders';
 const namesRowIndex = 0;
 const pricesRowIndex = 1;
 const imagesRowIndex = 2;
@@ -16,17 +16,25 @@ const totalsRowIndex = 4;
 const firstUserRowIndex = 5;
 
 //
-// The orders sheet contains the current week's products and orders. Row 1,
-// columns B and later contain the names of the products. Row 2, columns B
-// and later contain the order limits for each product. Row 3, columns B and
-// later contain formulas for the total quantity ordered for each product.
-// Rows 4 and later contain the user orders, where column A is the user's id,
-// and the other columns are the quantites of the products they have ordered
-// (blank means 0).
+// The orders sheet contains a week's products and orders. Row 1, columns B and
+// later contain the names of the products. Row 2, columns B and later contain
+// the order limits for each product. Row 3, columns B and later contain
+// formulas for the total quantity ordered for each product. Rows 4 and later
+// contain the user orders, where column A is the user's id, and the other
+// columns are the quantites of the products they have ordered (blank means 0).
+//
+// By default an OrdersSheet points to the sheet for the current week, but it
+// can be passed a `sheetName` of a past week orders sheet to access past weeks.
 //
 class OrdersSheet extends Sheet {
-  constructor({ client, spreadsheetId }) {
+  constructor({ client, spreadsheetId, sheetName = ordersSheetName }) {
     super({ client, spreadsheetId, sheetName });
+  }
+
+  // This is a past orders sheet if the name is anything other than the orders
+  // sheet name!
+  get isPastOrders() {
+    return this.sheetName !== ordersSheetName;
   }
 
   // Get the order data for a user. Used both to return to the client to render
@@ -50,7 +58,7 @@ class OrdersSheet extends Sheet {
     try {
       columns = await this.getAll({ majorDimension: 'COLUMNS' });
     } catch (e) {
-      if (e.code === 400) {
+      if (e.code === 400 && !this.isPastOrders) {
         throw new OrdersNotOpenError();
       } else {
         throw e;
@@ -127,6 +135,30 @@ class OrdersSheet extends Sheet {
 
     product.ordered = quantity;
     return products;
+  }
+
+  // Get an array of user ids (emails) that have ordered a non-zero quantity of
+  // any product
+  async getUsersWithOrders() {
+    let rows;
+    try {
+      rows = await this.getAll({ majorDimension: 'ROWS' });
+    } catch (e) {
+      if (e.code === 400 && !this.isPastOrders) {
+        throw new OrdersNotOpenError();
+      } else {
+        throw e;
+      }
+    }
+
+    let emails = [];
+    for (let [email, ...quantities] of rows.slice(firstUserRowIndex)) {
+      // Look for any non-zero value
+      if (email && quantities.find((cell) => cell)) {
+        emails.push(email);
+      }
+    }
+    return emails;
   }
 }
 

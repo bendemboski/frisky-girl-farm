@@ -73,4 +73,26 @@ describe('UsersSheet', function () {
       ).to.eventually.be.rejectedWith(UnknownUserError);
     });
   });
+
+  it('getUsers', async function () {
+    expect(
+      await sheet.getUsers([
+        'spacey@friskygirlfarm.com',
+        'ellen@friskygirlfarm.com',
+      ])
+    ).to.deep.equal([
+      {
+        email: 'ellen@friskygirlfarm.com',
+        name: 'Ellen Scheffer',
+        location: 'Lake City',
+        balance: 25.0,
+      },
+      {
+        email: 'spacey@friskygirlfarm.com',
+        name: 'Spacey McWhitespace',
+        location: 'Wallingford',
+        balance: 35.0,
+      },
+    ]);
+  });
 });

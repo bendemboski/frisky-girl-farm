@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Frisky Girl Farm API server",
   "main": "src/index.js",
-  "repository": "https://github.com/bendemboski/frisky-girl-farm-api",
+  "repository": "https://github.com/bendemboski/frisky-girl-farm",
   "author": "Ben Demboski <demboskb@gmail.com>",
   "license": "MIT",
   "files": [
@@ -13,12 +13,13 @@
   "scripts": {
     "test": "mocha",
     "lint": "eslint .",
-    "serve": "nodemon ./dev/serve.js",
-    "serve-inspect": "nodemon --inspect ./dev/serve.js",
-    "deploy": "dotenv sls deploy"
+    "serve": "dotenv -- nodemon ./dev/serve.js",
+    "serve-inspect": "dotenv -- nodemon --inspect ./dev/serve.js",
+    "deploy": "dotenv -- sls deploy"
   },
   "private": false,
   "dependencies": {
+    "aws-sdk": "^2.884.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",
@@ -29,6 +30,7 @@
     "body-parser": "*"
   },
   "devDependencies": {
+    "@haftahave/serverless-ses-template": "^3.0.2",
     "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
@@ -44,7 +46,8 @@
     "serverless": "^2.15.0",
     "serverless-plugin-monorepo": "^0.10.0",
     "sinon": "^10.0.0",
-    "sinon-chai": "^3.5.0"
+    "sinon-chai": "^3.5.0",
+    "yaml": "^1.10.2"
   },
   "volta": {
     "extends": "../../package.json"

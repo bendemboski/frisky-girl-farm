@@ -4,6 +4,7 @@ const cors = require('cors');
 const asyncHandler = require('express-async-handler');
 
 const { SheetsError, UnknownUserError } = require('./sheets/errors');
+const sendConfirmationEmails = require('./send-confirmation-emails');
 
 function serializeProducts(products) {
   return {
@@ -13,7 +14,7 @@ function serializeProducts(products) {
   };
 }
 
-function buildApp(spreadsheetFactory) {
+function buildApp(spreadsheetFactory, awsFactory) {
   let app = express();
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(
@@ -92,6 +93,71 @@ function buildApp(spreadsheetFactory) {
         ordered
       );
       return res.status(200).json(serializeProducts(products));
+    })
+  );
+
+  //
+  // send confirmation emails
+  //
+  app.post(
+    '/admin/confirmation-emails',
+    asyncHandler(async (req, res) => {
+      let {
+        body: { sheetId },
+      } = req;
+
+      if (!sheetId) {
+        return res.status(400).json({ error: 'No sheet specified' });
+      }
+
+      // The API endpoint takes a sheet id rather than a name to make it
+      // slightly more secure -- names are much easier to guess than ids. So
+      // here we fetch the info for the sheet so we can get its name for A1
+      // queries, and also verify that it is actually an orders sheet via the
+      // developer metadata.
+      let spreadsheet = await spreadsheetFactory();
+      let {
+        data: { sheets },
+      } = await spreadsheet.client.spreadsheets.getByDataFilter({
+        spreadsheetId: spreadsheet.id,
+        resource: {
+          dataFilters: [{ gridRange: { sheetId } }],
+        },
+        fields: 'sheets.properties,sheets.developerMetadata',
+      });
+
+      // Make sure it exists
+      if (sheets.length === 0) {
+        return res.status(400).json({ error: 'Sheet does not exist' });
+      }
+
+      // Check developer metadata
+      let metadata = sheets[0].developerMetadata || [];
+      if (!metadata.find(({ metadataKey }) => metadataKey === 'orderSheet')) {
+        return res.status(400).json({ error: 'Sheet is not an order sheet' });
+      }
+
+      // Get the user/location data
+      let sheet = spreadsheet.getOrdersSheet(sheets[0].properties.title);
+      let [users, locations] = await Promise.all([
+        (async () => {
+          let emails = await sheet.getUsersWithOrders();
+          return await spreadsheet.getUsers(emails);
+        })(),
+        await spreadsheet.getLocations(),
+      ]);
+
+      let failedSends = await sendConfirmationEmails(
+        awsFactory,
+        users,
+        locations
+      );
+
+      if (failedSends.length > 0) {
+        console.error('Failed sends', failedSends.join(' '));
+      }
+
+      res.status(200).json({ failedSends });
     })
   );
 

@@ -366,4 +366,41 @@ describe('OrdersSheet', function () {
       ).to.eventually.be.rejectedWith(OrdersNotOpenError);
     });
   });
+
+  it('getUsersWithOrders', async function () {
+    client.setOrders(
+      [1, 0, 1],
+      ['hasorder@friskygirlfarm.com', 0, 0, 1],
+      ['hasnoorder@friskygirlfarm.com', 0, 0, 0],
+      ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
+    );
+
+    let ret = await sheet.getUsersWithOrders();
+    expect(ret).to.deep.equal([
+      'hasorder@friskygirlfarm.com',
+      'alsohasorder@friskygirlfarm.com',
+    ]);
+  });
+
+  it('past orders sheet', async function () {
+    sheet = new OrdersSheet({
+      client,
+      spreadsheetId: 'ssid',
+      sheetName: 'Orders 6-25',
+    });
+
+    client.setOrders(
+      'Orders 6-25',
+      [1, 0, 1],
+      ['hasorder@friskygirlfarm.com', 0, 0, 1],
+      ['hasnoorder@friskygirlfarm.com', 0, 0, 0],
+      ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
+    );
+
+    let ret = await sheet.getUsersWithOrders();
+    expect(ret).to.deep.equal([
+      'hasorder@friskygirlfarm.com',
+      'alsohasorder@friskygirlfarm.com',
+    ]);
+  });
 });
