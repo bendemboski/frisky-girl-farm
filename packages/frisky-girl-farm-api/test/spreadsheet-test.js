@@ -140,21 +140,402 @@ describe('Spreadsheet', function () {
     });
   });
 
-  it('getOrdersSheet', async function () {
-    let sheet = spreadsheet.getOrdersSheet('Orders 6-25');
+  describe('getUserOrders', function () {
+    it('works', async function () {
+      client.setSheetsAndValuesFilterQuery({
+        sheet1: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 2, 18).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 3-18',
+          },
+          values: ['ashley@friskygirlfarm.com', 'ellen@friskygirlfarm.com'],
+        },
+        sheet2: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 3, 20).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 4-20',
+          },
+          values: ['herbie@firskygirlfarm.com', 'ellen@friskygirlfarm.com'],
+        },
+        sheet3: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 1, 14).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 2-14',
+          },
+          values: ['herbie@firskygirlfarm.com', 'ashley@friskygirlfarm.com'],
+        },
+      });
 
-    client.setOrders(
-      'Orders 6-25',
-      [1, 0, 1],
-      ['hasorder@friskygirlfarm.com', 0, 0, 1],
-      ['hasnoorder@friskygirlfarm.com', 0, 0, 0],
-      ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
-    );
+      await expect(
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+      ).to.eventually.deep.equal([
+        {
+          id: 'sheet1',
+          date: new Date(2021, 2, 18),
+        },
+        {
+          id: 'sheet3',
+          date: new Date(2021, 1, 14),
+        },
+      ]);
 
-    let ret = await sheet.getUsersWithOrders();
-    expect(ret).to.deep.equal([
-      'hasorder@friskygirlfarm.com',
-      'alsohasorder@friskygirlfarm.com',
-    ]);
+      expect(client.spreadsheets.getByDataFilter).to.have.been.calledOnce;
+      expect(
+        client.spreadsheets.getByDataFilter.firstCall.args[0]
+      ).to.deep.equal({
+        spreadsheetId: 'ssid',
+        resource: {
+          dataFilters: [
+            {
+              developerMetadataLookup: {
+                metadataLocation: {
+                  locationType: 'SHEET',
+                },
+                metadataKey: 'orderSheet',
+              },
+            },
+          ],
+        },
+        fields: [
+          'sheets.properties.sheetId',
+          'sheets.properties.title',
+          'sheets.developerMetadata.metadataKey',
+          'sheets.developerMetadata.metadataValue',
+        ].join(','),
+      });
+
+      expect(client.spreadsheets.values.batchGetByDataFilter).to.have.been
+        .calledOnce;
+      expect(
+        client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0]
+      ).to.deep.equal({
+        spreadsheetId: 'ssid',
+        resource: {
+          dataFilters: [
+            {
+              gridRange: {
+                sheetId: 'sheet1',
+                startColumnIndex: 0,
+                endColumnIndex: 1,
+                startRowIndex: 5,
+              },
+            },
+            {
+              gridRange: {
+                sheetId: 'sheet2',
+                startColumnIndex: 0,
+                endColumnIndex: 1,
+                startRowIndex: 5,
+              },
+            },
+            {
+              gridRange: {
+                sheetId: 'sheet3',
+                startColumnIndex: 0,
+                endColumnIndex: 1,
+                startRowIndex: 5,
+              },
+            },
+          ],
+          majorDimension: 'COLUMNS',
+        },
+      });
+    });
+
+    it('works with other developer metadata present', async function () {
+      client.setSheetsAndValuesFilterQuery({
+        sheet1: {
+          developerMetadata: [
+            {
+              metadataKey: 'somethingElse',
+              metadataValue: 'whee',
+            },
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 2, 18).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 3-18',
+          },
+          values: ['ashley@friskygirlfarm.com', 'ellen@friskygirlfarm.com'],
+        },
+      });
+
+      await expect(
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+      ).to.eventually.deep.equal([
+        {
+          id: 'sheet1',
+          date: new Date(2021, 2, 18),
+        },
+      ]);
+
+      // Verify that the get values queried sheet1
+      expect(
+        client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0].resource.dataFilters.map(
+          (f) => f.gridRange.sheetId
+        )
+      ).to.deep.equal(['sheet1']);
+    });
+
+    it('ignores the open orders sheet and non-order sheets', async function () {
+      client.setSheetsFilterQuery({
+        sheet1: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 2, 18).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 3-18',
+          },
+          values: ['ashley@friskygirlfarm.com', 'ellen@friskygirlfarm.com'],
+        },
+        sheet2: {
+          developerMetadata: [
+            {
+              metadataKey: 'somethingElse',
+              metadataValue: new Date(2021, 2, 18).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Something else',
+          },
+          values: ['herbie@firskygirlfarm.com', 'ashley@friskygirlfarm.com'],
+        },
+        sheet3: {
+          values: ['herbie@firskygirlfarm.com', 'ashley@friskygirlfarm.com'],
+        },
+        sheet4: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 1, 14).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders',
+          },
+          values: ['ashley@friskygirlfarm.com', 'ellen@friskygirlfarm.com'],
+        },
+      });
+
+      client.setValuesFilterQuery({
+        sheet1: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 2, 18).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 3-18',
+          },
+          values: ['ashley@friskygirlfarm.com', 'ellen@friskygirlfarm.com'],
+        },
+      });
+
+      await expect(
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+      ).to.eventually.deep.equal([
+        {
+          id: 'sheet1',
+          date: new Date(2021, 2, 18),
+        },
+      ]);
+
+      // Verify that the get values queried sheet1, and ignored sheet2 and
+      // sheet3
+      expect(
+        client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0].resource.dataFilters.map(
+          (f) => f.gridRange.sheetId
+        )
+      ).to.deep.equal(['sheet1']);
+    });
+
+    it('works with no order sheets', async function () {
+      client.setSheetsAndValuesFilterQuery({});
+
+      await expect(
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+      ).to.eventually.deep.equal([]);
+
+      // Verify that no values query was issued
+      expect(client.spreadsheets.values.batchGetByDataFilter).to.not.have.been
+        .called;
+    });
+
+    it('works with no values', async function () {
+      client.setSheetsFilterQuery({
+        sheet1: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 2, 18).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 3-18',
+          },
+        },
+      });
+
+      client.spreadsheets.values.batchGetByDataFilter =
+        client.spreadsheets.values.batchGetByDataFilter || sinon.stub();
+
+      client.spreadsheets.values.batchGetByDataFilter.resolves({
+        data: {
+          valueRanges: [
+            {
+              valueRange: {},
+              dataFilters: [{ gridRange: { sheetId: 'sheet1' } }],
+            },
+          ],
+        },
+      });
+
+      await expect(
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+      ).to.eventually.deep.equal([]);
+    });
+
+    it('works with no sheets that include the current user', async function () {
+      client.setSheetsAndValuesFilterQuery({
+        sheet1: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 2, 18).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 3-18',
+          },
+          values: ['herbie@friskygirlfarm.com', 'ellen@friskygirlfarm.com'],
+        },
+      });
+
+      await expect(
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+      ).to.eventually.deep.equal([]);
+    });
+  });
+
+  describe('getOrdersSheet', function () {
+    let getStub;
+
+    beforeEach(function () {
+      getStub = sinon.stub();
+      client.spreadsheets.getByDataFilter = getStub;
+    });
+
+    it('works', async function () {
+      getStub.resolves({
+        data: {
+          sheets: [
+            {
+              properties: { title: 'Orders 6-25' },
+              developerMetadata: [
+                {
+                  metadataKey: 'orderSheet',
+                  metadataValue: new Date(2021, 5, 25).toISOString(),
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      let sheet = await spreadsheet.getOrdersSheet(12345);
+
+      // Make sure the getByDataFilter API was called correctly
+      expect(getStub).to.have.been.calledOnce;
+      expect(getStub.firstCall.args[0].spreadsheetId).to.equal('ssid');
+      expect(getStub.firstCall.args[0].resource.dataFilters).to.deep.equal([
+        { gridRange: { sheetId: 12345 } },
+      ]);
+      expect(getStub.firstCall.args[0].fields.split(',')).to.include(
+        'sheets.properties'
+      );
+      expect(getStub.firstCall.args[0].fields.split(',')).to.include(
+        'sheets.developerMetadata'
+      );
+
+      // Make sure the returned sheet works
+      client.setOrders(
+        'Orders 6-25',
+        [1, 0, 1],
+        ['hasorder@friskygirlfarm.com', 0, 0, 1],
+        ['hasnoorder@friskygirlfarm.com', 0, 0, 0],
+        ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
+      );
+
+      let ret = await sheet.getUsersWithOrders();
+      expect(ret).to.deep.equal([
+        'hasorder@friskygirlfarm.com',
+        'alsohasorder@friskygirlfarm.com',
+      ]);
+    });
+
+    it('handles the sheet not being found', async function () {
+      getStub.resolves({ data: { sheets: [] } });
+      let sheet = await spreadsheet.getOrdersSheet(12345);
+      expect(sheet).to.be.null;
+    });
+
+    it('handles other metadata being present', async function () {
+      getStub.resolves({
+        data: {
+          sheets: [
+            {
+              properties: { title: 'Orders 6-25' },
+              developerMetadata: [
+                {
+                  metadataKey: 'somethingElse',
+                  metadataValue: 'stuff',
+                },
+                {
+                  metadataKey: 'orderSheet',
+                  metadataValue: new Date(2021, 5, 25).toISOString(),
+                },
+              ],
+            },
+          ],
+        },
+      });
+      let sheet = await spreadsheet.getOrdersSheet(12345);
+
+      // Make sure the returned sheet works
+      client.setOrders(
+        'Orders 6-25',
+        [1, 0, 1],
+        ['hasorder@friskygirlfarm.com', 0, 0, 1],
+        ['hasnoorder@friskygirlfarm.com', 0, 0, 0],
+        ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
+      );
+
+      let ret = await sheet.getUsersWithOrders();
+      expect(ret).to.deep.equal([
+        'hasorder@friskygirlfarm.com',
+        'alsohasorder@friskygirlfarm.com',
+      ]);
+    });
   });
 });

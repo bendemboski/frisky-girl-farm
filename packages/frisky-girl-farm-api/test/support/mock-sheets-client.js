@@ -150,6 +150,45 @@ class MockSheetsClient {
     this._stubGetOrders(sheetName).resetBehavior();
   }
 
+  setSheetsFilterQuery(sheets) {
+    this.spreadsheets.getByDataFilter =
+      this.spreadsheets.getByDataFilter || sinon.stub();
+
+    this.spreadsheets.getByDataFilter.resolves({
+      data: {
+        sheets: Object.entries(sheets).map(
+          ([sheetId, { developerMetadata, properties }]) => {
+            return {
+              developerMetadata,
+              properties: { ...properties, sheetId },
+            };
+          }
+        ),
+      },
+    });
+  }
+
+  setValuesFilterQuery(sheets) {
+    this.spreadsheets.values.batchGetByDataFilter =
+      this.spreadsheets.values.batchGetByDataFilter || sinon.stub();
+
+    this.spreadsheets.values.batchGetByDataFilter.resolves({
+      data: {
+        valueRanges: Object.entries(sheets).map(([sheetId, { values }]) => {
+          return {
+            valueRange: { values: [values] },
+            dataFilters: [{ gridRange: { sheetId } }],
+          };
+        }),
+      },
+    });
+  }
+
+  setSheetsAndValuesFilterQuery(sheets) {
+    this.setSheetsFilterQuery(sheets);
+    this.setValuesFilterQuery(sheets);
+  }
+
   setPastOrders(sheetName, totals, ...users) {
     let ordered = [0, 0, 0];
     users.forEach((orders) => {
@@ -158,20 +197,34 @@ class MockSheetsClient {
       ordered[2] += orders[3] || 0;
     });
 
-    this._stubGetOrders({ sheetName, majorDimension: 'ROWS' }).resolves({
+    this._stubGetOrders({ sheetName }).resolves({
       data: {
         values: [
-          ['', 'Lettuce', 'Kale', 'Spicy Greens'],
-          ['price', 0.15, 0.85, 15.0],
+          ['', 'price', 'image', 'total', 'ordered', ...users.map((u) => u[0])],
           [
-            'image',
+            'Lettuce',
+            0.15,
             'http://lettuce.com/image.jpg',
-            'http://kale.com/image.jpg',
-            'http://spicy-greens.com/image.jpg',
+            totals[0],
+            ordered[0],
+            ...users.map((u) => u[1]),
           ],
-          ['total', ...totals],
-          ['ordered', ...ordered],
-          ...users,
+          [
+            'Kale',
+            0.85,
+            'http://kale.com/image.jpg',
+            totals[1],
+            ordered[1],
+            ...users.map((u) => u[2]),
+          ],
+          [
+            'Spicy Greens',
+            15.0,
+            'http://spicy-greens.com/image.jpg',
+            totals[2],
+            ordered[2],
+            ...users.map((u) => u[3]),
+          ],
         ],
       },
     });

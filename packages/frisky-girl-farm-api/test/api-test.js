@@ -348,6 +348,209 @@ describe('API', function () {
     });
   });
 
+  describe('GET /orders', function () {
+    it('works', async function () {
+      client.setSheetsAndValuesFilterQuery({
+        sheet1: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 2, 18).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 3-18',
+          },
+          values: ['ashley@friskygirlfarm.com', 'ellen@friskygirlfarm.com'],
+        },
+        sheet2: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 3, 20).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 4-20',
+          },
+          values: ['herbie@firskygirlfarm.com', 'ellen@friskygirlfarm.com'],
+        },
+        sheet3: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 1, 14).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 2-14',
+          },
+          values: ['herbie@firskygirlfarm.com', 'ashley@friskygirlfarm.com'],
+        },
+      });
+
+      let res = await api.get('/orders?userId=ashley@friskygirlfarm.com');
+      expect(res).to.have.status(200);
+      expect(res.body).to.deep.equal({
+        orders: [
+          {
+            id: 'sheet1',
+            date: new Date(2021, 2, 18).toISOString(),
+          },
+          {
+            id: 'sheet3',
+            date: new Date(2021, 1, 14).toISOString(),
+          },
+        ],
+      });
+    });
+
+    it('sorts by date', async function () {
+      client.setSheetsAndValuesFilterQuery({
+        sheet1: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 2, 18).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 3-18',
+          },
+          values: ['ashley@friskygirlfarm.com'],
+        },
+        sheet2: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 3, 20).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 4-20',
+          },
+          values: ['ashley@friskygirlfarm.com'],
+        },
+        sheet3: {
+          developerMetadata: [
+            {
+              metadataKey: 'orderSheet',
+              metadataValue: new Date(2021, 1, 14).toISOString(),
+            },
+          ],
+          properties: {
+            title: 'Orders 2-14',
+          },
+          values: ['ashley@friskygirlfarm.com'],
+        },
+      });
+
+      let res = await api.get('/orders?userId=ashley@friskygirlfarm.com');
+      expect(res).to.have.status(200);
+      expect(res.body).to.deep.equal({
+        orders: [
+          {
+            id: 'sheet2',
+            date: new Date(2021, 3, 20).toISOString(),
+          },
+          {
+            id: 'sheet1',
+            date: new Date(2021, 2, 18).toISOString(),
+          },
+          {
+            id: 'sheet3',
+            date: new Date(2021, 1, 14).toISOString(),
+          },
+        ],
+      });
+    });
+
+    it('works if the user has not placed any orders', async function () {
+      client.setSheetsAndValuesFilterQuery({});
+
+      let res = await api.get('/orders?userId=ashley@friskygirlfarm.com');
+      expect(res).to.have.status(200);
+      expect(res.body).to.deep.equal({ orders: [] });
+    });
+  });
+
+  describe('GET /orders/:id', function () {
+    let getStub;
+
+    beforeEach(function () {
+      getStub = sinon.stub();
+      client.spreadsheets.getByDataFilter = getStub;
+    });
+
+    it('works', async function () {
+      getStub.resolves({
+        data: {
+          sheets: [
+            {
+              properties: { title: 'Orders 6-25' },
+              developerMetadata: [
+                {
+                  metadataKey: 'orderSheet',
+                  metadataValue: new Date(2021, 5, 25).toISOString(),
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      client.setPastOrders(
+        'Orders 6-25',
+        [7, 3, 5],
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
+        ['ashley@friskygirlfarm.com', 4, 0, 1]
+      );
+
+      let res = await api.get('/orders/12345?userId=ashley@friskygirlfarm.com');
+
+      expect(getStub).to.have.been.calledOnce;
+      expect(getStub.firstCall.args[0].resource.dataFilters).to.deep.equal([
+        { gridRange: { sheetId: '12345' } },
+      ]);
+
+      expect(res).to.have.status(200);
+      expect(res.body).to.deep.equal({
+        products: [
+          {
+            name: 'Lettuce',
+            imageUrl: 'http://lettuce.com/image.jpg',
+            price: 0.15,
+            ordered: 4,
+          },
+          {
+            name: 'Kale',
+            imageUrl: 'http://kale.com/image.jpg',
+            price: 0.85,
+            ordered: 0,
+          },
+          {
+            name: 'Spicy Greens',
+            imageUrl: 'http://spicy-greens.com/image.jpg',
+            price: 15.0,
+            ordered: 1,
+          },
+        ],
+      });
+    });
+
+    it('works if the sheet is not found', async function () {
+      getStub.resolves({
+        data: {
+          sheets: [],
+        },
+      });
+
+      let res = await api.get('/orders/12345?userId=ashley@friskygirlfarm.com');
+
+      expect(res).to.have.status(404);
+    });
+  });
+
   describe('POST /admin/confirmation-emails', function () {
     let getByDataFilterStub;
 

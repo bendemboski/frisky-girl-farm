@@ -27,6 +27,9 @@ const firstUserRowIndex = 5;
 // can be passed a `sheetName` of a past week orders sheet to access past weeks.
 //
 class OrdersSheet extends Sheet {
+  static openOrdersSheetName = ordersSheetName;
+  static firstUserRowIndex = firstUserRowIndex;
+
   constructor({ client, spreadsheetId, sheetName = ordersSheetName }) {
     super({ client, spreadsheetId, sheetName });
   }
