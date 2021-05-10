@@ -30,6 +30,11 @@ function generateOneHarvestList(
   day: string,
   locations: string[]
 ) {
+  let { products, users } = getUserOrders(orderSheet, locations);
+  if (products.length === 0) {
+    return;
+  }
+
   let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   let ui = SpreadsheetApp.getUi();
 
@@ -59,8 +64,6 @@ function generateOneHarvestList(
     newSheet = spreadsheet.insertSheet(text);
   }
 
-  let { products, users } = getUserOrders(orderSheet, locations);
-
   // Harvest list
   let harvestListRange = newSheet.getRange(1, 1, products.length, 2);
   harvestListRange.setValues(products);
@@ -70,7 +73,7 @@ function generateOneHarvestList(
   let packingSlips = users
     .map(({ name, location, quantities }) => {
       let lines = [`${name} (${location})`];
-      Object.entries(quantities).forEach((productName, quantity) => {
+      Object.entries(quantities).forEach(([productName, quantity]) => {
         lines.push(`${quantity} ${productName}`);
       });
       return lines.join('\n');

@@ -72,8 +72,7 @@ function completeSendConfirmationEmails({
   },
 }: any) {
   let response = UrlFetchApp.fetch(
-    // 'https://uh7v0bgk40.execute-api.us-west-2.amazonaws.com/prod/admin/confirmation-emails',
-    'https://yukpp0dfe2.execute-api.us-west-2.amazonaws.com/staging/admin/confirmation-emails',
+    'https://uh7v0bgk40.execute-api.us-west-2.amazonaws.com/prod/admin/confirmation-emails',
     {
       method: 'post',
       contentType: 'application/json',
