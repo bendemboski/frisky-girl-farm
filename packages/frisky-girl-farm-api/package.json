@@ -30,6 +30,7 @@
     "body-parser": "*"
   },
   "devDependencies": {
+    "@connected-home/serverless-plugin-stringify-variables": "^1.0.1",
     "@haftahave/serverless-ses-template": "^3.0.2",
     "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
@@ -48,6 +49,9 @@
     "sinon": "^10.0.0",
     "sinon-chai": "^3.5.0",
     "yaml": "^1.10.2"
+  },
+  "engines": {
+    "node": ">=14"
   },
   "volta": {
     "extends": "../../package.json"
