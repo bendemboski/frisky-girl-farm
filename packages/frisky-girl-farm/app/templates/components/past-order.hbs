@@ -1,0 +1,10 @@
+{{#if @pastOrder.isLoaded}}
+  {{#each @pastOrder.products as |product|}}
+    <div class="d-flex">
+      <span class="flex-grow-1">({{product.ordered}}) {{product.name}}</span>
+      <span class="pl-2">{{currency (mult product.ordered product.price)}}</span>
+    </div>
+  {{else}}
+    <div>You didn't order anything this week</div>
+  {{/each}}
+{{/if}}

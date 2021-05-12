@@ -16,7 +16,7 @@
       <navbar.nav as |nav|>
         <nav.item>
           <a href="#" role="button" class="nav-link" data-test-order-trigger>
-            Your Order
+            Shopping Cart
             <FaIcon @icon={{if this.orderPopoverShown "caret-up" "caret-down"}}/>
           </a>
           <BsPopover
@@ -46,6 +46,14 @@
               {{/if}}
             </div>
           </BsPopover>          
+        </nav.item>
+
+        <nav.item>
+          <LinkTo @route="auth.index" class="nav-link">Current order</LinkTo>
+        </nav.item>
+
+        <nav.item>
+          <LinkTo @route="auth.past-orders" class="nav-link">Past orders</LinkTo>
         </nav.item>
 
         <nav.item>

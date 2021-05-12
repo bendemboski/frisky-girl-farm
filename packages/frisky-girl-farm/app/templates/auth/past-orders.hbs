@@ -1,0 +1,31 @@
+<h4 class="my-3 text-center">Your past orders</h4>
+
+<div class="past-orders">
+  {{#each this.pastOrderStates as |state|}}
+    <div class="border">
+      <div
+        class="p-2 bg-light"
+        role="button"
+        {{on "click" (perform state.toggle)}}
+      >
+        Week of {{monday-date state.pastOrder.date}}
+        {{#if state.toggle.isRunning}}
+          <FaIcon @icon="spinner" @spin={{true}}/>
+        {{/if}}
+      </div>
+      <BsCollapse @collapsed={{not state.isOpen}}>
+        <div class="p-2 bg-light">
+          <PastOrder @pastOrder={{state.pastOrder}}/>
+        </div>
+      </BsCollapse>
+    </div>
+  {{else}}
+    <div class="h-100 d-flex justify-content-center align-items-center" data-test-order-closed>
+      <div class="card flex-fill center-card">
+        <div class="card-body">
+          You don't have any past orders.
+        </div>
+      </div>
+    </div>
+  {{/each}}
+</div>

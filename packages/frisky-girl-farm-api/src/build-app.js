@@ -97,6 +97,50 @@ function buildApp(spreadsheetFactory, awsFactory) {
   );
 
   //
+  // get order weeks
+  //
+  app.get(
+    '/orders',
+    asyncHandler(async (req, res) => {
+      let {
+        query: { userId },
+      } = req;
+
+      let spreadsheet = await spreadsheetFactory();
+      let orders = await spreadsheet.getUserOrders(userId);
+      return res
+        .status(200)
+        .json({ orders: orders.sort((a, b) => b.date - a.date) });
+    })
+  );
+
+  app.get(
+    '/orders/:id',
+    asyncHandler(async (req, res) => {
+      let {
+        query: { userId },
+        params: { id: sheetId },
+      } = req;
+
+      let spreadsheet = await spreadsheetFactory();
+
+      let sheet = await spreadsheet.getOrdersSheet(sheetId);
+      if (!sheet) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+
+      let { products } = await sheet.getForUser(userId);
+      return res.status(200).json({
+        products: Object.values(products).map(
+          ({ name, imageUrl, price, ordered }) => {
+            return { name, imageUrl, price, ordered };
+          }
+        ),
+      });
+    })
+  );
+
+  //
   // send confirmation emails
   //
   app.post(
@@ -116,29 +160,12 @@ function buildApp(spreadsheetFactory, awsFactory) {
       // queries, and also verify that it is actually an orders sheet via the
       // developer metadata.
       let spreadsheet = await spreadsheetFactory();
-      let {
-        data: { sheets },
-      } = await spreadsheet.client.spreadsheets.getByDataFilter({
-        spreadsheetId: spreadsheet.id,
-        resource: {
-          dataFilters: [{ gridRange: { sheetId } }],
-        },
-        fields: 'sheets.properties,sheets.developerMetadata',
-      });
-
-      // Make sure it exists
-      if (sheets.length === 0) {
-        return res.status(400).json({ error: 'Sheet does not exist' });
-      }
-
-      // Check developer metadata
-      let metadata = sheets[0].developerMetadata || [];
-      if (!metadata.find(({ metadataKey }) => metadataKey === 'orderSheet')) {
-        return res.status(400).json({ error: 'Sheet is not an order sheet' });
+      let sheet = await spreadsheet.getOrdersSheet(sheetId);
+      if (!sheet) {
+        return res.status(400).json({ error: 'Orders sheet not found' });
       }
 
       // Get the user/location data
-      let sheet = spreadsheet.getOrdersSheet(sheets[0].properties.title);
       let [users, locations] = await Promise.all([
         (async () => {
           let emails = await sheet.getUsersWithOrders();

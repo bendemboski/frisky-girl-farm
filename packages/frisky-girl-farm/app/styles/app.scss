@@ -24,4 +24,12 @@ html, .ember-application {
   width: 65px;
 }
 
+.past-orders {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
 @import "ember-bootstrap/bootstrap";
+
+@import "ember-modal-dialog/ember-modal-structure";
+@import "ember-modal-dialog/ember-modal-appearance";

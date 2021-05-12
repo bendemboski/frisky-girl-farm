@@ -7,7 +7,7 @@ import OrderService from '../../services/order';
 export default class AuthIndexRoute extends Route {
   @service declare order: OrderService;
 
-  async afterModel() {
-    await taskFor(this.order.loadProducts).perform();
+  async model() {
+    return await taskFor(this.order.loadPastOrders).perform();
   }
 }

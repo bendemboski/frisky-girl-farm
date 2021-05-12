@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { reads, filterBy } from 'macro-decorators';
 import { action } from '@ember/object';
+import window from 'ember-window-mock';
 
 import RouterService from '@ember/routing/router-service';
 import UserService from '../services/user';
@@ -22,6 +23,6 @@ export default class NavBar extends Component {
   logout(e: Event) {
     e.preventDefault();
     this.user.logout();
-    this.router.transitionTo('login');
+    window.location.href = this.router.urlFor('login');
   }
 }
