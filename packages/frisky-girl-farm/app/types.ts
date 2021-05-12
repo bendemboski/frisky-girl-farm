@@ -5,11 +5,14 @@ export interface User {
   balance: number;
 }
 
-export interface ProductOrder {
-  id: string;
+export interface PastOrderProduct {
   name: string;
   imageUrl: string;
   price: number;
-  available: number;
   ordered: number;
+}
+
+export interface ProductOrder extends PastOrderProduct {
+  id: string;
+  available: number;
 }

@@ -1,13 +1,16 @@
 import { module, test } from 'qunit';
-import { visit, click, currentURL } from '@ember/test-helpers';
+import { visit, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import setupPretender from '../helpers/setup-pretender';
+import { setupWindowMock } from 'ember-window-mock/test-support';
 import loginUser from '../helpers/login-user';
 import setProducts from '../helpers/set-products';
+import window from 'ember-window-mock';
 
 module('Acceptance | navbar', function (hooks) {
   setupApplicationTest(hooks);
   setupPretender(hooks);
+  setupWindowMock(hooks);
 
   test('it renders when not logged in', async function (assert) {
     try {
@@ -190,7 +193,7 @@ module('Acceptance | navbar', function (hooks) {
     await visit('/');
 
     await click('[data-test-logout]');
-    assert.equal(currentURL(), '/login');
+    assert.equal(window.location.pathname, '/login');
     assert.notOk(
       this.owner.lookup('service:local-settings').get('settings.userEmail')
     );

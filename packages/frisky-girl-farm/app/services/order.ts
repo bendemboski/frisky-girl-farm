@@ -4,13 +4,32 @@ import { task, enqueueTask } from 'ember-concurrency';
 import { ApiError } from './api';
 
 import ApiService from './api';
-import { ProductOrder } from '../types';
+import { PastOrderProduct, ProductOrder } from '../types';
+
+export class PastOrder {
+  @tracked products: PastOrderProduct[] | null = null;
+
+  constructor(public id: string, public date: Date, private api: ApiService) {}
+
+  get isLoaded() {
+    return this.products !== null;
+  }
+
+  async load() {
+    if (!this.products) {
+      let products = await this.api.getPastOrderProducts(this.id);
+      this.products = products.filter((product) => product.ordered > 0);
+    }
+    return this.products;
+  }
+}
 
 export default class OrderService extends Service {
   @service declare api: ApiService;
 
   @tracked isOrderingOpen = false;
   @tracked products: ProductOrder[] | null = null;
+  @tracked pastOrders: PastOrder[] | null = null;
 
   get spent() {
     let products = this.products || [];
@@ -35,6 +54,18 @@ export default class OrderService extends Service {
         throw e;
       }
     }
+    return this.products;
+  }
+
+  @task
+  async loadPastOrders() {
+    if (!this.pastOrders) {
+      let orders = await this.api.getPastOrders();
+      this.pastOrders = orders.map(
+        ({ id, date }) => new PastOrder(id, date, this.api)
+      );
+    }
+    return this.pastOrders;
   }
 
   // The server doesn't have protections against concurrent API calls. This can

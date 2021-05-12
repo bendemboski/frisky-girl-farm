@@ -3,7 +3,7 @@ import ENV from '../config/environment';
 import fetch from 'fetch';
 
 import UserService from './user';
-import { User, ProductOrder } from '../types';
+import { User, ProductOrder, PastOrderProduct } from '../types';
 
 const {
   api: { host, namespace },
@@ -11,6 +11,14 @@ const {
 
 interface ProductsResponse {
   products: ProductOrder[];
+}
+
+interface PastOrdersResponse {
+  orders: { id: string; date: string }[];
+}
+
+interface PastOrderProductsResponse {
+  products: PastOrderProduct[];
 }
 
 export default class ApiService extends Service {
@@ -38,6 +46,18 @@ export default class ApiService extends Service {
         body: JSON.stringify({ ordered: quantity }),
       }
     );
+    return data.products;
+  }
+
+  async getPastOrders() {
+    let relUrl = `/orders?${this.authQueryParam}`;
+    let data: PastOrdersResponse = await apiFetch(relUrl);
+    return data.orders.map(({ id, date }) => ({ id, date: new Date(date) }));
+  }
+
+  async getPastOrderProducts(pastOrderId: string) {
+    let relUrl = `/orders/${pastOrderId}?${this.authQueryParam}`;
+    let data: PastOrderProductsResponse = await apiFetch(relUrl);
     return data.products;
   }
 
