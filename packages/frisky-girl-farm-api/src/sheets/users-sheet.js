@@ -38,6 +38,10 @@ class UsersSheet extends Sheet {
     let [, ...userRows] = await this.getAll({ majorDimension: 'ROWS' });
     let users = [];
     for (let row of userRows) {
+      if (!row[emailColumnIndex]) {
+        continue;
+      }
+
       if (userIds.includes(row[emailColumnIndex].trim())) {
         users.push({
           // Tolerate accidental whitespace, and trim it out when generating the email
