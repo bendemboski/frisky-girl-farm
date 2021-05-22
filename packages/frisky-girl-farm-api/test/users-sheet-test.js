@@ -20,6 +20,8 @@ describe('UsersSheet', function () {
         100.0,
         65.0,
       ],
+      // Make sure some extra garbage data doesn't mess things up
+      [null, null, null, 0, null, null],
     ]);
 
     sheet = new UsersSheet({
