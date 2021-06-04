@@ -5,7 +5,7 @@ const orderConfirmationLines = [
   '',
   '{{pickupInstructions}}',
   '',
-  "Please remember to wear a mask and either use gloves or the hand sanitizer that we've provided when you pick up your order. And please remember to return your bag from last week when you pick up your order.",
+  'Please remember to wear a mask and return your bag from last week when you pick up your order.',
   '',
 ];
 
