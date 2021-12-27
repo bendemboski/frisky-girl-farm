@@ -67,6 +67,11 @@ function generateOneHarvestList(
   // Harvest list
   let harvestListRange = newSheet.getRange(1, 1, products.length, 2);
   harvestListRange.setValues(products);
+  harvestListRange.applyRowBanding(
+    SpreadsheetApp.BandingTheme.GREY,
+    false,
+    false
+  );
   newSheet.autoResizeColumns(1, 1);
 
   // Packing slips
