@@ -1,8 +1,9 @@
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   parserOptions: {
     ecmaVersion: 2019,
+    requireConfigFile: false,
   },
   plugins: ['@typescript-eslint', 'prettier', 'googleappsscript'],
   extends: ['eslint:recommended', 'plugin:prettier/recommended'],

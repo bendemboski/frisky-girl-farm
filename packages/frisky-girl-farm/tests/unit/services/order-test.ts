@@ -116,7 +116,7 @@ module('Unit | Service | order', function (hooks) {
       await taskFor(service.loadProducts).perform();
       assert.ok(service.isOrderingOpen);
       assert.deepEqual(service.products, products);
-      assert.equal(
+      assert.strictEqual(
         getPretenderState().getProductsStub.firstCall.args[0].queryParams
           .userId,
         'ashley@friskygirlfarm.com'
@@ -176,7 +176,7 @@ module('Unit | Service | order', function (hooks) {
       await taskFor(service.setProductOrder).perform(service.products![0], 3);
       products[0].ordered += 3;
       assert.deepEqual(service.products, products);
-      assert.equal(
+      assert.strictEqual(
         getPretenderState().putProductStub.firstCall.args[0].queryParams.userId,
         'ashley@friskygirlfarm.com'
       );
@@ -186,7 +186,7 @@ module('Unit | Service | order', function (hooks) {
       await taskFor(service.setProductOrder).perform(service.products![3], 2);
       products[3].ordered += 2;
       assert.deepEqual(service.products, products);
-      assert.equal(
+      assert.strictEqual(
         getPretenderState().putProductStub.firstCall.args[0].queryParams.userId,
         'ashley@friskygirlfarm.com'
       );
@@ -204,7 +204,7 @@ module('Unit | Service | order', function (hooks) {
       }
 
       assert.ok(error);
-      assert.equal(error.code, 'quantityNotAvailable');
+      assert.strictEqual(error.code, 'quantityNotAvailable');
       assert.deepEqual(error.extra, { available: 25 });
     });
   });
@@ -247,15 +247,15 @@ module('Unit | Service | order', function (hooks) {
     setProducts(products);
 
     await taskFor(service.loadProducts).perform();
-    assert.equal(service.spent, 0);
+    assert.strictEqual(service.spent, 0);
 
     await taskFor(service.setProductOrder).perform(service.products![0], 3);
-    assert.equal(service.spent, 10.5);
+    assert.strictEqual(service.spent, 10.5);
 
     await taskFor(service.setProductOrder).perform(service.products![2], 5);
-    assert.equal(service.spent, 75.5);
+    assert.strictEqual(service.spent, 75.5);
 
     await taskFor(service.setProductOrder).perform(service.products![3], 2);
-    assert.equal(service.spent, 83.5);
+    assert.strictEqual(service.spent, 83.5);
   });
 });

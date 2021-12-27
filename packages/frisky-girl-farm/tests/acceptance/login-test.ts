@@ -10,12 +10,8 @@ module('Acceptance | login', function (hooks) {
   setupPretender(hooks);
 
   test('it is shown when not logged in', async function (assert) {
-    try {
-      await visit('/');
-    } catch (e) {
-      // https://github.com/emberjs/ember-test-helpers/issues/332
-    }
-    assert.equal(currentURL(), '/login');
+    await visit('/');
+    assert.strictEqual(currentURL(), '/login');
   });
 
   test('it is not shown when logged in', async function (assert) {
@@ -26,7 +22,7 @@ module('Acceptance | login', function (hooks) {
       balance: 85.0,
     });
     await visit('/');
-    assert.equal(currentURL(), '/');
+    assert.strictEqual(currentURL(), '/');
   });
 
   test('it can log in', async function (assert) {
@@ -36,33 +32,26 @@ module('Acceptance | login', function (hooks) {
       location: 'Wallingford',
       balance: 85.0,
     });
-    try {
-      await visit('/');
-    } catch (e) {
-      // https://github.com/emberjs/ember-test-helpers/issues/332
-    }
+
+    await visit('/');
 
     await fillIn('input[type="email"]', 'ashley@friskygirlfarm.com');
     await click('[type="submit"]');
 
-    assert.equal(currentURL(), '/');
-    assert.equal(
+    assert.strictEqual(currentURL(), '/');
+    assert.strictEqual(
       this.owner.lookup('service:local-settings').get('settings.userEmail'),
       'ashley@friskygirlfarm.com'
     );
   });
 
   test('it handles login failures', async function (assert) {
-    try {
-      await visit('/');
-    } catch (e) {
-      // https://github.com/emberjs/ember-test-helpers/issues/332
-    }
+    await visit('/');
 
     await fillIn('input[type="email"]', 'ashley@friskygirlfarm.com');
     await click('[type="submit"]');
 
-    assert.equal(currentURL(), '/login');
+    assert.strictEqual(currentURL(), '/login');
     assert
       .dom('.invalid-feedback')
       .includesText('We do not recognize that email address');

@@ -37,10 +37,10 @@ module('Unit | Service | user', function (hooks) {
       let result = await taskFor(service.checkLoggedIn).perform();
       assert.ok(result);
       assert.ok(service.isLoggedIn);
-      assert.equal(service.email, 'ashley@friskygirlfarm.com');
-      assert.equal(service.name, 'Ashley Wilson');
-      assert.equal(service.location, 'Wallingford');
-      assert.equal(service.balance, 58.0);
+      assert.strictEqual(service.email, 'ashley@friskygirlfarm.com');
+      assert.strictEqual(service.name, 'Ashley Wilson');
+      assert.strictEqual(service.location, 'Wallingford');
+      assert.strictEqual(service.balance, 58.0);
     });
 
     test('it works with an invalid stored email', async function (assert) {
@@ -66,10 +66,10 @@ module('Unit | Service | user', function (hooks) {
       );
       assert.ok(result);
       assert.ok(service.isLoggedIn);
-      assert.equal(service.email, 'ashley@friskygirlfarm.com');
-      assert.equal(service.name, 'Ashley Wilson');
-      assert.equal(service.location, 'Wallingford');
-      assert.equal(service.balance, 58.0);
+      assert.strictEqual(service.email, 'ashley@friskygirlfarm.com');
+      assert.strictEqual(service.name, 'Ashley Wilson');
+      assert.strictEqual(service.location, 'Wallingford');
+      assert.strictEqual(service.balance, 58.0);
     });
 
     test('it handles failures', async function (assert) {

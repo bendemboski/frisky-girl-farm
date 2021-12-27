@@ -13,11 +13,7 @@ module('Acceptance | navbar', function (hooks) {
   setupWindowMock(hooks);
 
   test('it renders when not logged in', async function (assert) {
-    try {
-      await visit('/');
-    } catch (e) {
-      // https://github.com/emberjs/ember-test-helpers/issues/332
-    }
+    await visit('/');
     assert.dom('[data-test-username]').doesNotExist();
     assert.dom('[data-test-balance]').doesNotExist();
     assert.dom('[data-test-order-trigger]').doesNotExist();
@@ -193,7 +189,7 @@ module('Acceptance | navbar', function (hooks) {
     await visit('/');
 
     await click('[data-test-logout]');
-    assert.equal(window.location.pathname, '/login');
+    assert.strictEqual(window.location.pathname, '/login');
     assert.notOk(
       this.owner.lookup('service:local-settings').get('settings.userEmail')
     );
