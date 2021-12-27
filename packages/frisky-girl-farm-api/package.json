@@ -30,9 +30,9 @@
     "body-parser": "*"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.16.5",
     "@connected-home/serverless-plugin-stringify-variables": "^1.0.1",
     "@haftahave/serverless-ses-template": "^3.0.2",
-    "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-http": "^4.3.0",
