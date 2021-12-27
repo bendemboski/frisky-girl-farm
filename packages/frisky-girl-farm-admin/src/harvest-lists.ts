@@ -67,6 +67,11 @@ function generateOneHarvestList(
   // Harvest list
   let harvestListRange = newSheet.getRange(1, 1, products.length, 2);
   harvestListRange.setValues(products);
+  harvestListRange.applyRowBanding(
+    SpreadsheetApp.BandingTheme.GREY,
+    false,
+    false
+  );
   newSheet.autoResizeColumns(1, 1);
 
   // Packing slips
@@ -81,4 +86,15 @@ function generateOneHarvestList(
     .join('\n\n');
 
   newSheet.getRange(products.length + 3, 1).setValue(packingSlips);
+
+  // Prune out unused columns and rows so they don't count towards the
+  // spreadsheet's max cell limit
+  let firstBlankColumn = newSheet.getLastColumn() + 1;
+  newSheet.deleteColumns(
+    firstBlankColumn,
+    newSheet.getMaxColumns() - firstBlankColumn + 1
+  );
+
+  let firstBlankRow = newSheet.getLastRow() + 1;
+  newSheet.deleteRows(firstBlankRow, newSheet.getMaxRows() - firstBlankRow + 1);
 }
