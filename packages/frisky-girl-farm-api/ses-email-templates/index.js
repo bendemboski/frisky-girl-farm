@@ -5,7 +5,7 @@ const orderConfirmationLines = [
   '',
   '{{pickupInstructions}}',
   '',
-  'Please remember to wear a mask and return your bag from last week when you pick up your order.',
+  'Please remember to return your CSA bag from last week and if you ordered plant starts or flowers, remember to grab them from beside the fridge.',
   '',
 ];
 
