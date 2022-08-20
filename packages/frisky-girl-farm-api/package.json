@@ -30,14 +30,14 @@
     "body-parser": "*"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.16.5",
+    "@babel/eslint-parser": "^7.18.9",
     "@connected-home/serverless-plugin-stringify-variables": "^1.0.1",
     "@haftahave/serverless-ses-template": "^3.0.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-http": "^4.3.0",
     "dotenv-cli": "^4.0.0",
-    "eslint": "^8.5.0",
+    "eslint": "^8.22.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
