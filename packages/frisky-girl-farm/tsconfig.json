@@ -41,4 +41,8 @@
     "tests/**/*",
     "types/**/*"
   ],
+
+  "glint": {
+    "environment": "ember-loose",
+  }
 }

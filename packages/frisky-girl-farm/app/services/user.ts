@@ -26,12 +26,12 @@ export default class UserService extends Service {
   // Check if we're logged in (and our login is still valid)
   //
   @task
-  *checkLoggedIn() {
+  private *_checkLoggedIn() {
     if (!this.email) {
       return false;
     }
 
-    let data: User | null = yield taskFor(this._fetchData).perform(this.email);
+    let data: User | null = yield this.fetchData.perform(this.email);
     if (!data) {
       this.logout();
       return false;
@@ -40,13 +40,14 @@ export default class UserService extends Service {
     this._setData(data);
     return true;
   }
+  readonly checkLoggedIn = taskFor(this._checkLoggedIn);
 
   //
   // Log in
   //
   @task
-  *login(email: string) {
-    let data: User | null = yield taskFor(this._fetchData).perform(email);
+  private *_login(email: string) {
+    let data: User | null = yield this.fetchData.perform(email);
     if (!data) {
       return false;
     }
@@ -55,6 +56,7 @@ export default class UserService extends Service {
     this.email = email;
     return true;
   }
+  readonly login = taskFor(this._login);
 
   //
   // Log out
@@ -77,6 +79,7 @@ export default class UserService extends Service {
       throw e;
     }
   }
+  readonly fetchData = taskFor(this._fetchData);
 
   private _setData({ name, location, balance }: User) {
     this.name = name;

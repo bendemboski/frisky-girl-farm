@@ -4,6 +4,7 @@ import { tracked } from '@glimmer/tracking';
 import { localCopy } from 'tracked-toolbox';
 import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
 
 import { ProductOrder } from '../types';
 
@@ -39,7 +40,7 @@ export default class ProductOrderComponent extends Component<ProductOrderArgumen
   }
 
   @task
-  *submit(ordered: number) {
+  private *_submit(ordered: number) {
     this.availabilityError = null;
 
     if (this.product.available !== -1 && ordered > this.product.available) {
@@ -56,5 +57,12 @@ export default class ProductOrderComponent extends Component<ProductOrderArgumen
         throw e;
       }
     }
+  }
+  readonly submit = taskFor(this._submit);
+}
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    ProductOrder: typeof ProductOrderComponent;
   }
 }

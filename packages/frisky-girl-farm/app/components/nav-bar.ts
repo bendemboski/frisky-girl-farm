@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import window from 'ember-window-mock';
 
@@ -11,6 +12,8 @@ export default class NavBar extends Component {
   @service('user') declare user: UserService;
   @service('order') declare order: OrderService;
   @service('router') declare router: RouterService;
+
+  @tracked orderPopoverShown = false;
 
   get isLoggedIn() {
     return this.user.isLoggedIn;
@@ -25,5 +28,11 @@ export default class NavBar extends Component {
     e.preventDefault();
     this.user.logout();
     window.location.href = this.router.urlFor('login');
+  }
+}
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    NavBar: typeof NavBar;
   }
 }

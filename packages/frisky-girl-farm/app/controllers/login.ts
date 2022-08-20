@@ -20,12 +20,10 @@ export default class LoginController extends Controller {
   readonly createFormState = helper(() => new FormState());
 
   @task
-  *login(formState: FormState) {
+  private *_login(formState: FormState) {
     formState.error = '';
 
-    let didLogIn: boolean = yield taskFor(this.user.login).perform(
-      formState.email!
-    );
+    let didLogIn: boolean = yield this.user.login.perform(formState.email!);
     if (didLogIn) {
       yield this.router.transitionTo('auth.index');
     } else {
@@ -33,4 +31,5 @@ export default class LoginController extends Controller {
         'We do not recognize that email address. Please ensure you are using the same email that you registered with.';
     }
   }
+  readonly login = taskFor(this._login);
 }

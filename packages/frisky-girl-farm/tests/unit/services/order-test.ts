@@ -5,7 +5,6 @@ import setupPretender, {
 } from '../../helpers/setup-pretender';
 import loginUser from '../../helpers/login-user';
 import setProducts from '../../helpers/set-products';
-import { taskFor } from 'ember-concurrency-ts';
 
 import OrderService from 'frisky-girl-farm/services/order';
 import { ProductOrder } from 'frisky-girl-farm/types';
@@ -69,7 +68,7 @@ module('Unit | Service | order', function (hooks) {
       ];
       setProducts(products);
 
-      await taskFor(service.loadProducts).perform();
+      await service.loadProducts.perform();
       assert.ok(service.isOrderingOpen);
       assert.deepEqual(service.products, products);
       assert.notOk(
@@ -114,7 +113,7 @@ module('Unit | Service | order', function (hooks) {
       ];
       setProducts(products);
 
-      await taskFor(service.loadProducts).perform();
+      await service.loadProducts.perform();
       assert.ok(service.isOrderingOpen);
       assert.deepEqual(service.products, products);
       assert.strictEqual(
@@ -125,7 +124,7 @@ module('Unit | Service | order', function (hooks) {
     });
 
     test('it works when ordering is not open', async function (assert) {
-      await taskFor(service.loadProducts).perform();
+      await service.loadProducts.perform();
       assert.notOk(service.isOrderingOpen);
     });
   });
@@ -170,11 +169,11 @@ module('Unit | Service | order', function (hooks) {
       ];
       setProducts(products);
 
-      await taskFor(service.loadProducts).perform();
+      await service.loadProducts.perform();
     });
 
     test('it works', async function (assert) {
-      await taskFor(service.setProductOrder).perform(service.products![0], 3);
+      await service.setProductOrder.perform(service.products![0], 3);
       products[0].ordered += 3;
       assert.deepEqual(service.products, products);
       assert.strictEqual(
@@ -184,7 +183,7 @@ module('Unit | Service | order', function (hooks) {
     });
 
     test('it works on products with unlimited quantities', async function (assert) {
-      await taskFor(service.setProductOrder).perform(service.products![3], 2);
+      await service.setProductOrder.perform(service.products![3], 2);
       products[3].ordered += 2;
       assert.deepEqual(service.products, products);
       assert.strictEqual(
@@ -196,10 +195,7 @@ module('Unit | Service | order', function (hooks) {
     test('it errors when the quantity is not available', async function (assert) {
       let error;
       try {
-        await taskFor(service.setProductOrder).perform(
-          service.products![2],
-          50
-        );
+        await service.setProductOrder.perform(service.products![2], 50);
       } catch (e) {
         error = e;
       }
@@ -247,16 +243,16 @@ module('Unit | Service | order', function (hooks) {
     ];
     setProducts(products);
 
-    await taskFor(service.loadProducts).perform();
+    await service.loadProducts.perform();
     assert.strictEqual(service.spent, 0);
 
-    await taskFor(service.setProductOrder).perform(service.products![0], 3);
+    await service.setProductOrder.perform(service.products![0], 3);
     assert.strictEqual(service.spent, 10.5);
 
-    await taskFor(service.setProductOrder).perform(service.products![2], 5);
+    await service.setProductOrder.perform(service.products![2], 5);
     assert.strictEqual(service.spent, 75.5);
 
-    await taskFor(service.setProductOrder).perform(service.products![3], 2);
+    await service.setProductOrder.perform(service.products![3], 2);
     assert.strictEqual(service.spent, 83.5);
   });
 });
