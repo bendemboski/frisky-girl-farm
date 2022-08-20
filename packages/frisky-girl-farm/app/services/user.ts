@@ -1,6 +1,6 @@
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { alias, bool } from 'macro-decorators';
+import { alias } from 'macro-decorators';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { ApiError } from './api';
@@ -9,10 +9,13 @@ import ApiService from './api';
 import { User } from '../types';
 
 export default class UserService extends Service {
-  @service declare localSettings: unknown;
-  @service declare api: ApiService;
+  // @ts-expect-error not in the registry
+  @service('local-settings') declare localSettings: unknown;
+  @service('api') declare api: ApiService;
 
-  @bool('email') declare isLoggedIn: boolean;
+  get isLoggedIn() {
+    return Boolean(this.email);
+  }
 
   @alias('localSettings.settings.userEmail') declare email: string | null;
   @tracked name: string | null = null;
@@ -79,5 +82,11 @@ export default class UserService extends Service {
     this.name = name;
     this.location = location;
     this.balance = balance;
+  }
+}
+
+declare module '@ember/service' {
+  interface Registry {
+    user: UserService;
   }
 }

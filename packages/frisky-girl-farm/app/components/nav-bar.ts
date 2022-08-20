@@ -1,23 +1,24 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
-import { reads, filterBy } from 'macro-decorators';
 import { action } from '@ember/object';
 import window from 'ember-window-mock';
 
 import RouterService from '@ember/routing/router-service';
 import UserService from '../services/user';
-import OrderService from '../services/user';
-import { ProductOrder } from '../types';
+import OrderService from '../services/order';
 
 export default class NavBar extends Component {
-  @service declare user: UserService;
-  @service declare order: OrderService;
+  @service('user') declare user: UserService;
+  @service('order') declare order: OrderService;
   @service('router') declare router: RouterService;
 
-  @reads('user.isLoggedIn') declare isLoggedIn: boolean;
+  get isLoggedIn() {
+    return this.user.isLoggedIn;
+  }
 
-  @filterBy('order.products', 'ordered')
-  declare productsOrdered: ProductOrder[];
+  get productsOrdered() {
+    return this.order.products?.filter((p) => p.ordered) || [];
+  }
 
   @action
   logout(e: Event) {

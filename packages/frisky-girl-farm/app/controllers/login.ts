@@ -14,10 +14,10 @@ class FormState {
 }
 
 export default class LoginController extends Controller {
-  @service declare user: UserService;
+  @service('user') declare user: UserService;
   @service('router') declare router: RouterService;
 
-  createFormState = helper(() => new FormState());
+  readonly createFormState = helper(() => new FormState());
 
   @task
   *login(formState: FormState) {

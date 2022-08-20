@@ -27,7 +27,7 @@ export interface PastOrder {
 }
 
 export default class ApiService extends Service {
-  @service declare user: UserService;
+  @service('user') declare user: UserService;
 
   async getUser(email: string): Promise<User> {
     return await apiFetch<User>(`/users/${email}`);
@@ -66,8 +66,14 @@ export default class ApiService extends Service {
     return data.products;
   }
 
-  get authQueryParam() {
+  private get authQueryParam() {
     return `userId=${encodeURIComponent(this.user.email!)}`;
+  }
+}
+
+declare module '@ember/service' {
+  interface Registry {
+    api: ApiService;
   }
 }
 

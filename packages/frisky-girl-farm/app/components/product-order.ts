@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 // @ts-expect-error no types
 import { localCopy } from 'tracked-toolbox';
@@ -12,9 +11,18 @@ interface AvailabilityError {
   available: number;
 }
 
-export default class ProductOrderComponent extends Component {
-  @reads('args.product') declare product: ProductOrder;
-  @reads('args.setOrder') declare setOrder: (count: number) => Promise<void>;
+interface ProductOrderArguments {
+  product: ProductOrder;
+  setOrder: (count: number) => Promise<void>;
+}
+
+export default class ProductOrderComponent extends Component<ProductOrderArguments> {
+  get product() {
+    return this.args.product;
+  }
+  get setOrder() {
+    return this.args.setOrder;
+  }
 
   @localCopy('product.ordered') declare ordered: number;
   @tracked availabilityError: AvailabilityError | null = null;

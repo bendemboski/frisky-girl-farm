@@ -25,7 +25,7 @@ export class PastOrder {
 }
 
 export default class OrderService extends Service {
-  @service declare api: ApiService;
+  @service('api') declare api: ApiService;
 
   @tracked isOrderingOpen = false;
   @tracked products: ProductOrder[] | null = null;
@@ -76,5 +76,11 @@ export default class OrderService extends Service {
   @enqueueTask
   *setProductOrder(product: ProductOrder, quantity: number) {
     this.products = yield this.api.setProductOrder(product.id, quantity);
+  }
+}
+
+declare module '@ember/service' {
+  interface Registry {
+    order: OrderService;
   }
 }
