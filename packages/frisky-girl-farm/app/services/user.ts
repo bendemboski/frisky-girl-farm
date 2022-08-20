@@ -1,7 +1,7 @@
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { alias, bool } from 'macro-decorators';
-import { task } from 'ember-concurrency';
+import { task, TaskGenerator } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { ApiError } from './api';
 
@@ -9,7 +9,7 @@ import ApiService from './api';
 import { User } from '../types';
 
 export default class UserService extends Service {
-  @service declare localSettings: any;
+  @service declare localSettings: unknown;
   @service declare api: ApiService;
 
   @bool('email') declare isLoggedIn: boolean;
@@ -23,12 +23,12 @@ export default class UserService extends Service {
   // Check if we're logged in (and our login is still valid)
   //
   @task
-  async checkLoggedIn() {
+  *checkLoggedIn() {
     if (!this.email) {
       return false;
     }
 
-    let data = await taskFor(this._fetchData).perform(this.email);
+    let data: User | null = yield taskFor(this._fetchData).perform(this.email);
     if (!data) {
       this.logout();
       return false;
@@ -42,8 +42,8 @@ export default class UserService extends Service {
   // Log in
   //
   @task
-  async login(email: string) {
-    let data = await taskFor(this._fetchData).perform(email);
+  *login(email: string) {
+    let data: User | null = yield taskFor(this._fetchData).perform(email);
     if (!data) {
       return false;
     }
@@ -64,9 +64,9 @@ export default class UserService extends Service {
   }
 
   @task
-  async _fetchData(email: string) {
+  private *_fetchData(email: string): TaskGenerator<User | null> {
     try {
-      return await this.api.getUser(email);
+      return yield this.api.getUser(email);
     } catch (e) {
       if (e instanceof ApiError && e.isUnknownUser) {
         return null;
@@ -75,7 +75,7 @@ export default class UserService extends Service {
     }
   }
 
-  _setData({ name, location, balance }: User) {
+  private _setData({ name, location, balance }: User) {
     this.name = name;
     this.location = location;
     this.balance = balance;

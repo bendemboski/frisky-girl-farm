@@ -11,12 +11,13 @@ module('Unit | Service | user', function (hooks) {
   setupTest(hooks);
   setupPretender(hooks);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let localSettings: any;
   let service: UserService;
 
   hooks.beforeEach(function () {
     localSettings = this.owner.lookup('service:local-settings');
-    service = this.owner.lookup('service:user');
+    service = this.owner.lookup('service:user') as UserService;
   });
 
   module('checkLoggedIn', function () {

@@ -26,10 +26,13 @@ module.exports = {
     {
       files: ['**/*.ts'],
       parser: '@typescript-eslint/parser',
+      extends: [
+        'plugin:@typescript-eslint/eslint-recommended',
+        'plugin:@typescript-eslint/recommended',
+      ],
       rules: {
         'prefer-const': 'off',
-        'no-undef': 'off',
-        'no-unused-vars': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
       },
     },
     // node files

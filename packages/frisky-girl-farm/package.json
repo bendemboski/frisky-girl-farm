@@ -82,7 +82,6 @@
     "ember-cli-typescript-blueprints": "^3.0.0",
     "ember-click-outside": "^5.0.1",
     "ember-concurrency": "^2.2.1",
-    "ember-concurrency-async": "^1.0.0",
     "ember-concurrency-ts": "^0.3.1",
     "ember-fetch": "^8.1.1",
     "ember-load-initializers": "^2.1.2",

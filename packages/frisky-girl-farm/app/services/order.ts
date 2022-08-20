@@ -3,8 +3,8 @@ import { tracked } from '@glimmer/tracking';
 import { task, enqueueTask } from 'ember-concurrency';
 import { ApiError } from './api';
 
-import ApiService from './api';
-import { PastOrderProduct, ProductOrder } from '../types';
+import type ApiService from './api';
+import type { PastOrderProduct, ProductOrder } from '../types';
 
 export class PastOrder {
   @tracked products: PastOrderProduct[] | null = null;
@@ -42,10 +42,10 @@ export default class OrderService extends Service {
   }
 
   @task
-  async loadProducts() {
+  *loadProducts() {
     try {
       this.isOrderingOpen = true;
-      this.products = await this.api.getProducts();
+      this.products = yield this.api.getProducts();
     } catch (e) {
       if (e instanceof ApiError && e.isOrdersNotOpen) {
         this.isOrderingOpen = false;
@@ -58,9 +58,9 @@ export default class OrderService extends Service {
   }
 
   @task
-  async loadPastOrders() {
+  *loadPastOrders() {
     if (!this.pastOrders) {
-      let orders = await this.api.getPastOrders();
+      let orders: PastOrder[] = yield this.api.getPastOrders();
       this.pastOrders = orders.map(
         ({ id, date }) => new PastOrder(id, date, this.api)
       );
@@ -74,7 +74,7 @@ export default class OrderService extends Service {
   // mitigate this on the server, but just preventing the client from making
   // concurrent order API calls seems like it should be sufficient.
   @enqueueTask
-  async setProductOrder(product: ProductOrder, quantity: number) {
-    this.products = await this.api.setProductOrder(product.id, quantity);
+  *setProductOrder(product: ProductOrder, quantity: number) {
+    this.products = yield this.api.setProductOrder(product.id, quantity);
   }
 }

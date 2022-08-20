@@ -2,8 +2,8 @@ import Service, { inject as service } from '@ember/service';
 import ENV from '../config/environment';
 import fetch from 'fetch';
 
-import UserService from './user';
-import { User, ProductOrder, PastOrderProduct } from '../types';
+import type UserService from './user';
+import type { User, ProductOrder, PastOrderProduct } from '../types';
 
 const {
   api: { host, namespace },
@@ -21,11 +21,16 @@ interface PastOrderProductsResponse {
   products: PastOrderProduct[];
 }
 
+export interface PastOrder {
+  id: string;
+  date: Date;
+}
+
 export default class ApiService extends Service {
   @service declare user: UserService;
 
   async getUser(email: string): Promise<User> {
-    return await apiFetch(`/users/${email}`);
+    return await apiFetch<User>(`/users/${email}`);
   }
 
   async getProducts() {
@@ -33,12 +38,12 @@ export default class ApiService extends Service {
     if (this.user.isLoggedIn) {
       relUrl = `${relUrl}?${this.authQueryParam}`;
     }
-    let data: ProductsResponse = await apiFetch(relUrl);
+    let data = await apiFetch<ProductsResponse>(relUrl);
     return data.products;
   }
 
   async setProductOrder(productId: string, quantity: number) {
-    let data: ProductsResponse = await apiFetch(
+    let data = await apiFetch<ProductsResponse>(
       `/products/${productId}?${this.authQueryParam}`,
       {
         method: 'PUT',
@@ -49,15 +54,15 @@ export default class ApiService extends Service {
     return data.products;
   }
 
-  async getPastOrders() {
+  async getPastOrders(): Promise<PastOrder[]> {
     let relUrl = `/orders?${this.authQueryParam}`;
-    let data: PastOrdersResponse = await apiFetch(relUrl);
+    let data = await apiFetch<PastOrdersResponse>(relUrl);
     return data.orders.map(({ id, date }) => ({ id, date: new Date(date) }));
   }
 
   async getPastOrderProducts(pastOrderId: string) {
     let relUrl = `/orders/${pastOrderId}?${this.authQueryParam}`;
-    let data: PastOrderProductsResponse = await apiFetch(relUrl);
+    let data = await apiFetch<PastOrderProductsResponse>(relUrl);
     return data.products;
   }
 
@@ -67,10 +72,11 @@ export default class ApiService extends Service {
 }
 
 export class ApiError extends Error {
-  code: string;
-  extra: Object;
-
-  constructor(code: string, extra: Object, message?: string) {
+  constructor(
+    readonly code: string,
+    readonly extra: Record<string, unknown>,
+    message?: string
+  ) {
     super(message);
     this.code = code;
     this.extra = extra;
@@ -98,7 +104,7 @@ export class ApiError extends Error {
   }
 }
 
-async function apiFetch(relUrl: string, options?: RequestInit): Promise<any> {
+async function apiFetch<T>(relUrl: string, options?: RequestInit): Promise<T> {
   let url;
   if (host) {
     url = `${host}`;

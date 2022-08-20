@@ -14,6 +14,7 @@ module('Unit | Service | order', function (hooks) {
   setupTest(hooks);
   setupPretender(hooks);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let localSettings: any;
   let service: OrderService;
 
@@ -26,7 +27,7 @@ module('Unit | Service | order', function (hooks) {
       balance: 85.0,
     });
 
-    service = this.owner.lookup('service:order');
+    service = this.owner.lookup('service:order') as OrderService;
   });
 
   module('loadProducts', function () {

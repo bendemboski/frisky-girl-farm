@@ -20,11 +20,14 @@ export default class LoginController extends Controller {
   createFormState = helper(() => new FormState());
 
   @task
-  async login(formState: FormState) {
+  *login(formState: FormState) {
     formState.error = '';
 
-    if (await taskFor(this.user.login).perform(formState.email!)) {
-      await this.router.transitionTo('auth.index');
+    let didLogIn: boolean = yield taskFor(this.user.login).perform(
+      formState.email!
+    );
+    if (didLogIn) {
+      yield this.router.transitionTo('auth.index');
     } else {
       formState.error =
         'We do not recognize that email address. Please ensure you are using the same email that you registered with.';

@@ -7,6 +7,7 @@
         class="p-2 bg-light"
         role="button"
         {{on "click" (perform state.toggle)}}
+        {{! template-lint-disable require-presentational-children }}
       >
         Week of {{monday-date state.pastOrder.date}}
         {{#if state.toggle.isRunning}}

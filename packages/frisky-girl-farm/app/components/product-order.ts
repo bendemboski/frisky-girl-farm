@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
-// @ts-expect-error
+// @ts-expect-error no types
 import { localCopy } from 'tracked-toolbox';
 import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
@@ -31,7 +31,7 @@ export default class ProductOrderComponent extends Component {
   }
 
   @task
-  async submit(ordered: number) {
+  *submit(ordered: number) {
     this.availabilityError = null;
 
     if (this.product.available !== -1 && ordered > this.product.available) {
@@ -40,7 +40,7 @@ export default class ProductOrderComponent extends Component {
     }
 
     try {
-      await this.setOrder(ordered);
+      yield this.setOrder(ordered);
     } catch (e) {
       if (e.isQuantityNotAvailable) {
         this.availabilityError = { available: e.extra.available };

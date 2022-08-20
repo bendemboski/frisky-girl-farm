@@ -17,7 +17,7 @@ class TestState {
   pretenderState = new PretenderState();
 }
 
-const state: WeakMap<Object, TestState> = new WeakMap();
+const state: WeakMap<object, TestState> = new WeakMap();
 
 function getPretender(): Pretender {
   return state.get(getContext())!.pretender;
