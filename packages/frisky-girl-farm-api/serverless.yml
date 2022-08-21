@@ -2,7 +2,7 @@ service: frisky-girl-farm-api
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
   stage: ${opt:stage, 'prod'}
   region: us-west-2
   timeout: 30
