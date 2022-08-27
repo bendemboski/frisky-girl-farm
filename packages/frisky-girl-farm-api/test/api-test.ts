@@ -1,33 +1,29 @@
-require('./support/setup');
-const chai = require('chai');
-const { expect } = chai;
-const sinon = require('sinon');
-const buildApp = require('../src/build-app');
-const MockSheetsClient = require('./support/mock-sheets-client');
-const Spreadsheet = require('../src/sheets/spreadsheet');
+import './support/setup';
+import chai, { expect } from 'chai';
+import sinon, { SinonStub } from 'sinon';
+import buildApp from '../src/build-app';
+import MockSheetsClient, { MockSheet } from './support/mock-sheets-client';
+import Spreadsheet from '../src/sheets/spreadsheet';
 
 describe('API', function () {
-  let client;
-  let api;
-  let sendEmailsStub;
+  let client: MockSheetsClient;
+  let api: ChaiHttp.Agent;
+  let sendEmailsStub: SinonStub;
 
   class SESStub {
-    sendBulkTemplatedEmail(...args) {
+    sendBulkTemplatedEmail(...args: unknown[]) {
       return { promise: () => sendEmailsStub(...args) };
     }
   }
-  const awsFactory = () => ({ SES: SESStub });
+  const awsFactory = () => ({ SES: SESStub } as typeof import('aws-sdk'));
 
   beforeEach(function () {
     client = new MockSheetsClient();
     client.setUsers();
 
     api = chai.request(
-      buildApp(async () => {
-        let spreadsheet = new Spreadsheet({
-          id: 'ssid',
-          client,
-        });
+      buildApp(() => {
+        let spreadsheet = new Spreadsheet('ssid', client.asSheets());
         return spreadsheet;
       }, awsFactory)
     );
@@ -351,7 +347,7 @@ describe('API', function () {
   describe('GET /orders', function () {
     it('works', async function () {
       client.setSheetsAndValuesFilterQuery({
-        sheet1: {
+        [1]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -363,7 +359,7 @@ describe('API', function () {
           },
           values: ['ashley@friskygirlfarm.com', 'ellen@friskygirlfarm.com'],
         },
-        sheet2: {
+        [2]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -375,7 +371,7 @@ describe('API', function () {
           },
           values: ['herbie@firskygirlfarm.com', 'ellen@friskygirlfarm.com'],
         },
-        sheet3: {
+        [3]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -394,11 +390,11 @@ describe('API', function () {
       expect(res.body).to.deep.equal({
         orders: [
           {
-            id: 'sheet1',
+            id: 1,
             date: new Date(2021, 2, 18).toISOString(),
           },
           {
-            id: 'sheet3',
+            id: 3,
             date: new Date(2021, 1, 14).toISOString(),
           },
         ],
@@ -407,7 +403,7 @@ describe('API', function () {
 
     it('sorts by date', async function () {
       client.setSheetsAndValuesFilterQuery({
-        sheet1: {
+        [1]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -419,7 +415,7 @@ describe('API', function () {
           },
           values: ['ashley@friskygirlfarm.com'],
         },
-        sheet2: {
+        [2]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -431,7 +427,7 @@ describe('API', function () {
           },
           values: ['ashley@friskygirlfarm.com'],
         },
-        sheet3: {
+        [3]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -450,15 +446,15 @@ describe('API', function () {
       expect(res.body).to.deep.equal({
         orders: [
           {
-            id: 'sheet2',
+            id: 2,
             date: new Date(2021, 3, 20).toISOString(),
           },
           {
-            id: 'sheet1',
+            id: 1,
             date: new Date(2021, 2, 18).toISOString(),
           },
           {
-            id: 'sheet3',
+            id: 3,
             date: new Date(2021, 1, 14).toISOString(),
           },
         ],
@@ -475,11 +471,10 @@ describe('API', function () {
   });
 
   describe('GET /orders/:id', function () {
-    let getStub;
+    let getStub: typeof client.spreadsheets.getByDataFilter;
 
     beforeEach(function () {
-      getStub = sinon.stub();
-      client.spreadsheets.getByDataFilter = getStub;
+      getStub = client.spreadsheets.getByDataFilter;
     });
 
     it('works', async function () {
@@ -509,8 +504,8 @@ describe('API', function () {
       let res = await api.get('/orders/12345?userId=ashley@friskygirlfarm.com');
 
       expect(getStub).to.have.been.calledOnce;
-      expect(getStub.firstCall.args[0].resource.dataFilters).to.deep.equal([
-        { gridRange: { sheetId: '12345' } },
+      expect(getStub.firstCall.args[0].requestBody?.dataFilters).to.deep.equal([
+        { gridRange: { sheetId: 12345 } },
       ]);
 
       expect(res).to.have.status(200);
@@ -552,15 +547,14 @@ describe('API', function () {
   });
 
   describe('POST /admin/confirmation-emails', function () {
-    let getByDataFilterStub;
+    let getStub: typeof client.spreadsheets.getByDataFilter;
 
     beforeEach(function () {
-      getByDataFilterStub = sinon.stub();
-      client.spreadsheets.getByDataFilter = getByDataFilterStub;
+      getStub = client.spreadsheets.getByDataFilter;
     });
 
-    function stubSheets(sheets) {
-      getByDataFilterStub.resolves({ data: { sheets } });
+    function stubSheets(sheets: ReadonlyArray<MockSheet>) {
+      getStub.resolves({ data: { sheets } });
     }
 
     it('it works', async function () {
@@ -582,7 +576,7 @@ describe('API', function () {
         ],
       ]);
       client.setLocations();
-      client.setOrders(
+      client.setOrdersForSheet(
         'Orders 4-20',
         [1, 0, 1],
         ['ashley@friskygirlfarm.com', 0, 0, 1],
@@ -596,15 +590,15 @@ describe('API', function () {
 
       let res = await api
         .post('/admin/confirmation-emails')
-        .send({ sheetId: 'sheet123' });
+        .send({ sheetId: 123 });
       expect(res).to.have.status(200);
       expect(res.body).to.deep.equal({ failedSends: [] });
 
-      expect(getByDataFilterStub).to.have.been.calledOnce;
-      expect(getByDataFilterStub).to.have.been.calledWithMatch({
+      expect(getStub).to.have.been.calledOnce;
+      expect(getStub).to.have.been.calledWithMatch({
         spreadsheetId: 'ssid',
-        resource: {
-          dataFilters: [{ gridRange: { sheetId: 'sheet123' } }],
+        requestBody: {
+          dataFilters: [{ gridRange: { sheetId: 123 } }],
         },
       });
 
@@ -640,7 +634,7 @@ describe('API', function () {
       ]);
 
       client.setLocations();
-      client.setOrders(
+      client.setOrdersForSheet(
         'Orders 4-20',
         [1, 0, 1],
         ['ashley@friskygirlfarm.com', 0, 0, 1],
@@ -653,7 +647,7 @@ describe('API', function () {
 
       let res = await api
         .post('/admin/confirmation-emails')
-        .send({ sheetId: 'sheet123' });
+        .send({ sheetId: 123 });
       expect(res).to.have.status(200);
       expect(res.body).to.deep.equal({
         failedSends: ['ellen@friskygirlfarm.com', 'ashley@friskygirlfarm.com'],
@@ -670,7 +664,7 @@ describe('API', function () {
 
       let res = await api
         .post('/admin/confirmation-emails')
-        .send({ sheetId: 'notfound' });
+        .send({ sheetId: 99999 });
       expect(res).to.have.status(400);
     });
 
@@ -679,7 +673,7 @@ describe('API', function () {
 
       let res = await api
         .post('/admin/confirmation-emails')
-        .send({ sheetId: 'notfound' });
+        .send({ sheetId: 99999 });
       expect(res).to.have.status(400);
     });
   });

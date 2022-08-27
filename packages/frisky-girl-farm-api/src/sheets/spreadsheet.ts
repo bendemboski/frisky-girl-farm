@@ -1,35 +1,46 @@
-const LocationsSheet = require('./locations-sheet');
-const UsersSheet = require('./users-sheet');
-const OrdersSheet = require('./orders-sheet');
-const log = require('../log');
+import LocationsSheet, { Location } from './locations-sheet';
+import UsersSheet from './users-sheet';
+import OrdersSheet, { ProductOrderMap } from './orders-sheet';
+import log from '../log';
+import type { sheets_v4 } from 'googleapis';
+import type { PastOrder, User } from '../types';
 
-class Spreadsheet {
-  constructor({ id, client }) {
-    this.id = id;
-    this.client = client;
-    this.locations = new LocationsSheet({ client, spreadsheetId: id });
-    this.users = new UsersSheet({ client, spreadsheetId: id });
-    this.orders = new OrdersSheet({ client, spreadsheetId: id });
+export default class Spreadsheet {
+  private readonly locations: LocationsSheet;
+  private readonly users: UsersSheet;
+  private readonly orders: OrdersSheet;
+
+  constructor(
+    private readonly id: string,
+    private readonly client: sheets_v4.Sheets
+  ) {
+    this.locations = new LocationsSheet(client, id);
+    this.users = new UsersSheet(client, id);
+    this.orders = new OrdersSheet(client, id);
   }
 
-  async getLocations() {
+  async getLocations(): Promise<Location[]> {
     return await this.locations.getLocations();
   }
 
-  async getUsers(userIds) {
+  async getUsers(userIds: ReadonlyArray<string>): Promise<User[]> {
     return await this.users.getUsers(userIds);
   }
 
-  async getUser(userId) {
+  async getUser(userId: string): Promise<User> {
     return await this.users.getUser(userId);
   }
 
-  async getProducts(userId) {
+  async getProducts(userId: string): Promise<ProductOrderMap> {
     let { products } = await this.orders.getForUser(userId);
     return products;
   }
 
-  async setProductOrder(userId, productId, quantity) {
+  async setProductOrder(
+    userId: string,
+    productId: number,
+    quantity: number
+  ): Promise<ProductOrderMap> {
     try {
       log('setting order');
       return await this.orders.setOrdered(userId, productId, quantity);
@@ -42,19 +53,15 @@ class Spreadsheet {
   /**
    * Get a list of all of the (past) orders for a given user
    *
-   * @param {string} userId the id/email of the user
-   *
-   * @returns {Array<{id: string, date: Date}>}
+   * @param userId the id/email of the user
    */
-  async getUserOrders(userId) {
+  async getUserOrders(userId: string): Promise<PastOrder[]> {
     const orderSheetKey = 'orderSheet';
 
     // Get all order sheets by filtering by developer metadata
-    let {
-      data: { sheets },
-    } = await this.client.spreadsheets.getByDataFilter({
+    let getResponse = await this.client.spreadsheets.getByDataFilter({
       spreadsheetId: this.id,
-      resource: {
+      requestBody: {
         dataFilters: [
           {
             developerMetadataLookup: {
@@ -73,10 +80,11 @@ class Spreadsheet {
         'sheets.developerMetadata.metadataValue',
       ].join(','),
     });
+    let sheets = getResponse.data.sheets || [];
 
-    let sheetDates = {};
+    let sheetDates = new Map<number, Date>();
     for (let sheet of sheets) {
-      if (sheet.properties.title === OrdersSheet.openOrdersSheetName) {
+      if (sheet.properties!.title === OrdersSheet.openOrdersSheetName) {
         // Ignore the current/open orders sheet
         continue;
       }
@@ -89,42 +97,45 @@ class Spreadsheet {
         (meta) => meta.metadataKey === orderSheetKey
       );
       if (metadata) {
-        sheetDates[sheet.properties.sheetId] = new Date(metadata.metadataValue);
+        sheetDates.set(
+          sheet.properties!.sheetId!,
+          new Date(metadata.metadataValue!)
+        );
       }
     }
 
-    if (Object.keys(sheetDates).length === 0) {
+    if (sheetDates.size === 0) {
       return [];
     }
 
     // Now do a batch get of the first columns of all the order sheets so we can
     // look to see which ones include the current user
-    let {
-      data: { valueRanges },
-    } = await this.client.spreadsheets.values.batchGetByDataFilter({
-      spreadsheetId: this.id,
-      resource: {
-        dataFilters: Object.keys(sheetDates).map((sheetId) => {
-          return {
-            gridRange: {
-              sheetId,
-              startColumnIndex: 0,
-              endColumnIndex: 1,
-              startRowIndex: OrdersSheet.firstUserRowIndex,
-            },
-          };
-        }),
-        majorDimension: 'COLUMNS',
-      },
-    });
+    let batchGetResponse =
+      await this.client.spreadsheets.values.batchGetByDataFilter({
+        spreadsheetId: this.id,
+        requestBody: {
+          dataFilters: Array.from(sheetDates.keys()).map((sheetId) => {
+            return {
+              gridRange: {
+                sheetId,
+                startColumnIndex: 0,
+                endColumnIndex: 1,
+                startRowIndex: OrdersSheet.firstUserRowIndex,
+              },
+            };
+          }),
+          majorDimension: 'COLUMNS',
+        },
+      });
+    let valueRanges = batchGetResponse.data.valueRanges || [];
 
     // Now assemble the data into order objects
-    let orders = [];
+    let orders: PastOrder[] = [];
     for (let { valueRange, dataFilters } of valueRanges) {
       // If we didn't match any values (which should never happen, but let's be
       // defensive), then instead of `valueRange.values` being an empty array,
       // it will just be missing.
-      let values = valueRange.values || [];
+      let values = valueRange!.values || [];
       let column = values[0] || [];
 
       // values is an array of columns, although we only requested one, so
@@ -134,26 +145,25 @@ class Spreadsheet {
       }
 
       // Get the sheet id back out of the data filters the response echoes back
-      let sheetId = dataFilters[0].gridRange.sheetId;
+      let sheetId = dataFilters![0].gridRange!.sheetId!;
       // Create an order object!
       orders.push({
         id: sheetId,
-        date: sheetDates[sheetId],
+        date: sheetDates.get(sheetId)!,
       });
     }
     return orders;
   }
 
-  async getOrdersSheet(sheetId) {
-    let {
-      data: { sheets },
-    } = await this.client.spreadsheets.getByDataFilter({
+  async getOrdersSheet(sheetId: number): Promise<OrdersSheet | null> {
+    let response = await this.client.spreadsheets.getByDataFilter({
       spreadsheetId: this.id,
-      resource: {
+      requestBody: {
         dataFilters: [{ gridRange: { sheetId } }],
       },
       fields: 'sheets.properties,sheets.developerMetadata',
     });
+    let sheets = response.data!.sheets!;
 
     // Make sure it exists
     if (sheets.length === 0) {
@@ -166,12 +176,6 @@ class Spreadsheet {
       return null;
     }
 
-    return new OrdersSheet({
-      client: this.client,
-      spreadsheetId: this.id,
-      sheetName: sheets[0].properties.title,
-    });
+    return new OrdersSheet(this.client, this.id, sheets[0].properties!.title!);
   }
 }
-
-module.exports = Spreadsheet;

@@ -1,11 +1,13 @@
-const Sheet = require('./sheet');
-const { indexToColumn } = require('./a1-utils');
-const {
+import Sheet from './sheet';
+import { indexToColumn } from './a1-utils';
+import {
   OrdersNotOpenError,
   NegativeQuantityError,
   ProductNotFoundError,
   QuantityNotAvailableError,
-} = require('./errors');
+} from './errors';
+import type { sheets_v4 } from 'googleapis';
+import type { ProductOrder } from '../types';
 
 const ordersSheetName = 'Orders';
 const namesRowIndex = 0;
@@ -14,6 +16,8 @@ const imagesRowIndex = 2;
 const limitsRowIndex = 3;
 const totalsRowIndex = 4;
 const firstUserRowIndex = 5;
+
+export type ProductOrderMap = Map<number, Omit<ProductOrder, 'id'>>;
 
 //
 // The orders sheet contains a week's products and orders. Row 1, columns B and
@@ -26,12 +30,16 @@ const firstUserRowIndex = 5;
 // By default an OrdersSheet points to the sheet for the current week, but it
 // can be passed a `sheetName` of a past week orders sheet to access past weeks.
 //
-class OrdersSheet extends Sheet {
+export default class OrdersSheet extends Sheet {
   static openOrdersSheetName = ordersSheetName;
   static firstUserRowIndex = firstUserRowIndex;
 
-  constructor({ client, spreadsheetId, sheetName = ordersSheetName }) {
-    super({ client, spreadsheetId, sheetName });
+  constructor(
+    client: sheets_v4.Sheets,
+    spreadsheetId: string,
+    sheetName = ordersSheetName
+  ) {
+    super(client, spreadsheetId, sheetName);
   }
 
   // This is a past orders sheet if the name is anything other than the orders
@@ -56,7 +64,7 @@ class OrdersSheet extends Sheet {
   //             could set their order to without exceeding availability). If
   //             there is no limit on the product, this will be set to -1.
   // `ordered` is the number of units of the product the user has ordered
-  async getForUser(userId) {
+  async getForUser(userId: string) {
     let columns;
     try {
       columns = await this.getAll({ majorDimension: 'COLUMNS' });
@@ -70,7 +78,7 @@ class OrdersSheet extends Sheet {
 
     // Row 0 contains the user ids for the user order rows.
     let userRowIndex = columns[0].slice(firstUserRowIndex).indexOf(userId);
-    let products = {};
+    let products: ProductOrderMap = new Map<number, Omit<ProductOrder, 'id'>>();
     columns.slice(1).forEach((column, i) => {
       let limit = column[limitsRowIndex];
       // has to be non-empty and non-zero for product to appear
@@ -94,13 +102,13 @@ class OrdersSheet extends Sheet {
         }
 
         // id is i + 1 because we're skipping the first column in our iteration
-        products[i + 1] = {
+        products.set(i + 1, {
           name: column[namesRowIndex],
           imageUrl: column[imagesRowIndex],
           price: column[pricesRowIndex],
           available,
           ordered,
-        };
+        });
       }
     });
 
@@ -108,13 +116,13 @@ class OrdersSheet extends Sheet {
   }
 
   // Set the quantity ordered of a product for a user.
-  async setOrdered(userId, productId, quantity) {
+  async setOrdered(userId: string, productId: number, quantity: number) {
     if (quantity < 0) {
       throw new NegativeQuantityError();
     }
 
     let { products, userRowIndex } = await this.getForUser(userId);
-    let product = products[productId];
+    let product = products.get(productId);
     if (!product) {
       throw new ProductNotFoundError();
     }
@@ -131,7 +139,7 @@ class OrdersSheet extends Sheet {
         [[quantity]]
       );
     } else {
-      let row = [userId];
+      let row: Array<number | string> = [userId];
       row[productId] = quantity;
       await this.append(`A${firstUserRowIndex + 1}`, row);
     }
@@ -164,5 +172,3 @@ class OrdersSheet extends Sheet {
     return emails;
   }
 }
-
-module.exports = OrdersSheet;

@@ -1,21 +1,18 @@
-require('./support/setup');
-const { expect } = require('chai');
-const sinon = require('sinon');
-const LocationsSheet = require('../src/sheets/locations-sheet');
-const MockSheetsClient = require('./support/mock-sheets-client');
+import './support/setup';
+import { expect } from 'chai';
+import sinon from 'sinon';
+import LocationsSheet from '../src/sheets/locations-sheet';
+import MockSheetsClient from './support/mock-sheets-client';
 
 describe('LocationsSheet', function () {
-  let client;
-  let sheet;
+  let client: MockSheetsClient;
+  let sheet: LocationsSheet;
 
   beforeEach(function () {
     client = new MockSheetsClient();
     client.setLocations();
 
-    sheet = new LocationsSheet({
-      client,
-      spreadsheetId: 'ssid',
-    });
+    sheet = new LocationsSheet(client.asSheets(), 'ssid');
   });
 
   afterEach(function () {

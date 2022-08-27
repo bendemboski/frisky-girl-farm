@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "preserveConstEnums": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "noEmitOnError": true,
+    "target": "es2021",
+    "outDir": ".build",
+    "moduleResolution": "node",
+    "lib": ["es2021"],
+    "rootDir": "./",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+  },
+
+  "include": ["app", "test"]
+}

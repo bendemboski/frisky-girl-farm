@@ -1,9 +1,9 @@
-const { google } = require('googleapis');
+import { google } from 'googleapis';
 
 const scopes = ['https://www.googleapis.com/auth/spreadsheets'];
 
 // Create an authenticated Google sheets API client
-async function createClient(configPath) {
+export default function createClient(configPath: string) {
   let auth = new google.auth.GoogleAuth({
     keyFile: configPath,
     scopes,
@@ -14,5 +14,3 @@ async function createClient(configPath) {
     version: 'v4',
   });
 }
-
-module.exports = createClient;

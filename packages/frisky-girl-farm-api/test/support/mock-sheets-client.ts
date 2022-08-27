@@ -1,13 +1,63 @@
-const sinon = require('sinon');
+import sinon from 'sinon';
+import type { SinonStub } from 'sinon';
+import type { sheets_v4 } from 'googleapis';
 
-class MockSheetsClient {
-  constructor() {
-    this.spreadsheets = { values: {} };
+export type MockSheet = {
+  developerMetadata?: Array<{ metadataKey: string; metadataValue?: string }>;
+  properties?: Record<string, unknown>;
+  values?: string[];
+};
+
+type MockSheets = Record<number, MockSheet>;
+
+type UserData = [string, string, string, ...Array<number | string>];
+
+interface SpreadsheetsStubs {
+  values: {
+    get: SinonStub<
+      [sheets_v4.Params$Resource$Spreadsheets$Values$Get],
+      ReturnType<sheets_v4.Sheets['spreadsheets']['values']['get']>
+    >;
+    append: SinonStub<
+      [sheets_v4.Params$Resource$Spreadsheets$Values$Append],
+      ReturnType<sheets_v4.Sheets['spreadsheets']['values']['append']>
+    >;
+    update: SinonStub<
+      [sheets_v4.Params$Resource$Spreadsheets$Values$Update],
+      ReturnType<sheets_v4.Sheets['spreadsheets']['values']['update']>
+    >;
+    batchGetByDataFilter: SinonStub<
+      [sheets_v4.Params$Resource$Spreadsheets$Values$Batchgetbydatafilter],
+      ReturnType<
+        sheets_v4.Sheets['spreadsheets']['values']['batchGetByDataFilter']
+      >
+    >;
+  };
+  getByDataFilter: SinonStub<
+    [sheets_v4.Params$Resource$Spreadsheets$Getbydatafilter],
+    ReturnType<sheets_v4.Sheets['spreadsheets']['getByDataFilter']>
+  >;
+}
+
+export default class MockSheetsClient {
+  /**
+   * Type helper to cast this to a google sheets API instance
+   */
+  asSheets() {
+    return this as unknown as sheets_v4.Sheets;
   }
 
-  setUsers(extraUsers = []) {
-    this.spreadsheets.values.get = this.spreadsheets.values.get || sinon.stub();
+  readonly spreadsheets: SpreadsheetsStubs = {
+    values: {
+      get: sinon.stub(),
+      append: sinon.stub(),
+      update: sinon.stub(),
+      batchGetByDataFilter: sinon.stub(),
+    },
+    getByDataFilter: sinon.stub(),
+  };
 
+  setUsers(extraUsers: ReadonlyArray<UserData> = []) {
     this.spreadsheets.values.get
       .withArgs({
         spreadsheetId: 'ssid',
@@ -78,21 +128,16 @@ class MockSheetsClient {
     this._stubGetOrders().rejects({ code: 400 });
   }
 
-  setOrders(...args) {
-    let sheetName;
-    let totals;
-    let users;
-    if (typeof args[0] === 'string') {
-      [sheetName, totals, ...users] = args;
-    } else {
-      [totals, ...users] = args;
-    }
-
+  setOrdersForSheet(
+    sheetName: string | undefined,
+    totals: ReadonlyArray<number | ''>,
+    ...users: ReadonlyArray<[string, ...Array<number | ''>]>
+  ) {
     let ordered = [0, 0, 0];
     users.forEach((orders) => {
-      ordered[0] += orders[1] || 0;
-      ordered[1] += orders[2] || 0;
-      ordered[2] += orders[3] || 0;
+      ordered[0] += typeof orders[1] === 'number' ? orders[1] : 0;
+      ordered[1] += typeof orders[2] === 'number' ? orders[2] : 0;
+      ordered[2] += typeof orders[3] === 'number' ? orders[3] : 0;
     });
 
     this._stubGetOrders().resolves({
@@ -146,21 +191,25 @@ class MockSheetsClient {
     });
   }
 
-  resetOrders(sheetName) {
-    this._stubGetOrders(sheetName).resetBehavior();
+  setOrders(
+    totals: ReadonlyArray<number | ''>,
+    ...users: ReadonlyArray<[string, ...Array<number | ''>]>
+  ) {
+    this.setOrdersForSheet(undefined, totals, ...users);
   }
 
-  setSheetsFilterQuery(sheets) {
-    this.spreadsheets.getByDataFilter =
-      this.spreadsheets.getByDataFilter || sinon.stub();
+  resetOrders() {
+    this._stubGetOrders().resetBehavior();
+  }
 
+  setSheetsFilterQuery(sheets: MockSheets) {
     this.spreadsheets.getByDataFilter.resolves({
       data: {
         sheets: Object.entries(sheets).map(
           ([sheetId, { developerMetadata, properties }]) => {
             return {
               developerMetadata,
-              properties: { ...properties, sheetId },
+              properties: { ...properties, sheetId: parseInt(sheetId, 10) },
             };
           }
         ),
@@ -168,28 +217,29 @@ class MockSheetsClient {
     });
   }
 
-  setValuesFilterQuery(sheets) {
-    this.spreadsheets.values.batchGetByDataFilter =
-      this.spreadsheets.values.batchGetByDataFilter || sinon.stub();
-
+  setValuesFilterQuery(sheets: MockSheets) {
     this.spreadsheets.values.batchGetByDataFilter.resolves({
       data: {
         valueRanges: Object.entries(sheets).map(([sheetId, { values }]) => {
           return {
             valueRange: { values: [values] },
-            dataFilters: [{ gridRange: { sheetId } }],
+            dataFilters: [{ gridRange: { sheetId: parseInt(sheetId, 10) } }],
           };
         }),
       },
     });
   }
 
-  setSheetsAndValuesFilterQuery(sheets) {
+  setSheetsAndValuesFilterQuery(sheets: MockSheets) {
     this.setSheetsFilterQuery(sheets);
     this.setValuesFilterQuery(sheets);
   }
 
-  setPastOrders(sheetName, totals, ...users) {
+  setPastOrders(
+    sheetName: string,
+    totals: [number | '', number | '', number | ''],
+    ...users: [string, number | '', number | '', number | ''][]
+  ) {
     let ordered = [0, 0, 0];
     users.forEach((orders) => {
       ordered[0] += orders[1] || 0;
@@ -251,7 +301,10 @@ class MockSheetsClient {
       .resolves();
   }
 
-  _stubGetOrders({ sheetName = 'Orders', majorDimension = 'COLUMNS' } = {}) {
+  private _stubGetOrders({
+    sheetName = 'Orders',
+    majorDimension = 'COLUMNS',
+  } = {}) {
     this.spreadsheets.values.get = this.spreadsheets.values.get || sinon.stub();
 
     return this.spreadsheets.values.get.withArgs({
@@ -262,5 +315,3 @@ class MockSheetsClient {
     });
   }
 }
-
-module.exports = MockSheetsClient;

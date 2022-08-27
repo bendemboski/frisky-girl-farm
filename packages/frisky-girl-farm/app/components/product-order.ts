@@ -6,7 +6,7 @@ import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 
-import { ProductOrder } from '../types';
+import type { ProductOrder } from 'frisky-girl-farm-api/src/types';
 
 interface AvailabilityError {
   available: number;

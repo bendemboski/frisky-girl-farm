@@ -1,8 +1,8 @@
-const buildApp = require('../src/build-app');
-const createSpreadsheet = require('./create-spreadsheet');
-const AWS = require('aws-sdk');
-const { readFileSync } = require('fs');
-const YAML = require('yaml');
+import buildApp from '../src/build-app';
+import createSpreadsheet from './create-spreadsheet';
+import AWS from 'aws-sdk';
+import { readFileSync } from 'fs';
+import YAML from 'yaml';
 
 let [, , stage = 'staging'] = process.argv;
 

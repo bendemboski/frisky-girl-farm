@@ -7,7 +7,7 @@ import loginUser from '../../helpers/login-user';
 import setProducts from '../../helpers/set-products';
 
 import OrderService from 'frisky-girl-farm/services/order';
-import { ProductOrder } from 'frisky-girl-farm/types';
+import { ProductOrder } from 'frisky-girl-farm-api/src/types';
 
 module('Unit | Service | order', function (hooks) {
   setupTest(hooks);

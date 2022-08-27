@@ -1,17 +1,17 @@
-require('./support/setup');
-const { expect } = require('chai');
-const sinon = require('sinon');
-const Spreadsheet = require('../src/sheets/spreadsheet');
-const {
+import './support/setup';
+import { expect } from 'chai';
+import sinon from 'sinon';
+import Spreadsheet from '../src/sheets/spreadsheet';
+import {
   OrdersNotOpenError,
   QuantityNotAvailableError,
   UnknownUserError,
-} = require('../src/sheets/errors');
-const MockSheetsClient = require('./support/mock-sheets-client');
+} from '../src/sheets/errors';
+import MockSheetsClient from './support/mock-sheets-client';
 
 describe('Spreadsheet', function () {
-  let client;
-  let spreadsheet;
+  let client: MockSheetsClient;
+  let spreadsheet: Spreadsheet;
 
   beforeEach(function () {
     client = new MockSheetsClient();
@@ -24,10 +24,7 @@ describe('Spreadsheet', function () {
       ['ashley@friskygirlfarm.com', 3, 2, 0]
     );
 
-    spreadsheet = new Spreadsheet({
-      client,
-      id: 'ssid',
-    });
+    spreadsheet = new Spreadsheet('ssid', client.asSheets());
   });
 
   afterEach(function () {
@@ -78,7 +75,7 @@ describe('Spreadsheet', function () {
   describe('getProducts', function () {
     it('works', async function () {
       let ret = await spreadsheet.getProducts('ashley@friskygirlfarm.com');
-      expect(ret).to.deep.nested.include({
+      expect(Object.fromEntries(ret.entries())).to.deep.nested.include({
         '1.name': 'Lettuce',
         '1.imageUrl': 'http://lettuce.com/image.jpg',
         '1.price': 0.15,
@@ -114,7 +111,7 @@ describe('Spreadsheet', function () {
         3,
         3
       );
-      expect(ret).to.deep.nested.include({
+      expect(Object.fromEntries(ret.entries())).to.deep.nested.include({
         '1.available': 3,
         '1.ordered': 3,
         '2.available': 3,
@@ -143,7 +140,7 @@ describe('Spreadsheet', function () {
   describe('getUserOrders', function () {
     it('works', async function () {
       client.setSheetsAndValuesFilterQuery({
-        sheet1: {
+        [1]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -155,7 +152,7 @@ describe('Spreadsheet', function () {
           },
           values: ['ashley@friskygirlfarm.com', 'ellen@friskygirlfarm.com'],
         },
-        sheet2: {
+        [2]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -167,7 +164,7 @@ describe('Spreadsheet', function () {
           },
           values: ['herbie@firskygirlfarm.com', 'ellen@friskygirlfarm.com'],
         },
-        sheet3: {
+        [3]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -185,11 +182,11 @@ describe('Spreadsheet', function () {
         spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
       ).to.eventually.deep.equal([
         {
-          id: 'sheet1',
+          id: 1,
           date: new Date(2021, 2, 18),
         },
         {
-          id: 'sheet3',
+          id: 3,
           date: new Date(2021, 1, 14),
         },
       ]);
@@ -199,7 +196,7 @@ describe('Spreadsheet', function () {
         client.spreadsheets.getByDataFilter.firstCall.args[0]
       ).to.deep.equal({
         spreadsheetId: 'ssid',
-        resource: {
+        requestBody: {
           dataFilters: [
             {
               developerMetadataLookup: {
@@ -225,11 +222,11 @@ describe('Spreadsheet', function () {
         client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0]
       ).to.deep.equal({
         spreadsheetId: 'ssid',
-        resource: {
+        requestBody: {
           dataFilters: [
             {
               gridRange: {
-                sheetId: 'sheet1',
+                sheetId: 1,
                 startColumnIndex: 0,
                 endColumnIndex: 1,
                 startRowIndex: 5,
@@ -237,7 +234,7 @@ describe('Spreadsheet', function () {
             },
             {
               gridRange: {
-                sheetId: 'sheet2',
+                sheetId: 2,
                 startColumnIndex: 0,
                 endColumnIndex: 1,
                 startRowIndex: 5,
@@ -245,7 +242,7 @@ describe('Spreadsheet', function () {
             },
             {
               gridRange: {
-                sheetId: 'sheet3',
+                sheetId: 3,
                 startColumnIndex: 0,
                 endColumnIndex: 1,
                 startRowIndex: 5,
@@ -259,7 +256,7 @@ describe('Spreadsheet', function () {
 
     it('works with other developer metadata present', async function () {
       client.setSheetsAndValuesFilterQuery({
-        sheet1: {
+        [1]: {
           developerMetadata: [
             {
               metadataKey: 'somethingElse',
@@ -281,22 +278,22 @@ describe('Spreadsheet', function () {
         spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
       ).to.eventually.deep.equal([
         {
-          id: 'sheet1',
+          id: 1,
           date: new Date(2021, 2, 18),
         },
       ]);
 
       // Verify that the get values queried sheet1
       expect(
-        client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0].resource.dataFilters.map(
-          (f) => f.gridRange.sheetId
+        client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0].requestBody!.dataFilters!.map(
+          (f) => f.gridRange?.sheetId
         )
-      ).to.deep.equal(['sheet1']);
+      ).to.deep.equal([1]);
     });
 
     it('ignores the open orders sheet and non-order sheets', async function () {
       client.setSheetsFilterQuery({
-        sheet1: {
+        [1]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -308,7 +305,7 @@ describe('Spreadsheet', function () {
           },
           values: ['ashley@friskygirlfarm.com', 'ellen@friskygirlfarm.com'],
         },
-        sheet2: {
+        [2]: {
           developerMetadata: [
             {
               metadataKey: 'somethingElse',
@@ -320,10 +317,10 @@ describe('Spreadsheet', function () {
           },
           values: ['herbie@firskygirlfarm.com', 'ashley@friskygirlfarm.com'],
         },
-        sheet3: {
+        [3]: {
           values: ['herbie@firskygirlfarm.com', 'ashley@friskygirlfarm.com'],
         },
-        sheet4: {
+        [4]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -338,7 +335,7 @@ describe('Spreadsheet', function () {
       });
 
       client.setValuesFilterQuery({
-        sheet1: {
+        [1]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -356,7 +353,7 @@ describe('Spreadsheet', function () {
         spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
       ).to.eventually.deep.equal([
         {
-          id: 'sheet1',
+          id: 1,
           date: new Date(2021, 2, 18),
         },
       ]);
@@ -364,10 +361,10 @@ describe('Spreadsheet', function () {
       // Verify that the get values queried sheet1, and ignored sheet2 and
       // sheet3
       expect(
-        client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0].resource.dataFilters.map(
-          (f) => f.gridRange.sheetId
+        client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0].requestBody!.dataFilters!.map(
+          (f) => f.gridRange?.sheetId
         )
-      ).to.deep.equal(['sheet1']);
+      ).to.deep.equal([1]);
     });
 
     it('works with no order sheets', async function () {
@@ -384,7 +381,7 @@ describe('Spreadsheet', function () {
 
     it('works with no values', async function () {
       client.setSheetsFilterQuery({
-        sheet1: {
+        [1]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -405,7 +402,7 @@ describe('Spreadsheet', function () {
           valueRanges: [
             {
               valueRange: {},
-              dataFilters: [{ gridRange: { sheetId: 'sheet1' } }],
+              dataFilters: [{ gridRange: { sheetId: 1 } }],
             },
           ],
         },
@@ -418,7 +415,7 @@ describe('Spreadsheet', function () {
 
     it('works with no sheets that include the current user', async function () {
       client.setSheetsAndValuesFilterQuery({
-        sheet1: {
+        [1]: {
           developerMetadata: [
             {
               metadataKey: 'orderSheet',
@@ -439,11 +436,10 @@ describe('Spreadsheet', function () {
   });
 
   describe('getOrdersSheet', function () {
-    let getStub;
+    let getStub: typeof client.spreadsheets.getByDataFilter;
 
     beforeEach(function () {
-      getStub = sinon.stub();
-      client.spreadsheets.getByDataFilter = getStub;
+      getStub = client.spreadsheets.getByDataFilter;
     });
 
     it('works', async function () {
@@ -468,18 +464,18 @@ describe('Spreadsheet', function () {
       // Make sure the getByDataFilter API was called correctly
       expect(getStub).to.have.been.calledOnce;
       expect(getStub.firstCall.args[0].spreadsheetId).to.equal('ssid');
-      expect(getStub.firstCall.args[0].resource.dataFilters).to.deep.equal([
+      expect(getStub.firstCall.args[0].requestBody?.dataFilters).to.deep.equal([
         { gridRange: { sheetId: 12345 } },
       ]);
-      expect(getStub.firstCall.args[0].fields.split(',')).to.include(
+      expect(getStub.firstCall.args[0].fields?.split(',')).to.include(
         'sheets.properties'
       );
-      expect(getStub.firstCall.args[0].fields.split(',')).to.include(
+      expect(getStub.firstCall.args[0].fields?.split(',')).to.include(
         'sheets.developerMetadata'
       );
 
       // Make sure the returned sheet works
-      client.setOrders(
+      client.setOrdersForSheet(
         'Orders 6-25',
         [1, 0, 1],
         ['hasorder@friskygirlfarm.com', 0, 0, 1],
@@ -487,7 +483,7 @@ describe('Spreadsheet', function () {
         ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
       );
 
-      let ret = await sheet.getUsersWithOrders();
+      let ret = await sheet!.getUsersWithOrders();
       expect(ret).to.deep.equal([
         'hasorder@friskygirlfarm.com',
         'alsohasorder@friskygirlfarm.com',
@@ -523,7 +519,7 @@ describe('Spreadsheet', function () {
       let sheet = await spreadsheet.getOrdersSheet(12345);
 
       // Make sure the returned sheet works
-      client.setOrders(
+      client.setOrdersForSheet(
         'Orders 6-25',
         [1, 0, 1],
         ['hasorder@friskygirlfarm.com', 0, 0, 1],
@@ -531,7 +527,7 @@ describe('Spreadsheet', function () {
         ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
       );
 
-      let ret = await sheet.getUsersWithOrders();
+      let ret = await sheet!.getUsersWithOrders();
       expect(ret).to.deep.equal([
         'hasorder@friskygirlfarm.com',
         'alsohasorder@friskygirlfarm.com',

@@ -1,8 +1,16 @@
+import type { AWSFactory } from './build-app';
+import type { Location } from './sheets/locations-sheet';
+import type { User } from './types';
+
 /**
  * Send confirmation emails to a set of users, customized by their location.
  * This uses our SES template and configuration set
  */
-async function sendConfirmationEmails(awsFactory, users, locations) {
+export default async function sendConfirmationEmails(
+  awsFactory: AWSFactory,
+  users: ReadonlyArray<User>,
+  locations: ReadonlyArray<Location>
+) {
   // Split the users into chunks of 50 -- the maximum number of destinations
   // SES will let us send to at once
   let userChunks = [];
@@ -11,7 +19,7 @@ async function sendConfirmationEmails(awsFactory, users, locations) {
   }
 
   // Build a map from location name to pickup instructions
-  let pickupInstructionsByLocation = {};
+  let pickupInstructionsByLocation: Record<string, string> = {};
   for (let location of locations) {
     pickupInstructionsByLocation[location.name] = location.pickupInstructions;
   }
@@ -44,7 +52,8 @@ async function sendConfirmationEmails(awsFactory, users, locations) {
         })
         .promise();
 
-      for (let [i, status] of Object.entries(statuses)) {
+      for (let i = 0; i < statuses.length; i++) {
+        let status = statuses[i];
         if (status.Status !== 'Success') {
           let email = chunk[i].email;
           console.error(
@@ -63,5 +72,3 @@ async function sendConfirmationEmails(awsFactory, users, locations) {
 
   return failedSends;
 }
-
-module.exports = sendConfirmationEmails;

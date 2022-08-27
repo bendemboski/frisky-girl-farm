@@ -6,7 +6,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { ApiError } from './api';
 
 import ApiService from './api';
-import { User } from '../types';
+import { User } from 'frisky-girl-farm-api/src/types';
 
 export default class UserService extends Service {
   // @ts-expect-error not in the registry

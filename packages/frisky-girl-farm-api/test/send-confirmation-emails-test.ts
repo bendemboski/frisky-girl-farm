@@ -1,10 +1,15 @@
-require('./support/setup');
-const { expect } = require('chai');
-const sinon = require('sinon');
-const sendConfirmationEmails = require('../src/send-confirmation-emails');
+import './support/setup';
+import { expect } from 'chai';
+import sinon, { SinonStub } from 'sinon';
+import sendConfirmationEmails from '../src/send-confirmation-emails';
+import type { User } from '../src/types';
+import type { SES } from 'aws-sdk';
 
 describe('sendConfirmationEmails', function () {
-  let sendStub;
+  let sendStub: SinonStub<
+    [SES.Types.SendBulkTemplatedEmailRequest],
+    ReturnType<SES['sendBulkTemplatedEmail']>
+  >;
 
   beforeEach(function () {
     sendStub = sinon.stub();
@@ -15,11 +20,12 @@ describe('sendConfirmationEmails', function () {
   });
 
   class SESStub {
-    sendBulkTemplatedEmail(...args) {
-      return { promise: () => sendStub(...args) };
+    sendBulkTemplatedEmail(request: SES.Types.SendBulkTemplatedEmailRequest) {
+      return { promise: () => sendStub(request) };
     }
   }
-  const awsFactory = () => ({ SES: SESStub });
+  const awsFactory = () =>
+    ({ SES: SESStub } as unknown as typeof import('aws-sdk'));
 
   const locations = [
     {
@@ -33,6 +39,27 @@ describe('sendConfirmationEmails', function () {
     },
   ];
 
+  const users = [
+    {
+      email: 'ashley@friskygirlfarm.com',
+      location: 'North Bend',
+      name: 'Ashley Wilson',
+      balance: 0,
+    },
+    {
+      email: 'ellen@friskygirlfarm.com',
+      location: 'Wallingford',
+      name: 'Ellen Scheffer',
+      balance: 0,
+    },
+    {
+      email: 'herbie@friskygirlfarm.com',
+      location: 'North Bend',
+      name: 'Herb Dog',
+      balance: 9999999,
+    },
+  ];
+
   it('works', async function () {
     sendStub.resolves({
       Status: [
@@ -41,21 +68,6 @@ describe('sendConfirmationEmails', function () {
         { Status: 'Success' },
       ],
     });
-
-    let users = [
-      {
-        email: 'ashley@friskygirlfarm.com',
-        location: 'North Bend',
-      },
-      {
-        email: 'ellen@friskygirlfarm.com',
-        location: 'Wallingford',
-      },
-      {
-        email: 'herbie@friskygirlfarm.com',
-        location: 'North Bend',
-      },
-    ];
 
     await expect(
       sendConfirmationEmails(awsFactory, users, locations)
@@ -98,21 +110,6 @@ describe('sendConfirmationEmails', function () {
       ],
     });
 
-    let users = [
-      {
-        email: 'ashley@friskygirlfarm.com',
-        location: 'North Bend',
-      },
-      {
-        email: 'ellen@friskygirlfarm.com',
-        location: 'Wallingford',
-      },
-      {
-        email: 'herbie@friskygirlfarm.com',
-        location: 'North Bend',
-      },
-    ];
-
     sinon.stub(console, 'error');
     await expect(
       sendConfirmationEmails(awsFactory, users, locations)
@@ -125,21 +122,6 @@ describe('sendConfirmationEmails', function () {
   it('reports api errors', async function () {
     sendStub.rejects();
 
-    let users = [
-      {
-        email: 'ashley@friskygirlfarm.com',
-        location: 'North Bend',
-      },
-      {
-        email: 'ellen@friskygirlfarm.com',
-        location: 'Wallingford',
-      },
-      {
-        email: 'herbie@friskygirlfarm.com',
-        location: 'North Bend',
-      },
-    ];
-
     sinon.stub(console, 'error');
     await expect(
       sendConfirmationEmails(awsFactory, users, locations)
@@ -151,11 +133,13 @@ describe('sendConfirmationEmails', function () {
   });
 
   it('chunks users', async function () {
-    let users = [];
+    let users: User[] = [];
     for (let i = 0; i < 102; i++) {
       users.push({
         email: `user${i}@friskygirlfarm.com`,
         location: i % 2 ? 'Wallingford' : 'North Bend',
+        name: `User ${i}`,
+        balance: 0,
       });
     }
 
@@ -263,11 +247,13 @@ describe('sendConfirmationEmails', function () {
   });
 
   it('handles errors when chunking users', async function () {
-    let users = [];
+    let users: User[] = [];
     for (let i = 0; i < 102; i++) {
       users.push({
         email: `user${i}@friskygirlfarm.com`,
         location: i % 2 ? 'Wallingford' : 'North Bend',
+        name: `User ${i}`,
+        balance: 0,
       });
     }
 

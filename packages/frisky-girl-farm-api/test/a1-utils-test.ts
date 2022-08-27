@@ -1,6 +1,6 @@
-require('./support/setup');
-const { expect } = require('chai');
-const { indexToColumn } = require('../src/sheets/a1-utils');
+import './support/setup';
+import { expect } from 'chai';
+import { indexToColumn } from '../src/sheets/a1-utils';
 
 describe('a1 utils', function () {
   describe('indexToColumn', function () {

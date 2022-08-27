@@ -1,7 +1,7 @@
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 // Convert a zero-based column index to the row letter in A1 notation
-function indexToColumn(index) {
+export function indexToColumn(index: number) {
   index += 1;
 
   let column = '';
@@ -12,7 +12,3 @@ function indexToColumn(index) {
   }
   return column;
 }
-
-module.exports = {
-  indexToColumn,
-};

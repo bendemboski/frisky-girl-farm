@@ -1,7 +1,7 @@
 import { getContext } from '@ember/test-helpers';
 import createUser from './create-user';
 
-import type { User } from 'frisky-girl-farm/types';
+import type { User } from 'frisky-girl-farm-api/src/types';
 import type { TestContext } from '@ember/test-helpers';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

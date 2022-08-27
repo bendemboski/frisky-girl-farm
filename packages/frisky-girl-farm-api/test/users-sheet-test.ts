@@ -1,13 +1,13 @@
-require('./support/setup');
-const { expect } = require('chai');
-const sinon = require('sinon');
-const UsersSheet = require('../src/sheets/users-sheet');
-const { UnknownUserError } = require('../src/sheets/errors');
-const MockSheetsClient = require('./support/mock-sheets-client');
+import './support/setup';
+import { expect } from 'chai';
+import sinon from 'sinon';
+import UsersSheet from '../src/sheets/users-sheet';
+import { UnknownUserError } from '../src/sheets/errors';
+import MockSheetsClient from './support/mock-sheets-client';
 
 describe('UsersSheet', function () {
-  let client;
-  let sheet;
+  let client: MockSheetsClient;
+  let sheet: UsersSheet;
 
   beforeEach(function () {
     client = new MockSheetsClient();
@@ -21,13 +21,10 @@ describe('UsersSheet', function () {
         65.0,
       ],
       // Make sure some extra garbage data doesn't mess things up
-      [null, null, null, 0, null, null],
+      ['', '', '', 0, '', ''],
     ]);
 
-    sheet = new UsersSheet({
-      client,
-      spreadsheetId: 'ssid',
-    });
+    sheet = new UsersSheet(client.asSheets(), 'ssid');
   });
 
   afterEach(function () {

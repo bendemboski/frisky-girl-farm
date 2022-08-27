@@ -3,28 +3,17 @@ import ENV from '../config/environment';
 import fetch from 'fetch';
 
 import type UserService from './user';
-import type { User, ProductOrder, PastOrderProduct } from '../types';
+import type {
+  PastOrder,
+  PastOrderProductsResponse,
+  PastOrdersResponse,
+  ProductsResponse,
+  User,
+} from 'frisky-girl-farm-api/src/types';
 
 const {
   api: { host, namespace },
 } = ENV;
-
-interface ProductsResponse {
-  products: ProductOrder[];
-}
-
-interface PastOrdersResponse {
-  orders: { id: string; date: string }[];
-}
-
-interface PastOrderProductsResponse {
-  products: PastOrderProduct[];
-}
-
-export interface PastOrder {
-  id: string;
-  date: Date;
-}
 
 export default class ApiService extends Service {
   @service('user') declare user: UserService;

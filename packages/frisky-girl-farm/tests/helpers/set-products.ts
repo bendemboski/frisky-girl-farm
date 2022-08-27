@@ -1,6 +1,6 @@
 import { getPretenderState } from './setup-pretender';
 
-import { ProductOrder } from 'frisky-girl-farm/types';
+import type { ProductOrder } from 'frisky-girl-farm-api/src/types';
 
 //
 // Set the product list on the pretender server

@@ -1,20 +1,34 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const asyncHandler = require('express-async-handler');
+import express, { NextFunction, Request, Response } from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import asyncHandler from 'express-async-handler';
 
-const { SheetsError, UnknownUserError } = require('./sheets/errors');
-const sendConfirmationEmails = require('./send-confirmation-emails');
+import { SheetsError, UnknownUserError } from './sheets/errors';
+import sendConfirmationEmails from './send-confirmation-emails';
 
-function serializeProducts(products) {
+import type Spreadsheet from './sheets/spreadsheet';
+import type { ProductOrderMap } from './sheets/orders-sheet';
+import type {
+  ProductsResponse,
+  PastOrdersResponse,
+  User,
+  PastOrderProductsResponse,
+} from './types';
+
+export type AWSFactory = () => typeof import('aws-sdk');
+
+function serializeProducts(products: ProductOrderMap): ProductsResponse {
   return {
-    products: Object.keys(products).map((id) => {
-      return Object.assign({ id: `${id}` }, products[id]);
+    products: Array.from(products.entries()).map(([id, data]) => {
+      return { id: `${id}`, ...data };
     }),
   };
 }
 
-function buildApp(spreadsheetFactory, awsFactory) {
+export default function buildApp(
+  spreadsheetFactory: () => Spreadsheet,
+  awsFactory: AWSFactory
+) {
   let app = express();
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(
@@ -29,18 +43,16 @@ function buildApp(spreadsheetFactory, awsFactory) {
   //
   app.get(
     '/users/:id',
-    asyncHandler(async (req, res) => {
-      let {
-        params: { id: userId },
-      } = req;
+    asyncHandler(async (req, res: Response) => {
+      let userId = req.params.id;
 
-      let spreadsheet = await spreadsheetFactory();
+      let spreadsheet = spreadsheetFactory();
       try {
-        let user = await spreadsheet.getUser(userId);
-        return res.status(200).json(user);
+        let user: User = await spreadsheet.getUser(userId);
+        res.status(200).json(user);
       } catch (e) {
         if (e instanceof UnknownUserError) {
-          return res.status(404).json({ code: e.code });
+          res.status(404).json({ code: e.code });
         }
         throw e;
       }
@@ -53,13 +65,12 @@ function buildApp(spreadsheetFactory, awsFactory) {
   app.get(
     '/products',
     asyncHandler(async (req, res) => {
-      let {
-        query: { userId },
-      } = req;
+      let userId = req.query.userId as string;
 
-      let spreadsheet = await spreadsheetFactory();
+      let spreadsheet = spreadsheetFactory();
       let products = await spreadsheet.getProducts(userId);
-      return res.status(200).json(serializeProducts(products));
+      let response: ProductsResponse = serializeProducts(products);
+      res.status(200).json(response);
     })
   );
 
@@ -69,22 +80,21 @@ function buildApp(spreadsheetFactory, awsFactory) {
   app.put(
     '/products/:id',
     asyncHandler(async (req, res) => {
-      let {
-        query: { userId },
-        params: { id: productId },
-        body: { ordered },
-      } = req;
+      let productId = req.params.id;
+      let ordered = req.body.ordered;
+      let userId = req.query.userId as string;
 
-      let spreadsheet = await spreadsheetFactory();
+      let spreadsheet = spreadsheetFactory();
 
       // Verify that the user exists
       await spreadsheet.getUser(userId);
 
       if (typeof ordered !== 'number' || ordered < 0) {
-        return res.status(400).json({
+        res.status(400).json({
           code: 'badInput',
           message: "Must specify 'ordered' as a non-negative number",
         });
+        return;
       }
 
       let products = await spreadsheet.setProductOrder(
@@ -92,7 +102,8 @@ function buildApp(spreadsheetFactory, awsFactory) {
         parseInt(productId, 10),
         ordered
       );
-      return res.status(200).json(serializeProducts(products));
+      let response: ProductsResponse = serializeProducts(products);
+      res.status(200).json(response);
     })
   );
 
@@ -102,41 +113,42 @@ function buildApp(spreadsheetFactory, awsFactory) {
   app.get(
     '/orders',
     asyncHandler(async (req, res) => {
-      let {
-        query: { userId },
-      } = req;
+      let userId = req.query.userId as string;
 
-      let spreadsheet = await spreadsheetFactory();
+      let spreadsheet = spreadsheetFactory();
       let orders = await spreadsheet.getUserOrders(userId);
-      return res
-        .status(200)
-        .json({ orders: orders.sort((a, b) => b.date - a.date) });
+      let response: PastOrdersResponse = {
+        orders: orders
+          .sort((a, b) => b.date.getTime() - a.date.getTime())
+          .map(({ id, date }) => ({ id, date: date.toISOString() })),
+      };
+      res.status(200).json(response);
     })
   );
 
   app.get(
     '/orders/:id',
     asyncHandler(async (req, res) => {
-      let {
-        query: { userId },
-        params: { id: sheetId },
-      } = req;
+      let sheetId = parseInt(req.params.id, 10);
+      let userId = req.query.userId as string;
 
-      let spreadsheet = await spreadsheetFactory();
+      let spreadsheet = spreadsheetFactory();
 
       let sheet = await spreadsheet.getOrdersSheet(sheetId);
       if (!sheet) {
-        return res.status(404).json({ error: 'Order not found' });
+        res.status(404).json({ error: 'Order not found' });
+        return;
       }
 
       let { products } = await sheet.getForUser(userId);
-      return res.status(200).json({
-        products: Object.values(products).map(
+      let response: PastOrderProductsResponse = {
+        products: Array.from(products.values()).map(
           ({ name, imageUrl, price, ordered }) => {
             return { name, imageUrl, price, ordered };
           }
         ),
-      });
+      };
+      res.status(200).json(response);
     })
   );
 
@@ -146,12 +158,16 @@ function buildApp(spreadsheetFactory, awsFactory) {
   app.post(
     '/admin/confirmation-emails',
     asyncHandler(async (req, res) => {
-      let {
-        body: { sheetId },
-      } = req;
+      let sheetId = req.body.sheetId;
 
       if (!sheetId) {
-        return res.status(400).json({ error: 'No sheet specified' });
+        res.status(400).json({ error: 'No sheet specified' });
+        return;
+      }
+
+      if (typeof sheetId !== 'number') {
+        res.status(400).json({ error: 'Sheet id must be a number' });
+        return;
       }
 
       // The API endpoint takes a sheet id rather than a name to make it
@@ -159,10 +175,11 @@ function buildApp(spreadsheetFactory, awsFactory) {
       // here we fetch the info for the sheet so we can get its name for A1
       // queries, and also verify that it is actually an orders sheet via the
       // developer metadata.
-      let spreadsheet = await spreadsheetFactory();
+      let spreadsheet = spreadsheetFactory();
       let sheet = await spreadsheet.getOrdersSheet(sheetId);
       if (!sheet) {
-        return res.status(400).json({ error: 'Orders sheet not found' });
+        res.status(400).json({ error: 'Orders sheet not found' });
+        return;
       }
 
       // Get the user/location data
@@ -189,7 +206,12 @@ function buildApp(spreadsheetFactory, awsFactory) {
   );
 
   // Log errors
-  app.use(function (err, req, res, next) {
+  app.use(function (
+    err: Error,
+    _req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     if (err instanceof SheetsError) {
       // One of our sheets errors
       let { code, extra } = err;
@@ -202,5 +224,3 @@ function buildApp(spreadsheetFactory, awsFactory) {
 
   return app;
 }
-
-module.exports = buildApp;

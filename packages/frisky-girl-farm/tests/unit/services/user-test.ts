@@ -4,7 +4,7 @@ import setupPretender from '../../helpers/setup-pretender';
 import createUser from '../../helpers/create-user';
 import loginUser from '../../helpers/login-user';
 
-import UserService from 'frisky-girl-farm/services/user';
+import type UserService from 'frisky-girl-farm/services/user';
 
 module('Unit | Service | user', function (hooks) {
   setupTest(hooks);

@@ -1,25 +1,22 @@
-require('./support/setup');
-const { expect } = require('chai');
-const sinon = require('sinon');
-const OrdersSheet = require('../src/sheets/orders-sheet');
-const {
+import './support/setup';
+import { expect } from 'chai';
+import sinon from 'sinon';
+import OrdersSheet from '../src/sheets/orders-sheet';
+import {
   OrdersNotOpenError,
   NegativeQuantityError,
   ProductNotFoundError,
   QuantityNotAvailableError,
-} = require('../src/sheets/errors');
-const MockSheetsClient = require('./support/mock-sheets-client');
+} from '../src/sheets/errors';
+import MockSheetsClient from './support/mock-sheets-client';
 
 describe('OrdersSheet', function () {
-  let client;
-  let sheet;
+  let client: MockSheetsClient;
+  let sheet: OrdersSheet;
 
   beforeEach(function () {
     client = new MockSheetsClient();
-    sheet = new OrdersSheet({
-      client,
-      spreadsheetId: 'ssid',
-    });
+    sheet = new OrdersSheet(client.asSheets(), 'ssid');
   });
 
   afterEach(function () {
@@ -31,17 +28,18 @@ describe('OrdersSheet', function () {
       client.setOrders([1, 1, 1]);
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
-      expect(ret.products).to.have.keys('1', '2', '3');
-      expect(ret).to.deep.nested.include({
-        'products.1.name': 'Lettuce',
-        'products.1.imageUrl': 'http://lettuce.com/image.jpg',
-        'products.1.price': 0.15,
-        'products.2.name': 'Kale',
-        'products.2.imageUrl': 'http://kale.com/image.jpg',
-        'products.2.price': 0.85,
-        'products.3.name': 'Spicy Greens',
-        'products.3.imageUrl': 'http://spicy-greens.com/image.jpg',
-        'products.3.price': 15.0,
+      let products = Object.fromEntries(ret.products?.entries() || []);
+      expect(products).to.have.keys('1', '2', '3');
+      expect(products).to.deep.nested.include({
+        '1.name': 'Lettuce',
+        '1.imageUrl': 'http://lettuce.com/image.jpg',
+        '1.price': 0.15,
+        '2.name': 'Kale',
+        '2.imageUrl': 'http://kale.com/image.jpg',
+        '2.price': 0.85,
+        '3.name': 'Spicy Greens',
+        '3.imageUrl': 'http://spicy-greens.com/image.jpg',
+        '3.price': 15.0,
       });
     });
 
@@ -49,10 +47,11 @@ describe('OrdersSheet', function () {
       client.setOrders([1, 0, 1]);
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
-      expect(ret.products).to.have.keys('1', '3');
-      expect(ret).to.deep.nested.include({
-        'products.1.name': 'Lettuce',
-        'products.3.name': 'Spicy Greens',
+      let products = Object.fromEntries(ret.products?.entries() || []);
+      expect(products).to.have.keys('1', '3');
+      expect(products).to.deep.nested.include({
+        '1.name': 'Lettuce',
+        '3.name': 'Spicy Greens',
       });
     });
 
@@ -60,13 +59,14 @@ describe('OrdersSheet', function () {
       client.setOrders([7, 3, 5]);
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
-      expect(ret).to.deep.nested.include({
-        'products.1.available': 7,
-        'products.1.ordered': 0,
-        'products.2.available': 3,
-        'products.2.ordered': 0,
-        'products.3.available': 5,
-        'products.3.ordered': 0,
+      let products = Object.fromEntries(ret.products?.entries() || []);
+      expect(products).to.deep.nested.include({
+        '1.available': 7,
+        '1.ordered': 0,
+        '2.available': 3,
+        '2.ordered': 0,
+        '3.available': 5,
+        '3.ordered': 0,
       });
     });
 
@@ -78,13 +78,14 @@ describe('OrdersSheet', function () {
       );
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
-      expect(ret).to.deep.nested.include({
-        'products.1.available': 0,
-        'products.1.ordered': 0,
-        'products.2.available': 1,
-        'products.2.ordered': 0,
-        'products.3.available': 2,
-        'products.3.ordered': 0,
+      let products = Object.fromEntries(ret.products?.entries() || []);
+      expect(products).to.deep.nested.include({
+        '1.available': 0,
+        '1.ordered': 0,
+        '2.available': 1,
+        '2.ordered': 0,
+        '3.available': 2,
+        '3.ordered': 0,
       });
     });
 
@@ -96,13 +97,14 @@ describe('OrdersSheet', function () {
       );
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
-      expect(ret).to.deep.nested.include({
-        'products.1.available': 4,
-        'products.1.ordered': 4,
-        'products.2.available': 1,
-        'products.2.ordered': 0,
-        'products.3.available': 3,
-        'products.3.ordered': 1,
+      let products = Object.fromEntries(ret.products?.entries() || []);
+      expect(products).to.deep.nested.include({
+        '1.available': 4,
+        '1.ordered': 4,
+        '2.available': 1,
+        '2.ordered': 0,
+        '3.available': 3,
+        '3.ordered': 1,
       });
     });
 
@@ -114,13 +116,14 @@ describe('OrdersSheet', function () {
       );
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
-      expect(ret).to.deep.nested.include({
-        'products.1.available': 4,
-        'products.1.ordered': 4,
-        'products.2.available': 1,
-        'products.2.ordered': 0,
-        'products.3.available': 5,
-        'products.3.ordered': 1,
+      let products = Object.fromEntries(ret.products?.entries() || []);
+      expect(products).to.deep.nested.include({
+        '1.available': 4,
+        '1.ordered': 4,
+        '2.available': 1,
+        '2.ordered': 0,
+        '3.available': 5,
+        '3.ordered': 1,
       });
     });
 
@@ -146,7 +149,7 @@ describe('OrdersSheet', function () {
       client.stubAppendOrder();
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 2);
-      expect(ret).to.deep.nested.include({
+      expect(Object.fromEntries(ret.entries())).to.deep.nested.include({
         '1.available': 0,
         '1.ordered': 0,
         '2.available': 1,
@@ -175,7 +178,7 @@ describe('OrdersSheet', function () {
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 2);
-      expect(ret).to.deep.nested.include({
+      expect(Object.fromEntries(ret.entries())).to.deep.nested.include({
         '1.available': 3,
         '1.ordered': 3,
         '2.available': 3,
@@ -200,7 +203,7 @@ describe('OrdersSheet', function () {
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 3);
-      expect(ret).to.deep.nested.include({
+      expect(Object.fromEntries(ret.entries())).to.deep.nested.include({
         '1.available': 3,
         '1.ordered': 3,
         '2.available': 3,
@@ -225,7 +228,7 @@ describe('OrdersSheet', function () {
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 2);
-      expect(ret).to.deep.nested.include({
+      expect(Object.fromEntries(ret.entries())).to.deep.nested.include({
         '1.available': 3,
         '1.ordered': 3,
         '2.available': 3,
@@ -250,7 +253,7 @@ describe('OrdersSheet', function () {
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 0);
-      expect(ret).to.deep.nested.include({
+      expect(Object.fromEntries(ret.entries())).to.deep.nested.include({
         '1.available': 3,
         '1.ordered': 3,
         '2.available': 3,
@@ -275,7 +278,7 @@ describe('OrdersSheet', function () {
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 5);
-      expect(ret).to.deep.nested.include({
+      expect(Object.fromEntries(ret.entries())).to.deep.nested.include({
         '1.available': 3,
         '1.ordered': 3,
         '2.available': 3,
@@ -300,7 +303,7 @@ describe('OrdersSheet', function () {
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 4);
-      expect(ret).to.deep.nested.include({
+      expect(Object.fromEntries(ret.entries())).to.deep.nested.include({
         '1.available': 3,
         '1.ordered': 3,
         '2.available': 3,
@@ -383,13 +386,9 @@ describe('OrdersSheet', function () {
   });
 
   it('past orders sheet', async function () {
-    sheet = new OrdersSheet({
-      client,
-      spreadsheetId: 'ssid',
-      sheetName: 'Orders 6-25',
-    });
+    sheet = new OrdersSheet(client.asSheets(), 'ssid', 'Orders 6-25');
 
-    client.setOrders(
+    client.setOrdersForSheet(
       'Orders 6-25',
       [1, 0, 1],
       ['hasorder@friskygirlfarm.com', 0, 0, 1],

@@ -38,6 +38,7 @@ functions:
 
 plugins:
   - serverless-plugin-monorepo
+  - serverless-plugin-typescript
   - '@haftahave/serverless-ses-template'
   - '@connected-home/serverless-plugin-stringify-variables'
 

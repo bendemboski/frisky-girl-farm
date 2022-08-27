@@ -1,5 +1,7 @@
-const Sheet = require('./sheet');
-const { UnknownUserError } = require('./errors');
+import Sheet from './sheet';
+import { UnknownUserError } from './errors';
+import type { sheets_v4 } from 'googleapis';
+import type { User } from '../types';
 
 const sheetName = 'Users';
 const emailColumnIndex = 0;
@@ -7,9 +9,9 @@ const nameColumnIndex = 1;
 const locationColumnIndex = 2;
 const balanceColumnIndex = 3;
 
-class UsersSheet extends Sheet {
-  constructor({ client, spreadsheetId }) {
-    super({ client, spreadsheetId, sheetName });
+export default class UsersSheet extends Sheet {
+  constructor(client: sheets_v4.Sheets, spreadsheetId: string) {
+    super(client, spreadsheetId, sheetName);
   }
 
   // Get a user object by id (email). User objects look like
@@ -20,7 +22,7 @@ class UsersSheet extends Sheet {
   //   location,
   //   balance
   // }
-  async getUser(userId) {
+  async getUser(userId: string): Promise<User> {
     let users = await this.getUsers([userId]);
     if (users.length === 0) {
       throw new UnknownUserError();
@@ -31,7 +33,7 @@ class UsersSheet extends Sheet {
 
   // Get an array of user objects for the given ids (emails). Any that aren't
   // found will be omitted.
-  async getUsers(userIds) {
+  async getUsers(userIds: ReadonlyArray<string>): Promise<User[]> {
     // Make sure whitespace doesn't mess us up
     userIds = userIds.map((id) => id.trim());
 
@@ -56,5 +58,3 @@ class UsersSheet extends Sheet {
     return users;
   }
 }
-
-module.exports = UsersSheet;

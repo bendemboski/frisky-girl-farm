@@ -5,7 +5,10 @@ import { taskFor } from 'ember-concurrency-ts';
 import { ApiError } from './api';
 
 import type ApiService from './api';
-import type { PastOrderProduct, ProductOrder } from '../types';
+import type {
+  PastOrderProduct,
+  ProductOrder,
+} from 'frisky-girl-farm-api/src/types';
 
 export class PastOrder {
   @tracked products: PastOrderProduct[] | null = null;

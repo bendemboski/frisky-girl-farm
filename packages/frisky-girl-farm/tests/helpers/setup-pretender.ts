@@ -2,7 +2,7 @@ import Pretender from 'pretender';
 import sinon from 'sinon';
 import { getContext } from '@ember/test-helpers';
 
-import { User, ProductOrder } from 'frisky-girl-farm/types';
+import { User, ProductOrder } from 'frisky-girl-farm-api/src/types';
 
 export class PretenderState {
   users: Record<string, User> = {};
