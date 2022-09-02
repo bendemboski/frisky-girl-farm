@@ -1093,7 +1093,7 @@
     ember-cli-version-checker "^5.1.2"
     semver "^7.3.5"
 
-"@embroider/addon-shim@^1.0.0", "@embroider/addon-shim@^1.6.0":
+"@embroider/addon-shim@^1.0.0":
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/@embroider/addon-shim/-/addon-shim-1.8.3.tgz#2368510b8ce42d50d02cb3289c32e260dfa34bd9"
   integrity sha512-7pyHwzT6ESXc3nZsB8rfnirLkUhQWdvj6CkYH+0MUPN74mX4rslf7pnBqZE/KZkW3uBIaBYvU8fxi0hcKC/Paw==
@@ -8808,6 +8808,11 @@ forwarded@0.2.0:
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.2.0.tgz#2269936428aad4c15c7ebe9779a84bf0b2a81811"
   integrity sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==
 
+fractal-page-object@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/fractal-page-object/-/fractal-page-object-0.3.0.tgz#aaacfb44d9a618e17ccf9487f4a1ea6e638e0355"
+  integrity sha512-Jrbcm1eIFN/dY/RuTiTjr5K7YpfJbP4inGdt9f9n/jEnqBPi7gqM5WTKIIc4DnyBOWtWs9HE1treSoCYl1HUpg==
+
 fragment-cache@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/fragment-cache/-/fragment-cache-0.2.1.tgz#4290fad27f13e89be7f33799c6bc5a0abfff0d19"
@@ -15259,14 +15264,6 @@ tracked-toolbox@^1.2.3:
   dependencies:
     ember-cache-primitive-polyfill "^1.0.0"
     ember-cli-babel "^7.26.6"
-
-tracked-toolbox@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/tracked-toolbox/-/tracked-toolbox-2.0.0.tgz#7862575527b4c633ef8f9b4111d9d64c07ef2a49"
-  integrity sha512-adZtX+RGN6F+pWs/5JqVuDxLhuia4uhqmQp+UlUaxpykWjDFETtAdQR+LdDJiFPXFAXnS6FBqn/tnSLJQCm3Yw==
-  dependencies:
-    "@embroider/addon-shim" "^1.6.0"
-    ember-cache-primitive-polyfill "^1.0.0"
 
 traverse@^0.6.6:
   version "0.6.6"

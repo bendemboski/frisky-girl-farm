@@ -12,12 +12,91 @@ html, .ember-application {
   max-width: 400px;
 }
 
-.product-card {
-  flex: 0 0 400px;
+.product-orders-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
+  padding: 24px;
 }
 
-.product-card-image {
-  width: 35%;
+.product-tile-image {
+  width: 100%;
+  padding-top: 100%;
+  position: relative;
+
+  > img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(184, 184, 184, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: white;
+  }
+
+  .controls-container {
+    $primary-color: orange;
+
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 10px;
+
+    .add {
+      float: right;
+      border-radius: 50%;
+      background: $primary-color;
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      vertical-align: middle;      
+      border: 1px solid white;
+    }
+
+    .input-container {
+      $height: 30px;
+      $padding: 5px;
+      $border: 1px;
+
+      display: flex;
+      align-items: stretch;
+      background: $primary-color;
+      border-radius: 10px;
+      border: $border solid white;
+      padding: $padding;
+      gap: $padding;
+      line-height: $height;
+      height: $height;
+      box-sizing: content-box;
+
+      .trash-button {
+        padding: 0 2px 2px 2px;
+      }
+
+      > select, input {
+        width: 65px;
+        height: $height;
+      }
+
+      .order-button {
+        vertical-align: top;
+        height: $height;
+      }
+    }
+  }
 }
 
 .product-quantity-input {
@@ -27,6 +106,20 @@ html, .ember-application {
 .past-orders {
   max-width: 400px;
   margin: 0 auto;
+}
+
+.alert-container {
+  position: fixed;
+  top: 20px;
+  left: 0;
+  right: 0;
+  height: 0;
+  text-align: center;
+  z-index: 99999;
+
+  .alert {
+    display: inline-block;
+  }
 }
 
 @import "ember-bootstrap/bootstrap";

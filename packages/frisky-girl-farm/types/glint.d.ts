@@ -1,8 +1,10 @@
 import '@glint/environment-ember-loose';
 
 import EqHelper from '@gavant/glint-template-types/types/ember-truth-helpers/eq';
+import GtHelper from '@gavant/glint-template-types/types/ember-truth-helpers/gt';
 import NotHelper from '@gavant/glint-template-types/types/ember-truth-helpers/not';
 import PerformHelper from '@gavant/glint-template-types/types/ember-concurrency/perform';
+import OnDocumentHelper from '@gavant/glint-template-types/types/ember-on-document/on-document';
 import FaIconHelper from '@gavant/glint-template-types/types/@fortawesome/ember-fontawesome/helpers/fa-icon';
 import OnClickOutsideModifier from '@gavant/glint-template-types/types/ember-click-outside/modifier';
 import ModalDialog from '@gavant/glint-template-types/types/ember-modal-dialog/modal-dialog';
@@ -12,6 +14,7 @@ import { ComponentLike } from '@glint/template';
 declare module '@glint/environment-ember-loose/registry' {
   export default interface Registry {
     eq: typeof EqHelper;
+    gt: typeof GtHelper;
     not: typeof NotHelper;
     sub: HelperLike<{
       Args: { Positional: [number, number] };
@@ -22,6 +25,7 @@ declare module '@glint/environment-ember-loose/registry' {
       Return: number;
     }>;
     perform: typeof PerformHelper;
+    'on-document': typeof OnDocumentHelper;
     FaIcon: typeof FaIconHelper;
     'on-click-outside': typeof OnClickOutsideModifier;
     BsNavbar: ComponentLike<{
