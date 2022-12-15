@@ -21,7 +21,7 @@
   "dependencies": {
     "aws-sdk": "^2.1048.0",
     "cors": "^2.8.5",
-    "express": "^4.17.2",
+    "express": "^4.17.3",
     "express-async-handler": "^1.2.0",
     "googleapis": "^92.0.0",
     "serverless-http": "^2.6.0"
