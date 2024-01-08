@@ -1,0 +1,79 @@
+<BsNavbar @position="fixed-top" as |navbar|>
+  <navbar.toggle/>
+  <a class="navbar-brand" href="#">Frisky Girl Farm</a>
+  <navbar.content>
+    {{#if this.isLoggedIn}}
+      <navbar.nav class="flex-fill" as |nav|>
+        <nav.item>
+          <span class="navbar-text">
+            <span class="text-info" data-test-username>{{this.user.name}}</span>
+            <span class="small font-weight-bold" data-test-balance>
+              (Balance: {{currency (sub this.user.balance this.order.spent)}})
+            </span>
+          </span>
+        </nav.item>
+      </navbar.nav>
+      <navbar.nav as |nav|>
+        <nav.item>
+          <a
+            href="#"
+            role="button"
+            class="nav-link"
+            data-test-order-trigger
+            {{! template-lint-disable require-presentational-children }}
+          >
+            Shopping Cart
+            <FaIcon @icon={{if this.orderPopoverShown "caret-up" "caret-down"}}/>
+          </a>
+          <BsPopover
+            @placement="bottom"
+            class="mw-100"
+            @onShow={{fn (mut this.orderPopoverShown) true}}
+            @onHide={{fn (mut this.orderPopoverShown) false}}
+            as |po|
+          >
+            <div {{on-click-outside po.close}} data-test-order-popover>
+              {{#if this.order.isOrderingOpen}}
+                {{#if this.productsOrdered}}
+                  {{#each this.productsOrdered as |product|}}
+                    <div class="d-flex" data-test-order-item>
+                      <span class="flex-grow-1">({{product.ordered}}) {{product.name}}</span>
+                      <span class="pl-2">{{currency (mult product.ordered product.price)}}</span>
+                    </div>
+                  {{/each}}
+                  <div class="text-right font-weight-bold" data-test-order-total>
+                    Total: {{currency this.order.spent}}
+                  </div>
+                {{else}}
+                  You haven't ordered anything yet
+                {{/if}}
+              {{else}}
+                Ordering is not open
+              {{/if}}
+            </div>
+          </BsPopover>          
+        </nav.item>
+
+        <nav.item>
+          <LinkTo @route="auth.index" class="nav-link">Current order</LinkTo>
+        </nav.item>
+
+        <nav.item>
+          <LinkTo @route="auth.past-orders" class="nav-link">Past orders</LinkTo>
+        </nav.item>
+
+        <nav.item>
+          <a
+            href="#"
+            role="button"
+            class="nav-link"
+            {{on "click" this.logout}}
+            data-test-logout
+          >
+            Sign out
+          </a>
+        </nav.item>
+      </navbar.nav>
+    {{/if}}
+  </navbar.content>
+</BsNavbar>

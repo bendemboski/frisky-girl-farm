@@ -1,14 +1,6 @@
 'use strict';
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
-const { V1Addon } = require('@embroider/compat');
-const { forceIncludeModule } = require('@embroider/compat/src/compat-utils');
-
-class EmberDataCompatAdapter extends V1Addon {
-  get packageMeta() {
-    return forceIncludeModule(super.packageMeta, './-private');
-  }
-}
 
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
@@ -39,11 +31,5 @@ module.exports = function (defaults) {
     staticHelpers: true,
     staticModifiers: true,
     staticComponents: true,
-
-    // https://github.com/embroider-build/embroider/issues/396#issuecomment-611885598
-    compatAdapters: new Map([
-      ['@ember-data/model', EmberDataCompatAdapter],
-      ['@ember-data/record-data', EmberDataCompatAdapter],
-    ]),
   });
 };

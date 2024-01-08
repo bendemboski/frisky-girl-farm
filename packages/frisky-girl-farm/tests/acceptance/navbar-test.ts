@@ -7,6 +7,9 @@ import loginUser from '../helpers/login-user';
 import setProducts from '../helpers/set-products';
 import window from 'ember-window-mock';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LocalSettings = any;
+
 module('Acceptance | navbar', function (hooks) {
   setupApplicationTest(hooks);
   setupPretender(hooks);
@@ -191,7 +194,9 @@ module('Acceptance | navbar', function (hooks) {
     await click('[data-test-logout]');
     assert.strictEqual(window.location.pathname, '/login');
     assert.notOk(
-      this.owner.lookup('service:local-settings').get('settings.userEmail')
+      (this.owner.lookup('service:local-settings') as LocalSettings).get(
+        'settings.userEmail'
+      )
     );
   });
 });

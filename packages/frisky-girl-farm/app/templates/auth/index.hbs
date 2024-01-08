@@ -1,8 +1,8 @@
 {{#if this.order.isOrderingOpen}}
   <h4 class="my-3 text-center">Choose what you want this week</h4>
 
-  <div class="d-flex flex-wrap justify-content-center">
-    {{#each this.order.products as |product|}}
+  <div class="product-orders-container">
+    {{#each this.order.products key="id" as |product|}}
       {{!-- Only show the product if it has availability for this user --}}
       {{#if product.available}}
         <ProductOrder

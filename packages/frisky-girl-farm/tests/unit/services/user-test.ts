@@ -3,25 +3,25 @@ import { setupTest } from 'ember-qunit';
 import setupPretender from '../../helpers/setup-pretender';
 import createUser from '../../helpers/create-user';
 import loginUser from '../../helpers/login-user';
-import { taskFor } from 'ember-concurrency-ts';
 
-import UserService from 'frisky-girl-farm/services/user';
+import type UserService from 'frisky-girl-farm/services/user';
 
 module('Unit | Service | user', function (hooks) {
   setupTest(hooks);
   setupPretender(hooks);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let localSettings: any;
   let service: UserService;
 
   hooks.beforeEach(function () {
     localSettings = this.owner.lookup('service:local-settings');
-    service = this.owner.lookup('service:user');
+    service = this.owner.lookup('service:user') as UserService;
   });
 
   module('checkLoggedIn', function () {
     test('it works with no stored email', async function (assert) {
-      let result = await taskFor(service.checkLoggedIn).perform();
+      let result = await service.checkLoggedIn.perform();
       assert.notOk(result);
       assert.notOk(service.isLoggedIn);
     });
@@ -34,7 +34,7 @@ module('Unit | Service | user', function (hooks) {
         balance: 58.0,
       });
 
-      let result = await taskFor(service.checkLoggedIn).perform();
+      let result = await service.checkLoggedIn.perform();
       assert.ok(result);
       assert.ok(service.isLoggedIn);
       assert.strictEqual(service.email, 'ashley@friskygirlfarm.com');
@@ -46,7 +46,7 @@ module('Unit | Service | user', function (hooks) {
     test('it works with an invalid stored email', async function (assert) {
       localSettings.set('settings.userEmail', 'ashley@friskygirlfarm.com');
 
-      let result = await taskFor(service.checkLoggedIn).perform();
+      let result = await service.checkLoggedIn.perform();
       assert.notOk(result);
       assert.notOk(service.isLoggedIn);
     });
@@ -61,9 +61,7 @@ module('Unit | Service | user', function (hooks) {
         balance: 58.0,
       });
 
-      let result = await taskFor(service.login).perform(
-        'ashley@friskygirlfarm.com'
-      );
+      let result = await service.login.perform('ashley@friskygirlfarm.com');
       assert.ok(result);
       assert.ok(service.isLoggedIn);
       assert.strictEqual(service.email, 'ashley@friskygirlfarm.com');
@@ -73,9 +71,7 @@ module('Unit | Service | user', function (hooks) {
     });
 
     test('it handles failures', async function (assert) {
-      let result = await taskFor(service.login).perform(
-        'ashley@friskygirlfarm.com'
-      );
+      let result = await service.login.perform('ashley@friskygirlfarm.com');
       assert.notOk(result);
       assert.notOk(service.isLoggedIn);
     });
@@ -89,7 +85,7 @@ module('Unit | Service | user', function (hooks) {
       balance: 58.0,
     });
 
-    await taskFor(service.checkLoggedIn).perform();
+    await service.checkLoggedIn.perform();
     assert.ok(service.isLoggedIn);
     service.logout();
     assert.notOk(service.isLoggedIn);

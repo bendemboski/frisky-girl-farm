@@ -1,6 +1,11 @@
 import { helper } from '@ember/component/helper';
 
-export function mondayDate([date]: [Date]) {
+interface MondayDateSignature {
+  Args: { Positional: [Date] };
+  Return: string;
+}
+
+const mondayDate = helper<MondayDateSignature>(([date]: [Date]) => {
   let d = new Date(date);
   let day = d.getDay();
   let dayDelta;
@@ -17,6 +22,12 @@ export function mondayDate([date]: [Date]) {
   let monday = new Date(d.setDate(d.getDate() - dayDelta));
   // getMonth() is 0-based, getDate() isn't
   return `${monday.getMonth() + 1}-${monday.getDate()}`;
+});
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'monday-date': typeof mondayDate;
+  }
 }
 
-export default helper(mondayDate);
+export default mondayDate;

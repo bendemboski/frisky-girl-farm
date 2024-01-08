@@ -1,6 +1,5 @@
 import { getPretenderState } from './setup-pretender';
-
-import { User } from 'frisky-girl-farm/types';
+import type { User } from 'frisky-girl-farm-api/src/types';
 
 //
 // Create a user on the pretender server

@@ -1,26 +1,30 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
-import { map } from 'macro-decorators';
 import { dropTask } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
 import type { PastOrder } from 'frisky-girl-farm/services/order';
 
 class PastOrderState {
   @tracked isOpen = false;
 
-  constructor(public pastOrder: PastOrder) {}
+  constructor(readonly pastOrder: PastOrder) {}
 
   @dropTask
-  async toggle() {
+  private *_toggle() {
     if (this.isOpen) {
       this.isOpen = false;
     } else {
-      await this.pastOrder.load();
+      yield this.pastOrder.load();
       this.isOpen = true;
     }
   }
+  readonly toggle = taskFor(this._toggle);
 }
 
 export default class PastOrdersController extends Controller {
-  @map('model', (pastOrder) => new PastOrderState(pastOrder))
-  declare pastOrderStates: PastOrderState[];
+  declare model: PastOrder[];
+
+  get pastOrderStates() {
+    return this.model.map((pastOrder) => new PastOrderState(pastOrder));
+  }
 }

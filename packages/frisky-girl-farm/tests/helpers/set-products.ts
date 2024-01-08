@@ -1,14 +1,16 @@
 import { getPretenderState } from './setup-pretender';
 
-import { ProductOrder } from 'frisky-girl-farm/types';
+import type { ProductOrder } from 'frisky-girl-farm-api/src/types';
 
 //
 // Set the product list on the pretender server
 //
-export default function setProducts(products: ProductOrder[]) {
+export default function setProducts(products: ProductOrder[] | null) {
   let pretenderState = getPretenderState();
   if (!pretenderState) {
     throw new Error('You must call `setupPretender()` to use this method');
   }
-  pretenderState.products = JSON.parse(JSON.stringify(products));
+  pretenderState.products = products
+    ? JSON.parse(JSON.stringify(products))
+    : null;
 }

@@ -5,6 +5,9 @@ import setupPretender from '../helpers/setup-pretender';
 import loginUser from '../helpers/login-user';
 import createUser from '../helpers/create-user';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LocalSettings = any;
+
 module('Acceptance | login', function (hooks) {
   setupApplicationTest(hooks);
   setupPretender(hooks);
@@ -40,7 +43,9 @@ module('Acceptance | login', function (hooks) {
 
     assert.strictEqual(currentURL(), '/');
     assert.strictEqual(
-      this.owner.lookup('service:local-settings').get('settings.userEmail'),
+      (this.owner.lookup('service:local-settings') as LocalSettings).get(
+        'settings.userEmail'
+      ),
       'ashley@friskygirlfarm.com'
     );
   });

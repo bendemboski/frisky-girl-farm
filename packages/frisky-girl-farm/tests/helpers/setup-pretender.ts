@@ -2,7 +2,7 @@ import Pretender from 'pretender';
 import sinon from 'sinon';
 import { getContext } from '@ember/test-helpers';
 
-import { User, ProductOrder } from 'frisky-girl-farm/types';
+import { User, ProductOrder } from 'frisky-girl-farm-api/src/types';
 
 export class PretenderState {
   users: Record<string, User> = {};
@@ -17,7 +17,7 @@ class TestState {
   pretenderState = new PretenderState();
 }
 
-const state: WeakMap<Object, TestState> = new WeakMap();
+const state: WeakMap<object, TestState> = new WeakMap();
 
 function getPretender(): Pretender {
   return state.get(getContext())!.pretender;

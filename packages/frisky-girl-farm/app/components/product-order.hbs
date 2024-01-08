@@ -1,0 +1,97 @@
+<div data-test-product-order>
+  <div class="product-tile-image">
+    <img class="w-100" src={{@product.imageUrl}} alt={{@product.name}}>
+
+    {{#if this.setOrdered.isRunning}}
+      <div class="loading-overlay">
+        <FaIcon @icon="spinner" @spin={{true}} @size="4x"/>
+      </div>
+    {{/if}}
+
+    <div class="controls-container">
+      {{#if (eq this.controlsDisplayMode 'hidden')}}
+        <button type="button" class="add" {{on "click" this.showControls}} data-test-add-button>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#FFFFFF" xmlns="http://www.w3.org/2000/svg" size="24" color="systemGrayscale00">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3.5A1.5 1.5 0 0113.5 5v5.5H19a1.5 1.5 0 011.493 1.355L20.5 12a1.5 1.5 0 01-1.5 1.5h-5.5V19a1.5 1.5 0 01-1.355 1.493L12 20.5a1.5 1.5 0 01-1.5-1.5v-5.5H5a1.5 1.5 0 01-1.493-1.355L3.5 12A1.5 1.5 0 015 10.5h5.5V5a1.5 1.5 0 011.355-1.493L12 3.5z"></path>
+          </svg>
+        </button>
+      {{else}}
+        <div class="input-container">
+          <div>
+            <button
+              type="button"
+              class="btn btn-sm trash-button"
+              disabled={{this.setOrdered.isRunning}}
+              {{on "click" this.resetOrder}}
+              data-test-delete-button
+            >
+              <FaIcon @icon="trash"/>
+            </button>
+          </div>
+          <label for="quantity">Ordered:</label>
+          {{#if (eq this.controlsDisplayMode 'select')}}
+            <select
+              id="quantity"
+              class="form-control form-control-sm"
+              disabled={{this.setOrdered.isRunning}}
+              {{on "change" this.onSelectOrdered}}
+              data-test-quantity-select
+            >
+              {{#each this.selectValues as |selectValue|}}
+                <option value={{selectValue.value}} selected={{eq selectValue.value @product.ordered}}>
+                  {{selectValue.label}}
+                </option>
+              {{/each}}
+            </select>
+            <div class="flex-grow-1 text-right" data-test-total-price>
+              {{currency (mult @product.price @product.ordered)}}
+            </div>
+          {{else}}
+            <input
+              id="quantity"
+              type="number"
+              class="form-control form-control-sm"
+              min="0"
+              value={{this.customInputValue}}
+              disabled={{this.setOrdered.isRunning}}
+              {{this.autofocus}}
+              {{on "input" this.onInputCustomOrdered}}
+              {{on "focusout" this.saveCustomOrder}}
+              data-test-quantity-input
+            />
+            <div class="flex-grow-1"></div>
+            <div>
+              <button
+                type="button"
+                class="btn btn-primary btn-sm order-button"
+                disabled={{this.setOrdered.isRunning}}
+                {{on "click" this.saveCustomOrder}}
+                data-test-submit-quantity-input
+              >
+                Order
+              </button>
+            </div>
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
+  </div>
+  <div class="font-weight-bold">{{currency @product.price}}</div>
+  <div data-test-product-name>{{@product.name}}</div>
+</div>
+
+{{#if this.availabilityError}}
+  <div class="alert-container">
+    <div class="alert alert-danger" data-test-availability-error>
+      Sorry,
+      {{#if this.availabilityError.available}}
+        only {{this.availabilityError.available}}
+      {{else}}
+        none
+      {{/if}}
+      of these are available.
+    </div>
+  </div>
+ 
+  {{on-document 'mousedown' (fn (mut this.availabilityError) null) capture=true}}
+{{/if}}
