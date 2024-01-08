@@ -11,5 +11,10 @@
       "*": ["types/*"],
       "fetch": ["node_modules/ember-fetch"]
     }
-  }
+  },
+  "include": [
+    "app/**/*",
+    "tests/**/*",
+    "types/**/*",
+  ]
 }

@@ -7,6 +7,7 @@ import { waitFor } from '@ember/test-waiters';
 import { modifier } from 'ember-modifier';
 
 import type { ProductOrder } from 'frisky-girl-farm-api/src/types';
+import { ApiError } from 'frisky-girl-farm/services/api';
 
 interface AvailabilityError {
   available: number;
@@ -142,8 +143,8 @@ export default class ProductOrderComponent extends Component<ProductOrderArgumen
       this.controlsDisplayMode = 'select';
       return true;
     } catch (e) {
-      if (e.isQuantityNotAvailable) {
-        this.availabilityError = { available: e.extra.available };
+      if (e instanceof ApiError && e.isQuantityNotAvailable) {
+        this.availabilityError = { available: e.extra['available'] as number };
         return false;
       } else {
         throw e;

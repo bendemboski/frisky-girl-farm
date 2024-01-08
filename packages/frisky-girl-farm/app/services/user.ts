@@ -1,12 +1,12 @@
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { alias } from 'macro-decorators';
-import { task, TaskGenerator } from 'ember-concurrency';
+import { task, type TaskGenerator } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { ApiError } from './api';
 
 import ApiService from './api';
-import { User } from 'frisky-girl-farm-api/src/types';
+import { type User } from 'frisky-girl-farm-api/src/types';
 
 export default class UserService extends Service {
   @service('local-settings') declare localSettings: unknown;
