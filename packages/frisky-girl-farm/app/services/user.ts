@@ -9,7 +9,6 @@ import ApiService from './api';
 import { User } from 'frisky-girl-farm-api/src/types';
 
 export default class UserService extends Service {
-  // @ts-expect-error not in the registry
   @service('local-settings') declare localSettings: unknown;
   @service('api') declare api: ApiService;
 

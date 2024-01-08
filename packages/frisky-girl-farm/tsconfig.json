@@ -32,7 +32,7 @@
         "types/*"
       ],
       "fetch": [
-        "../../node_modules/ember-fetch"
+        "node_modules/ember-fetch"
       ]
     },
   },

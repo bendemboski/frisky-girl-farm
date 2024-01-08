@@ -2,13 +2,20 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "lint": "yarn workspaces run lint"
+    "lint": "pnpm --filter '*' lint",
+    "lint:fix": "pnpm --filter '*' lint:fix",
+    "test": "pnpm --filter '*' test"
   },
   "workspaces": [
     "packages/*"
   ],
+  "engines": {
+    "node": ">= 20.*",
+    "yarn": "use pnpm",
+    "npm": "use pnpm"
+  },
   "volta": {
-    "node": "16.13.0",
-    "yarn": "1.22.19"
+    "node": "20.9.0",
+    "pnpm": "8.14.0"
   }
 }

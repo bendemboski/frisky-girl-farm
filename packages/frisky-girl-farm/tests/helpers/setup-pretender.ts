@@ -20,11 +20,11 @@ class TestState {
 const state: WeakMap<object, TestState> = new WeakMap();
 
 function getPretender(): Pretender {
-  return state.get(getContext())!.pretender;
+  return state.get(getContext()!)!.pretender;
 }
 
 export function getPretenderState(): PretenderState {
-  return state.get(getContext())!.pretenderState;
+  return state.get(getContext()!)!.pretenderState;
 }
 
 //
@@ -32,7 +32,7 @@ export function getPretenderState(): PretenderState {
 //
 export default function setupPretender(hooks: NestedHooks) {
   hooks.beforeEach(function () {
-    state.set(getContext(), new TestState());
+    state.set(getContext()!, new TestState());
 
     let pretender = getPretender();
     let pretenderState = getPretenderState();

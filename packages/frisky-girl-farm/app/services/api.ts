@@ -75,7 +75,12 @@ export class ApiError extends Error {
     super(message);
     this.code = code;
     this.extra = extra;
-    Error.captureStackTrace(this, ApiError);
+    try {
+      // @ts-expect-error captureStackTrace is a v8 extension
+      Error.captureStackTrace(this, ApiError);
+    } catch (e) {
+      // ignore
+    }
   }
 
   get isOrdersNotOpen() {

@@ -10,8 +10,8 @@ This projects implements a Google Workspace Addon that runs in Google Sheets. Fa
 
 This project is set up to use [clasp](https://github.com/google/clasp), which is well documented. The quick list of useful commands is:
 
-* `yarn clasp login` -- log in to be able to push code to the workspace addon
-* `yarn clasp push` -- push local code to the workspace addon
+* `pnpm clasp login` -- log in to be able to push code to the workspace addon
+* `pnpm clasp push` -- push local code to the workspace addon
 
 Successful CI `main` builds auto-deploy using OAuth credentials configured in the `CLASP_OAUTH_CREDENTIALS` GitHub repository secret.
 

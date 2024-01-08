@@ -66,5 +66,5 @@ Next, set up the admin Google workspace addon:
 2. Create a [standalone Google app scripts project](https://script.google.com/create).
 3. In the project settings, change the Google Cloud Platform Project to the one you created above.
 4. Get the [script id](https://github.com/google/clasp#scriptid-required) from the Google app scripts project and put it in [packages/frisky-girl-admin/.clasp.json] under the `scriptId` key.
-5. From `/packages/frisky-girl-farm-admin`, run `yarn clasp login` and log authorize `clasp` with your Google account that has access to the scripts project.
+5. From `/packages/frisky-girl-farm-admin`, run `pnpm clasp login` and log authorize `clasp` with your Google account that has access to the scripts project.
 6. Base64-encode the generated credentials file, `base64 ~/.clasprc.json`) and set it as the value of the `CLASP_OAUTH_CREDENTIALS` GitHub repository secret in this repository, so CI can deploy the admin scripts on your behalf.
