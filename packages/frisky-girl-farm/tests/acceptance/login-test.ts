@@ -44,9 +44,9 @@ module('Acceptance | login', function (hooks) {
     assert.strictEqual(currentURL(), '/');
     assert.strictEqual(
       (this.owner.lookup('service:local-settings') as LocalSettings).get(
-        'settings.userEmail'
+        'settings.userEmail',
       ),
-      'ashley@friskygirlfarm.com'
+      'ashley@friskygirlfarm.com',
     );
   });
 

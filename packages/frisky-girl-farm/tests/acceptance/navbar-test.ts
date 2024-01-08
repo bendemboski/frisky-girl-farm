@@ -195,8 +195,8 @@ module('Acceptance | navbar', function (hooks) {
     assert.strictEqual(window.location.pathname, '/login');
     assert.notOk(
       (this.owner.lookup('service:local-settings') as LocalSettings).get(
-        'settings.userEmail'
-      )
+        'settings.userEmail',
+      ),
     );
   });
 });

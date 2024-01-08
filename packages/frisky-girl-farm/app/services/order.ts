@@ -13,7 +13,11 @@ import type {
 export class PastOrder {
   @tracked products: PastOrderProduct[] | null = null;
 
-  constructor(public id: string, public date: Date, private api: ApiService) {}
+  constructor(
+    public id: string,
+    public date: Date,
+    private api: ApiService,
+  ) {}
 
   get isLoaded() {
     return this.products !== null;
@@ -67,7 +71,7 @@ export default class OrderService extends Service {
     if (!this.pastOrders) {
       let orders: PastOrder[] = yield this.api.getPastOrders();
       this.pastOrders = orders.map(
-        ({ id, date }) => new PastOrder(id, date, this.api)
+        ({ id, date }) => new PastOrder(id, date, this.api),
       );
     }
     return this.pastOrders;

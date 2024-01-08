@@ -53,7 +53,7 @@ export default function setupPretender(hooks: NestedHooks) {
             JSON.stringify({ code: 'unknownUser' }),
           ];
         }
-      })
+      }),
     );
 
     pretender.get(
@@ -72,7 +72,7 @@ export default function setupPretender(hooks: NestedHooks) {
             JSON.stringify({ code: 'ordersNotOpen' }),
           ];
         }
-      })
+      }),
     );
 
     pretender.put(
@@ -88,7 +88,7 @@ export default function setupPretender(hooks: NestedHooks) {
           }
 
           let product = pretenderState.products.find(
-            ({ id }) => id === productId
+            ({ id }) => id === productId,
           );
           if (!product) {
             return [
@@ -116,8 +116,8 @@ export default function setupPretender(hooks: NestedHooks) {
             { 'Content-Type': 'application/json' },
             JSON.stringify({ products: pretenderState.products }),
           ];
-        }
-      )
+        },
+      ),
     );
   });
 

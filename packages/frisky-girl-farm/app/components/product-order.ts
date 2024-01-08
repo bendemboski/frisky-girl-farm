@@ -44,7 +44,7 @@ export default class ProductOrderComponent extends Component<ProductOrderArgumen
   get selectValues() {
     // Base numeric values
     let values: Array<{ value: number | string; label: string }> = Array.from(
-      Array(maxSelectQuantity + 1).keys()
+      Array(maxSelectQuantity + 1).keys(),
     ).map((value) => ({ value, label: `${value}` }));
 
     // If the ordered value is custom, show it as an option so it can be

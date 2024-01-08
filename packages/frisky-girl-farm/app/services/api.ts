@@ -38,7 +38,7 @@ export default class ApiService extends Service {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ordered: quantity }),
-      }
+      },
     );
     return data.products;
   }
@@ -70,7 +70,7 @@ export class ApiError extends Error {
   constructor(
     readonly code: string,
     readonly extra: Record<string, unknown>,
-    message?: string
+    message?: string,
   ) {
     super(message);
     this.code = code;

@@ -44,11 +44,11 @@ declare module '@glint/environment-ember-loose/registry' {
                 default: [
                   {
                     item: ComponentLike<{ Blocks: { default: [] } }>;
-                  }
+                  },
                 ];
               };
             }>;
-          }
+          },
         ];
       };
     }>;
@@ -80,7 +80,7 @@ declare module '@glint/environment-ember-loose/registry' {
               Blocks: { default: [] };
             }>;
             isSubmitting: boolean;
-          }
+          },
         ];
       };
     }>;

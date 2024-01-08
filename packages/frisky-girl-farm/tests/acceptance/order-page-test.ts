@@ -53,9 +53,9 @@ class OrderPage extends PageObject {
               get value() {
                 return this.element?.getAttribute('value');
               }
-            }
+            },
           );
-        }
+        },
       );
 
       /**
@@ -72,7 +72,7 @@ class OrderPage extends PageObject {
        * The total price display
        */
       totalPrice = selector('[data-test-total-price]');
-    }
+    },
   );
 }
 
@@ -213,7 +213,7 @@ module('Acceptance | order page', function (hooks) {
     assert.dom(page.products[0].quantitySelect.element).hasValue('5');
     assert.deepEqual(
       page.products[0].quantitySelect.options.map((option) => option.value),
-      ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'custom']
+      ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'custom'],
     );
     assert.dom(page.products[0].quantityInput.element).isNotVisible();
     assert.dom(page.products[0].totalPrice.element).hasText('$17.50');
@@ -239,7 +239,7 @@ module('Acceptance | order page', function (hooks) {
     assert.dom(page.products[0].quantitySelect.element).hasValue('22');
     assert.deepEqual(
       page.products[0].quantitySelect.options.map((option) => option.value),
-      ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '22', 'custom']
+      ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '22', 'custom'],
     );
     assert.dom(page.products[0].quantityInput.element).isNotVisible();
     assert.dom(page.products[0].totalPrice.element).hasText('$77.00');
@@ -271,9 +271,9 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      4
+      4,
     );
   });
 
@@ -310,9 +310,9 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      22
+      22,
     );
   });
 
@@ -343,9 +343,9 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      22
+      22,
     );
   });
 
@@ -372,9 +372,9 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      8
+      8,
     );
   });
 
@@ -407,9 +407,9 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      22
+      22,
     );
   });
 
@@ -436,9 +436,9 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      8
+      8,
     );
   });
 
@@ -465,9 +465,9 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      0
+      0,
     );
   });
 
@@ -493,9 +493,9 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      0
+      0,
     );
   });
 

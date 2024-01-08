@@ -72,7 +72,8 @@ module('Unit | Service | order', function (hooks) {
       assert.ok(service.isOrderingOpen);
       assert.deepEqual(service.products, products);
       assert.notOk(
-        getPretenderState().getProductsStub.firstCall.args[0].queryParams.userId
+        getPretenderState().getProductsStub.firstCall.args[0].queryParams
+          .userId,
       );
     });
 
@@ -119,7 +120,7 @@ module('Unit | Service | order', function (hooks) {
       assert.strictEqual(
         getPretenderState().getProductsStub.firstCall.args[0].queryParams
           .userId,
-        'ashley@friskygirlfarm.com'
+        'ashley@friskygirlfarm.com',
       );
     });
 
@@ -178,7 +179,7 @@ module('Unit | Service | order', function (hooks) {
       assert.deepEqual(service.products, products);
       assert.strictEqual(
         getPretenderState().putProductStub.firstCall.args[0].queryParams.userId,
-        'ashley@friskygirlfarm.com'
+        'ashley@friskygirlfarm.com',
       );
     });
 
@@ -188,7 +189,7 @@ module('Unit | Service | order', function (hooks) {
       assert.deepEqual(service.products, products);
       assert.strictEqual(
         getPretenderState().putProductStub.firstCall.args[0].queryParams.userId,
-        'ashley@friskygirlfarm.com'
+        'ashley@friskygirlfarm.com',
       );
     });
 
