@@ -95,9 +95,7 @@ function completeSendConfirmationEmails({
         .build();
     }
   } else {
-    message = `Failed to send emails. code=${code} body=${response.getContentText()} args=${JSON.stringify(
-      Array.from(arguments),
-    )}`;
+    message = `Failed to send emails. code=${code} body=${response.getContentText()} sheetId=${sheetId}`;
   }
 
   return CardService.newActionResponseBuilder()
