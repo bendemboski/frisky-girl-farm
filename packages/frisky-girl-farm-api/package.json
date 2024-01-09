@@ -12,8 +12,11 @@
   ],
   "scripts": {
     "test": "vitest",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint:fix": "concurrently \"npm:lint:*:fix\" --names \"fix:\"",
+    "lint:js": "eslint . --cache",
+    "lint": "concurrently \"npm:lint:*(!fix)\" --names \"lint:\"",
+    "lint:js:fix": "eslint . --fix",
+    "lint:types": "tsc --noEmit",
     "serve": "dotenv -- nodemon ./dev/serve.ts",
     "serve-inspect": "dotenv -- nodemon --inspect ./dev/serve.ts",
     "deploy": "dotenv -- sls deploy"
@@ -41,6 +44,7 @@
     "@typescript-eslint/eslint-plugin": "^6.18.1",
     "@typescript-eslint/parser": "^6.18.1",
     "@vitest/coverage-v8": "^1.1.3",
+    "concurrently": "^8.2.2",
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.22.0",
     "eslint-config-prettier": "^9.1.0",
