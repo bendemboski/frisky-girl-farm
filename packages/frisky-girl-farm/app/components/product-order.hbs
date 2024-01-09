@@ -92,6 +92,6 @@
       of these are available.
     </div>
   </div>
- 
-  {{on-document 'mousedown' (fn (mut this.availabilityError) null) capture=true}}
+
+  {{on-document 'mousedown' this.clearAvailabilityError capture=true}}
 {{/if}}

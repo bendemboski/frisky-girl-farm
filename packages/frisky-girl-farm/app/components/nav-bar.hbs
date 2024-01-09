@@ -8,7 +8,7 @@
           <span class="navbar-text">
             <span class="text-info" data-test-username>{{this.user.name}}</span>
             <span class="small font-weight-bold" data-test-balance>
-              (Balance: {{currency (sub this.user.balance this.order.spent)}})
+              (Balance: {{currency (sub (or this.user.balance 0) this.order.spent)}})
             </span>
           </span>
         </nav.item>
@@ -51,7 +51,7 @@
                 Ordering is not open
               {{/if}}
             </div>
-          </BsPopover>          
+          </BsPopover>
         </nav.item>
 
         <nav.item>

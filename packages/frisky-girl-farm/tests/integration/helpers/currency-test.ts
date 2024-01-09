@@ -9,7 +9,7 @@ module('Integration | Helper | currency', function (hooks) {
   test('it works', async function (assert) {
     this.set('amount', 0);
 
-    await render(hbs`{{currency this.amount}}`);
+    await render<{ amount: number }>(hbs`{{currency this.amount}}`);
     assert.dom().hasText('$0.00');
 
     this.set('amount', 3.5);

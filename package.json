@@ -21,6 +21,10 @@
   "pnpm": {
     "overrides": {
       "@glimmer/validator": "0.84.3"
+    },
+    "patchedDependencies": {
+      "@gavant/glint-template-types@0.3.6": "patches/@gavant__glint-template-types@0.3.6.patch",
+      "@fortawesome/ember-fontawesome@2.0.0": "patches/@fortawesome__ember-fontawesome@2.0.0.patch"
     }
   }
 }

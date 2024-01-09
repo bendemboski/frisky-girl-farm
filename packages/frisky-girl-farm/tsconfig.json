@@ -16,5 +16,14 @@
     "app/**/*",
     "tests/**/*",
     "types/**/*",
-  ]
+    "node_modules/@gavant/glint-template-types/types/ember-truth-helpers/*",
+    "node_modules/@gavant/glint-template-types/types/ember-concurrency/**/*",
+    "node_modules/@gavant/glint-template-types/types/ember-on-helper/**/*",
+    "node_modules/@gavant/glint-template-types/types/@fortawesome/ember-fontawesome/**/*",
+    "node_modules/@gavant/glint-template-types/types/ember-click-outside/**/*",
+    "node_modules/@gavant/glint-template-types/types/ember-modal-dialog/**/*",
+  ],
+  "glint": {
+    "environment": "ember-loose"
+  }
 }

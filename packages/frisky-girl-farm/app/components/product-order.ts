@@ -71,7 +71,7 @@ export default class ProductOrderComponent extends Component<ProductOrderArgumen
    * When the user chooses an option for the select input
    */
   @action
-  async onSelectOrdered(e: InputEvent) {
+  async onSelectOrdered(e: Event) {
     let select = e.target as HTMLSelectElement;
     let value = select.value;
     if (value === customSelectValue) {
@@ -92,7 +92,7 @@ export default class ProductOrderComponent extends Component<ProductOrderArgumen
    * When the user types into the custom order quantity input
    */
   @action
-  onInputCustomOrdered(e: InputEvent) {
+  onInputCustomOrdered(e: Event) {
     let value = (e.target as HTMLInputElement).value;
     this.customInputValue = parseInt(value, 10) || 0;
   }
@@ -117,13 +117,20 @@ export default class ProductOrderComponent extends Component<ProductOrderArgumen
     this.controlsDisplayMode = 'hidden';
   }
 
-  readonly autofocus = modifier((element: HTMLElement) => element.focus());
+  readonly autofocus = modifier((element: HTMLElement) => {
+    element.focus();
+  });
 
   /**
    * If the user tries to order more than is available, this describes the error
    * condition
    */
   @tracked availabilityError: AvailabilityError | null = null;
+
+  @action
+  clearAvailabilityError() {
+    this.availabilityError = null;
+  }
 
   @task
   @waitFor
