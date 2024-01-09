@@ -1,5 +1,4 @@
-import sinon from 'sinon';
-import type { SinonStub } from 'sinon';
+import { default as sinon, type SinonStub } from 'sinon';
 import type { sheets_v4 } from 'googleapis';
 
 export type MockSheet = {

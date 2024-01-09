@@ -1,5 +1,4 @@
-import './support/setup';
-import { expect } from 'chai';
+import { describe, beforeEach, afterEach, test, expect } from 'vitest';
 import sinon from 'sinon';
 import LocationsSheet from '../src/sheets/locations-sheet';
 import MockSheetsClient from './support/mock-sheets-client';
@@ -19,7 +18,7 @@ describe('LocationsSheet', function () {
     sinon.restore();
   });
 
-  it('getLocations', async function () {
+  test('getLocations', async function () {
     expect(await sheet.getLocations()).to.deep.equal([
       {
         name: 'Wallingford',

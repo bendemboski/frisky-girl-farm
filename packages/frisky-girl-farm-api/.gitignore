@@ -2,5 +2,6 @@ node_modules
 .serverless
 .build
 .env
+coverage
 
 config.*.json

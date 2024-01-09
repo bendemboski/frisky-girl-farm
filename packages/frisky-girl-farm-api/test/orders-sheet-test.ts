@@ -1,5 +1,4 @@
-import './support/setup';
-import { expect } from 'chai';
+import { describe, beforeEach, afterEach, test, expect } from 'vitest';
 import sinon from 'sinon';
 import OrdersSheet from '../src/sheets/orders-sheet';
 import {
@@ -24,7 +23,7 @@ describe('OrdersSheet', function () {
   });
 
   describe('getForUser', function () {
-    it('includes name, image URL and price', async function () {
+    test('includes name, image URL and price', async function () {
       client.setOrders([1, 1, 1]);
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
@@ -43,7 +42,7 @@ describe('OrdersSheet', function () {
       });
     });
 
-    it('omits products with a limit of 0', async function () {
+    test('omits products with a limit of 0', async function () {
       client.setOrders([1, 0, 1]);
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
@@ -55,7 +54,7 @@ describe('OrdersSheet', function () {
       });
     });
 
-    it('works with no users', async function () {
+    test('works with no users', async function () {
       client.setOrders([7, 3, 5]);
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
@@ -70,7 +69,7 @@ describe('OrdersSheet', function () {
       });
     });
 
-    it('works when the user has no row', async function () {
+    test('works when the user has no row', async function () {
       client.setOrders(
         [7, 3, 5],
         ['uid1', 4, 0, 1],
@@ -89,7 +88,7 @@ describe('OrdersSheet', function () {
       });
     });
 
-    it('works when the user has a row', async function () {
+    test('works when the user has a row', async function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
@@ -108,7 +107,7 @@ describe('OrdersSheet', function () {
       });
     });
 
-    it('works with blank user cells', async function () {
+    test('works with blank user cells', async function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, '', 1],
@@ -127,11 +126,11 @@ describe('OrdersSheet', function () {
       });
     });
 
-    it('fails if there is no orders sheet', async function () {
+    test('fails if there is no orders sheet', async function () {
       client.setNoOrders();
       await expect(
         sheet.getForUser('ashley@friskygirlfarm.com'),
-      ).to.eventually.be.rejectedWith(OrdersNotOpenError);
+      ).rejects.toThrow(OrdersNotOpenError);
     });
   });
 
@@ -140,7 +139,7 @@ describe('OrdersSheet', function () {
       client.stubUpdateOrder();
     });
 
-    it('works when the user has no row', async function () {
+    test('works when the user has no row', async function () {
       client.setOrders(
         [7, 3, 5],
         ['uid1', 4, 0, 1],
@@ -158,19 +157,21 @@ describe('OrdersSheet', function () {
         '3.ordered': 2,
       });
 
-      expect(client.spreadsheets.values.append).to.have.been.calledOnce;
-      expect(client.spreadsheets.values.append).to.have.been.calledWithMatch({
-        spreadsheetId: 'ssid',
-        range: 'Orders!A6',
-      });
+      expect(client.spreadsheets.values.append.callCount).toEqual(1);
+      expect(
+        client.spreadsheets.values.append.firstCall.args[0].spreadsheetId,
+      ).toEqual('ssid');
+      expect(client.spreadsheets.values.append.firstCall.args[0].range).toEqual(
+        'Orders!A6',
+      );
       expect(
         client.spreadsheets.values.append.firstCall.args[0].requestBody,
-      ).to.deep.equal({
+      ).toEqual({
         values: [['ashley@friskygirlfarm.com', undefined, undefined, 2]],
       });
     });
 
-    it('works when the user has a row', async function () {
+    test('works when the user has a row', async function () {
       client.setOrders(
         [7, 3, 5],
         ['uid1', 4, 0, 1],
@@ -187,15 +188,19 @@ describe('OrdersSheet', function () {
         '3.ordered': 2,
       });
 
-      expect(client.spreadsheets.values.update).to.have.been.calledOnce;
-      expect(client.spreadsheets.values.update).to.have.been.calledWithMatch({
-        spreadsheetId: 'ssid',
-        range: 'Orders!D7',
-        requestBody: { values: [[2]] },
-      });
+      expect(client.spreadsheets.values.update.callCount).toEqual(1);
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].spreadsheetId,
+      ).toEqual('ssid');
+      expect(client.spreadsheets.values.update.lastCall.args[0].range).toEqual(
+        'Orders!D7',
+      );
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].requestBody,
+      ).toEqual({ values: [[2]] });
     });
 
-    it('works for increasing the quantity of a product', async function () {
+    test('works for increasing the quantity of a product', async function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 1],
@@ -212,15 +217,19 @@ describe('OrdersSheet', function () {
         '3.ordered': 3,
       });
 
-      expect(client.spreadsheets.values.update).to.have.been.calledOnce;
-      expect(client.spreadsheets.values.update).to.have.been.calledWithMatch({
-        spreadsheetId: 'ssid',
-        range: 'Orders!D7',
-        requestBody: { values: [[3]] },
-      });
+      expect(client.spreadsheets.values.update.callCount).toEqual(1);
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].spreadsheetId,
+      ).toEqual('ssid');
+      expect(client.spreadsheets.values.update.lastCall.args[0].range).toEqual(
+        'Orders!D7',
+      );
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].requestBody,
+      ).toEqual({ values: [[3]] });
     });
 
-    it('works for decreasing the quantity of a product', async function () {
+    test('works for decreasing the quantity of a product', async function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 1],
@@ -237,15 +246,19 @@ describe('OrdersSheet', function () {
         '3.ordered': 2,
       });
 
-      expect(client.spreadsheets.values.update).to.have.been.calledOnce;
-      expect(client.spreadsheets.values.update).to.have.been.calledWithMatch({
-        spreadsheetId: 'ssid',
-        range: 'Orders!D7',
-        requestBody: { values: [[2]] },
-      });
+      expect(client.spreadsheets.values.update.callCount).toEqual(1);
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].spreadsheetId,
+      ).toEqual('ssid');
+      expect(client.spreadsheets.values.update.lastCall.args[0].range).toEqual(
+        'Orders!D7',
+      );
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].requestBody,
+      ).toEqual({ values: [[2]] });
     });
 
-    it('works for zeroing out the quantity of a product', async function () {
+    test('works for zeroing out the quantity of a product', async function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 1],
@@ -262,15 +275,19 @@ describe('OrdersSheet', function () {
         '3.ordered': 0,
       });
 
-      expect(client.spreadsheets.values.update).to.have.been.calledOnce;
-      expect(client.spreadsheets.values.update).to.have.been.calledWithMatch({
-        spreadsheetId: 'ssid',
-        range: 'Orders!D7',
-        requestBody: { values: [[0]] },
-      });
+      expect(client.spreadsheets.values.update.callCount).toEqual(1);
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].spreadsheetId,
+      ).toEqual('ssid');
+      expect(client.spreadsheets.values.update.lastCall.args[0].range).toEqual(
+        'Orders!D7',
+      );
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].requestBody,
+      ).toEqual({ values: [[0]] });
     });
 
-    it('works if the order consumes all remaining availability', async function () {
+    test('works if the order consumes all remaining availability', async function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 1],
@@ -287,15 +304,19 @@ describe('OrdersSheet', function () {
         '3.ordered': 5,
       });
 
-      expect(client.spreadsheets.values.update).to.have.been.calledOnce;
-      expect(client.spreadsheets.values.update).to.have.been.calledWithMatch({
-        spreadsheetId: 'ssid',
-        range: 'Orders!D7',
-        requestBody: { values: [[5]] },
-      });
+      expect(client.spreadsheets.values.update.callCount).toEqual(1);
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].spreadsheetId,
+      ).toEqual('ssid');
+      expect(client.spreadsheets.values.update.lastCall.args[0].range).toEqual(
+        'Orders!D7',
+      );
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].requestBody,
+      ).toEqual({ values: [[5]] });
     });
 
-    it('accounts for the current ordered quantity when checking availability', async function () {
+    test('accounts for the current ordered quantity when checking availability', async function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 1],
@@ -312,15 +333,19 @@ describe('OrdersSheet', function () {
         '3.ordered': 4,
       });
 
-      expect(client.spreadsheets.values.update).to.have.been.calledOnce;
-      expect(client.spreadsheets.values.update).to.have.been.calledWithMatch({
-        spreadsheetId: 'ssid',
-        range: 'Orders!D7',
-        requestBody: { values: [[4]] },
-      });
+      expect(client.spreadsheets.values.update.callCount).toEqual(1);
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].spreadsheetId,
+      ).toEqual('ssid');
+      expect(client.spreadsheets.values.update.lastCall.args[0].range).toEqual(
+        'Orders!D7',
+      );
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0].requestBody,
+      ).toEqual({ values: [[4]] });
     });
 
-    it('fails on a negative quantity or unknown product', async function () {
+    test('fails on a negative quantity or unknown product', async function () {
       client.setOrders(
         [7, 3, 5],
         ['uid1', 4, 0, 1],
@@ -329,14 +354,14 @@ describe('OrdersSheet', function () {
 
       await expect(
         sheet.setOrdered('ashley@friskygirlfarm.com', 3, -2),
-      ).to.eventually.be.rejectedWith(NegativeQuantityError);
+      ).rejects.toThrow(NegativeQuantityError);
       await expect(
         sheet.setOrdered('ashley@friskygirlfarm.com', 7, 3),
-      ).to.eventually.be.rejectedWith(ProductNotFoundError);
-      expect(client.spreadsheets.values.update).to.not.have.been.called;
+      ).rejects.toThrow(ProductNotFoundError);
+      expect(client.spreadsheets.values.update.callCount).toEqual(0);
     });
 
-    it('fails if the product is disabled', async function () {
+    test('fails if the product is disabled', async function () {
       client.setOrders(
         [7, 3, 0],
         ['uid1', 4, 0, 0],
@@ -345,32 +370,38 @@ describe('OrdersSheet', function () {
 
       await expect(
         sheet.setOrdered('ashley@friskygirlfarm.com', 3, 1),
-      ).to.eventually.be.rejectedWith(ProductNotFoundError);
-      expect(client.spreadsheets.values.update).to.not.have.been.called;
+      ).rejects.toThrow(ProductNotFoundError);
+      expect(client.spreadsheets.values.update.callCount).toEqual(0);
     });
 
-    it('fails if the order exceeds the availability', async function () {
+    test('fails if the order exceeds the availability', async function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 2],
         ['ashley@friskygirlfarm.com', 3, 0, 3],
       );
 
-      await expect(sheet.setOrdered('ashley@friskygirlfarm.com', 3, 5))
-        .to.eventually.be.rejectedWith(QuantityNotAvailableError)
-        .with.nested.property('extra.available', 4);
-      expect(client.spreadsheets.values.update).to.not.have.been.called;
+      let error;
+      try {
+        await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 5);
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).toBeInstanceOf(QuantityNotAvailableError);
+      expect(error).to.have.nested.property('extra.available', 4);
+      expect(client.spreadsheets.values.update.callCount).toEqual(0);
     });
 
-    it('fails if there is no orders sheet', async function () {
+    test('fails if there is no orders sheet', async function () {
       client.setNoOrders();
       await expect(
         sheet.setOrdered('ashley@friskygirlfarm.com', 3, 3),
-      ).to.eventually.be.rejectedWith(OrdersNotOpenError);
+      ).rejects.toThrow(OrdersNotOpenError);
     });
   });
 
-  it('getUsersWithOrders', async function () {
+  test('getUsersWithOrders', async function () {
     client.setOrders(
       [1, 0, 1],
       ['hasorder@friskygirlfarm.com', 0, 0, 1],
@@ -385,7 +416,7 @@ describe('OrdersSheet', function () {
     ]);
   });
 
-  it('past orders sheet', async function () {
+  test('past orders sheet', async function () {
     sheet = new OrdersSheet(client.asSheets(), 'ssid', 'Orders 6-25');
 
     client.setOrdersForSheet(

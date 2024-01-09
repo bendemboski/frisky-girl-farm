@@ -1,10 +1,9 @@
-import './support/setup';
-import { expect } from 'chai';
+import { describe, test, expect } from 'vitest';
 import { indexToColumn } from '../src/sheets/a1-utils';
 
 describe('a1 utils', function () {
   describe('indexToColumn', function () {
-    it('works', function () {
+    test('works', function () {
       expect(indexToColumn(0)).to.equal('A');
       expect(indexToColumn(5)).to.equal('F');
       expect(indexToColumn(25)).to.equal('Z');

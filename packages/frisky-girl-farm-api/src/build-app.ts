@@ -1,4 +1,9 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, {
+  type Express,
+  NextFunction,
+  Request,
+  Response,
+} from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import asyncHandler from 'express-async-handler';
@@ -28,7 +33,7 @@ function serializeProducts(products: ProductOrderMap): ProductsResponse {
 export default function buildApp(
   spreadsheetFactory: () => Spreadsheet,
   awsFactory: AWSFactory,
-) {
+): Express {
   let app = express();
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(
