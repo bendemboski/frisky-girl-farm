@@ -7,7 +7,7 @@ export default class Sheet {
   constructor(
     private readonly client: sheets_v4.Sheets,
     private readonly spreadsheetId: string,
-    protected readonly sheetName: string
+    protected readonly sheetName: string,
   ) {}
 
   async getAll({
@@ -37,7 +37,7 @@ export default class Sheet {
   async update(
     range: string,
     values: Array<Array<string | number>>,
-    { majorDimension }: { majorDimension?: 'ROWS' | 'COLUMNS' } = {}
+    { majorDimension }: { majorDimension?: 'ROWS' | 'COLUMNS' } = {},
   ) {
     await this._values.update({
       spreadsheetId: this.spreadsheetId,

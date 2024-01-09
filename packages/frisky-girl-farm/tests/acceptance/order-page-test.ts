@@ -53,9 +53,9 @@ class OrderPage extends PageObject {
               get value() {
                 return this.element?.getAttribute('value');
               }
-            }
+            },
           );
-        }
+        },
       );
 
       /**
@@ -72,7 +72,7 @@ class OrderPage extends PageObject {
        * The total price display
        */
       totalPrice = selector('[data-test-total-price]');
-    }
+    },
   );
 }
 
@@ -130,9 +130,9 @@ module('Acceptance | order page', function (hooks) {
     await visit('/');
     assert.dom(page.orderClosedMessage.element).isNotVisible();
     assert.strictEqual(page.products.length, 3);
-    assert.dom(page.products[0].name.element).hasText('Lettuce');
-    assert.dom(page.products[1].name.element).hasText('Kale');
-    assert.dom(page.products[2].name.element).hasText('Spicy Greens');
+    assert.dom(page.products[0]!.name.element).hasText('Lettuce');
+    assert.dom(page.products[1]!.name.element).hasText('Kale');
+    assert.dom(page.products[2]!.name.element).hasText('Spicy Greens');
   });
 
   test('it hides products that are not available to order', async function (assert) {
@@ -169,8 +169,8 @@ module('Acceptance | order page', function (hooks) {
     await visit('/');
     assert.dom(page.orderClosedMessage.element).isNotVisible();
     assert.strictEqual(page.products.length, 2);
-    assert.dom(page.products[0].name.element).hasText('Lettuce');
-    assert.dom(page.products[1].name.element).hasText('Spicy Greens');
+    assert.dom(page.products[0]!.name.element).hasText('Lettuce');
+    assert.dom(page.products[1]!.name.element).hasText('Spicy Greens');
   });
 
   test('it displays un-ordered products correctly', async function (assert) {
@@ -186,11 +186,11 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    assert.dom(page.products[0].name.element).hasText('Lettuce');
-    assert.dom(page.products[0].addButton.element).isVisible();
-    assert.dom(page.products[0].deleteButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isNotVisible();
-    assert.dom(page.products[0].quantityInput.element).isNotVisible();
+    assert.dom(page.products[0]!.name.element).hasText('Lettuce');
+    assert.dom(page.products[0]!.addButton.element).isVisible();
+    assert.dom(page.products[0]!.deleteButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isNotVisible();
+    assert.dom(page.products[0]!.quantityInput.element).isNotVisible();
   });
 
   test('it displays ordered products correctly', async function (assert) {
@@ -206,17 +206,17 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    assert.dom(page.products[0].name.element).hasText('Lettuce');
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].deleteButton.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('5');
+    assert.dom(page.products[0]!.name.element).hasText('Lettuce');
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.deleteButton.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('5');
     assert.deepEqual(
-      page.products[0].quantitySelect.options.map((option) => option.value),
-      ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'custom']
+      page.products[0]!.quantitySelect.options.map((option) => option.value),
+      ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'custom'],
     );
-    assert.dom(page.products[0].quantityInput.element).isNotVisible();
-    assert.dom(page.products[0].totalPrice.element).hasText('$17.50');
+    assert.dom(page.products[0]!.quantityInput.element).isNotVisible();
+    assert.dom(page.products[0]!.totalPrice.element).hasText('$17.50');
   });
 
   test('it displays ordered products with a custom quantity correctly', async function (assert) {
@@ -232,17 +232,17 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    assert.dom(page.products[0].name.element).hasText('Lettuce');
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].deleteButton.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('22');
+    assert.dom(page.products[0]!.name.element).hasText('Lettuce');
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.deleteButton.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('22');
     assert.deepEqual(
-      page.products[0].quantitySelect.options.map((option) => option.value),
-      ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '22', 'custom']
+      page.products[0]!.quantitySelect.options.map((option) => option.value),
+      ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '22', 'custom'],
     );
-    assert.dom(page.products[0].quantityInput.element).isNotVisible();
-    assert.dom(page.products[0].totalPrice.element).hasText('$77.00');
+    assert.dom(page.products[0]!.quantityInput.element).isNotVisible();
+    assert.dom(page.products[0]!.totalPrice.element).hasText('$77.00');
   });
 
   test('it can order', async function (assert) {
@@ -258,22 +258,22 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await click(page.products[0].addButton.element!);
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
+    await click(page.products[0]!.addButton.element!);
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
 
-    await fillIn(page.products[0].quantitySelect.element!, '4');
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('4');
-    assert.dom(page.products[0].totalPrice.element).hasText('$14.00');
+    await fillIn(page.products[0]!.quantitySelect.element!, '4');
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('4');
+    assert.dom(page.products[0]!.totalPrice.element).hasText('$14.00');
 
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      4
+      4,
     );
   });
 
@@ -290,29 +290,29 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await click(page.products[0].addButton.element!);
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
+    await click(page.products[0]!.addButton.element!);
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
 
-    await fillIn(page.products[0].quantitySelect.element!, 'custom');
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isNotVisible();
-    assert.dom(page.products[0].quantityInput.element).isVisible();
+    await fillIn(page.products[0]!.quantitySelect.element!, 'custom');
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isNotVisible();
+    assert.dom(page.products[0]!.quantityInput.element).isVisible();
 
-    await fillIn(page.products[0].quantityInput.element!, '22');
-    await click(page.products[0].submitQuantityInputButton.element!);
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('22');
-    assert.dom(page.products[0].quantityInput.element).isNotVisible();
-    assert.dom(page.products[0].totalPrice.element).hasText('$77.00');
+    await fillIn(page.products[0]!.quantityInput.element!, '22');
+    await click(page.products[0]!.submitQuantityInputButton.element!);
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('22');
+    assert.dom(page.products[0]!.quantityInput.element).isNotVisible();
+    assert.dom(page.products[0]!.totalPrice.element).hasText('$77.00');
 
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      22
+      22,
     );
   });
 
@@ -329,23 +329,23 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await click(page.products[0].addButton.element!);
-    await fillIn(page.products[0].quantitySelect.element!, 'custom');
-    await fillIn(page.products[0].quantityInput.element!, '22');
+    await click(page.products[0]!.addButton.element!);
+    await fillIn(page.products[0]!.quantitySelect.element!, 'custom');
+    await fillIn(page.products[0]!.quantityInput.element!, '22');
 
-    await blur(page.products[0].quantityInput.element!);
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('22');
-    assert.dom(page.products[0].quantityInput.element).isNotVisible();
-    assert.dom(page.products[0].totalPrice.element).hasText('$77.00');
+    await blur(page.products[0]!.quantityInput.element!);
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('22');
+    assert.dom(page.products[0]!.quantityInput.element).isNotVisible();
+    assert.dom(page.products[0]!.totalPrice.element).hasText('$77.00');
 
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      22
+      22,
     );
   });
 
@@ -362,19 +362,19 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await fillIn(page.products[0].quantitySelect.element!, '8');
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('8');
-    assert.dom(page.products[0].quantityInput.element).isNotVisible();
-    assert.dom(page.products[0].totalPrice.element).hasText('$28.00');
+    await fillIn(page.products[0]!.quantitySelect.element!, '8');
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('8');
+    assert.dom(page.products[0]!.quantityInput.element).isNotVisible();
+    assert.dom(page.products[0]!.totalPrice.element).hasText('$28.00');
 
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      8
+      8,
     );
   });
 
@@ -391,25 +391,25 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await fillIn(page.products[0].quantitySelect.element!, 'custom');
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isNotVisible();
-    assert.dom(page.products[0].quantityInput.element).isVisible();
+    await fillIn(page.products[0]!.quantitySelect.element!, 'custom');
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isNotVisible();
+    assert.dom(page.products[0]!.quantityInput.element).isVisible();
 
-    await fillIn(page.products[0].quantityInput.element!, '22');
-    await click(page.products[0].submitQuantityInputButton.element!);
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('22');
-    assert.dom(page.products[0].quantityInput.element).isNotVisible();
-    assert.dom(page.products[0].totalPrice.element).hasText('$77.00');
+    await fillIn(page.products[0]!.quantityInput.element!, '22');
+    await click(page.products[0]!.submitQuantityInputButton.element!);
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('22');
+    assert.dom(page.products[0]!.quantityInput.element).isNotVisible();
+    assert.dom(page.products[0]!.totalPrice.element).hasText('$77.00');
 
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      22
+      22,
     );
   });
 
@@ -426,19 +426,19 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await fillIn(page.products[0].quantitySelect.element!, '8');
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('8');
-    assert.dom(page.products[0].quantityInput.element).isNotVisible();
-    assert.dom(page.products[0].totalPrice.element).hasText('$28.00');
+    await fillIn(page.products[0]!.quantitySelect.element!, '8');
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('8');
+    assert.dom(page.products[0]!.quantityInput.element).isNotVisible();
+    assert.dom(page.products[0]!.totalPrice.element).hasText('$28.00');
 
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      8
+      8,
     );
   });
 
@@ -455,19 +455,19 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await fillIn(page.products[0].quantitySelect.element!, '0');
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('0');
-    assert.dom(page.products[0].quantityInput.element).isNotVisible();
-    assert.dom(page.products[0].totalPrice.element).hasText('$0.00');
+    await fillIn(page.products[0]!.quantitySelect.element!, '0');
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('0');
+    assert.dom(page.products[0]!.quantityInput.element).isNotVisible();
+    assert.dom(page.products[0]!.totalPrice.element).hasText('$0.00');
 
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      0
+      0,
     );
   });
 
@@ -484,18 +484,18 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await click(page.products[0].deleteButton.element!);
-    assert.dom(page.products[0].addButton.element).isVisible();
-    assert.dom(page.products[0].deleteButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isNotVisible();
-    assert.dom(page.products[0].quantityInput.element).isNotVisible();
+    await click(page.products[0]!.deleteButton.element!);
+    assert.dom(page.products[0]!.addButton.element).isVisible();
+    assert.dom(page.products[0]!.deleteButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isNotVisible();
+    assert.dom(page.products[0]!.quantityInput.element).isNotVisible();
 
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
     assert.deepEqual(
       JSON.parse(
-        getPretenderState().putProductStub.firstCall.args[0].requestBody
+        getPretenderState().putProductStub.firstCall.args[0].requestBody,
       ).ordered,
-      0
+      0,
     );
   });
 
@@ -512,13 +512,13 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await click(page.products[0].addButton.element!);
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
+    await click(page.products[0]!.addButton.element!);
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
 
-    await click(page.products[0].deleteButton.element!);
-    assert.dom(page.products[0].addButton.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).isNotVisible();
+    await click(page.products[0]!.deleteButton.element!);
+    assert.dom(page.products[0]!.addButton.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isNotVisible();
 
     // No API calls
     assert.strictEqual(getPretenderState().putProductStub.callCount, 0);
@@ -537,16 +537,16 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await click(page.products[0].addButton.element!);
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('0');
+    await click(page.products[0]!.addButton.element!);
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('0');
     assert.dom(page.availabilityError.element).isNotVisible();
 
-    await fillIn(page.products[0].quantitySelect.element!, '10');
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('0');
+    await fillIn(page.products[0]!.quantitySelect.element!, '10');
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('0');
     assert.dom(page.availabilityError.element).isVisible();
     assert.dom(page.availabilityError.element).includesText('only 5 of these');
 
@@ -554,7 +554,7 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 0);
 
     // Clicking clears
-    await click(page.products[0].quantitySelect.element!);
+    await click(page.products[0]!.quantitySelect.element!);
     assert.dom(page.availabilityError.element).isNotVisible();
   });
 
@@ -582,16 +582,16 @@ module('Acceptance | order page', function (hooks) {
       },
     ]);
 
-    await click(page.products[0].addButton.element!);
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('0');
+    await click(page.products[0]!.addButton.element!);
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('0');
     assert.dom(page.availabilityError.element).isNotVisible();
 
-    await fillIn(page.products[0].quantitySelect.element!, '10');
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isVisible();
-    assert.dom(page.products[0].quantitySelect.element).hasValue('0');
+    await fillIn(page.products[0]!.quantitySelect.element!, '10');
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).hasValue('0');
     assert.dom(page.availabilityError.element).isVisible();
     assert.dom(page.availabilityError.element).includesText('none of these');
 
@@ -599,7 +599,7 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 1);
 
     // Clicking clears
-    await click(page.products[0].quantitySelect.element!);
+    await click(page.products[0]!.quantitySelect.element!);
     assert.dom(page.availabilityError.element).isNotVisible();
   });
 
@@ -616,15 +616,15 @@ module('Acceptance | order page', function (hooks) {
     ]);
 
     await visit('/');
-    await click(page.products[0].addButton.element!);
-    await fillIn(page.products[0].quantitySelect.element!, 'custom');
-    await fillIn(page.products[0].quantityInput.element!, '22');
+    await click(page.products[0]!.addButton.element!);
+    await fillIn(page.products[0]!.quantitySelect.element!, 'custom');
+    await fillIn(page.products[0]!.quantityInput.element!, '22');
 
-    await click(page.products[0].submitQuantityInputButton.element!);
-    assert.dom(page.products[0].addButton.element).isNotVisible();
-    assert.dom(page.products[0].quantitySelect.element).isNotVisible();
-    assert.dom(page.products[0].quantityInput.element).isVisible();
-    assert.dom(page.products[0].quantityInput.element).hasValue('22');
+    await click(page.products[0]!.submitQuantityInputButton.element!);
+    assert.dom(page.products[0]!.addButton.element).isNotVisible();
+    assert.dom(page.products[0]!.quantitySelect.element).isNotVisible();
+    assert.dom(page.products[0]!.quantityInput.element).isVisible();
+    assert.dom(page.products[0]!.quantityInput.element).hasValue('22');
 
     assert.dom(page.availabilityError.element).isVisible();
     assert.dom(page.availabilityError.element).includesText('only 5 of these');
@@ -633,7 +633,7 @@ module('Acceptance | order page', function (hooks) {
     assert.strictEqual(getPretenderState().putProductStub.callCount, 0);
 
     // Clicking clears
-    await click(page.products[0].quantityInput.element!);
+    await click(page.products[0]!.quantityInput.element!);
     assert.dom(page.availabilityError.element).isNotVisible();
   });
 });

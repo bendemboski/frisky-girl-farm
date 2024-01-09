@@ -65,7 +65,9 @@
                 type="button"
                 class="btn btn-primary btn-sm order-button"
                 disabled={{this.setOrdered.isRunning}}
-                {{on "click" this.saveCustomOrder}}
+                {{!-- We don't have a click handler because the focusout handler
+                on the <input> takes care of saving the custom order -- the
+                button is just to reduce UI confusion --}}
                 data-test-submit-quantity-input
               >
                 Order
@@ -92,6 +94,6 @@
       of these are available.
     </div>
   </div>
- 
-  {{on-document 'mousedown' (fn (mut this.availabilityError) null) capture=true}}
+
+  {{on-document 'mousedown' this.clearAvailabilityError capture=true}}
 {{/if}}

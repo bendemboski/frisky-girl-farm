@@ -7,7 +7,7 @@ function generateHarvestLists() {
   let orderSheet = spreadsheet.getActiveSheet();
   if (!isOrderSheet(orderSheet)) {
     return createNotificationResponse(
-      'This sheet is not an orders sheet. Please navigate to the orders sheet for which you want to generate a harvest list.'
+      'This sheet is not an orders sheet. Please navigate to the orders sheet for which you want to generate a harvest list.',
     );
   }
 
@@ -28,7 +28,7 @@ function generateHarvestLists() {
 function generateOneHarvestList(
   orderSheet: GoogleAppsScript.Spreadsheet.Sheet,
   day: string,
-  locations: string[]
+  locations: string[],
 ) {
   let { products, users } = getUserOrders(orderSheet, locations);
   if (products.length === 0) {
@@ -42,7 +42,7 @@ function generateOneHarvestList(
   while (!newSheet) {
     let result = ui.prompt(
       `Name for the ${day} harvest list (or press cancel to skip):`,
-      ui.ButtonSet.OK_CANCEL
+      ui.ButtonSet.OK_CANCEL,
     );
     if (result.getSelectedButton() != ui.Button.OK) {
       return;
@@ -51,7 +51,7 @@ function generateOneHarvestList(
     let text = result.getResponseText();
     if (!text) {
       ui.alert(
-        'You have to enter the name of a new sheet to generate the harvest list.'
+        'You have to enter the name of a new sheet to generate the harvest list.',
       );
       continue;
     }
@@ -70,7 +70,7 @@ function generateOneHarvestList(
   harvestListRange.applyRowBanding(
     SpreadsheetApp.BandingTheme.GREY,
     false,
-    false
+    false,
   );
   newSheet.autoResizeColumns(1, 1);
 
@@ -92,7 +92,7 @@ function generateOneHarvestList(
   let firstBlankColumn = newSheet.getLastColumn() + 1;
   newSheet.deleteColumns(
     firstBlankColumn,
-    newSheet.getMaxColumns() - firstBlankColumn + 1
+    newSheet.getMaxColumns() - firstBlankColumn + 1,
   );
 
   let firstBlankRow = newSheet.getLastRow() + 1;

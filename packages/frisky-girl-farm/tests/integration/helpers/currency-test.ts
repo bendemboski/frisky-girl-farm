@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 
 module('Integration | Helper | currency', function (hooks) {
   setupRenderingTest(hooks);
@@ -9,7 +9,7 @@ module('Integration | Helper | currency', function (hooks) {
   test('it works', async function (assert) {
     this.set('amount', 0);
 
-    await render(hbs`{{currency this.amount}}`);
+    await render<{ amount: number }>(hbs`{{currency this.amount}}`);
     assert.dom().hasText('$0.00');
 
     this.set('amount', 3.5);

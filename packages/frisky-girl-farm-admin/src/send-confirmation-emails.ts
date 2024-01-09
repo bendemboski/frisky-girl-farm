@@ -8,7 +8,7 @@ function sendConfirmationEmails() {
   let orderSheet = spreadsheet.getActiveSheet();
   if (!isOrderSheet(orderSheet)) {
     return createNotificationResponse(
-      'This sheet is not an orders sheet. Please navigate to the orders sheet for which you want to send confirmation emails.'
+      'This sheet is not an orders sheet. Please navigate to the orders sheet for which you want to send confirmation emails.',
     );
   }
 
@@ -27,7 +27,7 @@ function sendConfirmationEmails() {
   let locationsSection = CardService.newCardSection();
   for (let [location, count] of Object.entries(byLocation)) {
     locationsSection.addWidget(
-      CardService.newTextParagraph().setText(`${count} users for ${location}`)
+      CardService.newTextParagraph().setText(`${count} users for ${location}`),
     );
   }
 
@@ -39,8 +39,8 @@ function sendConfirmationEmails() {
         CardService.newCardBuilder()
           .setHeader(
             CardService.newCardHeader().setTitle(
-              'Send order confirmation emails to:'
-            )
+              'Send order confirmation emails to:',
+            ),
           )
           .addSection(locationsSection)
           .addSection(
@@ -52,12 +52,12 @@ function sendConfirmationEmails() {
                     .setFunctionName(completeSendConfirmationEmails.name)
                     .setParameters({
                       sheetId: orderSheet.getSheetId().toString(),
-                    })
-                )
-            )
+                    }),
+                ),
+            ),
           )
-          .build()
-      )
+          .build(),
+      ),
     )
     .build();
 }
@@ -78,7 +78,7 @@ function completeSendConfirmationEmails({
       contentType: 'application/json',
       payload: JSON.stringify({ sheetId: parseInt(sheetId, 10) }),
       muteHttpExceptions: true,
-    }
+    },
   );
 
   let message;
@@ -90,13 +90,13 @@ function completeSendConfirmationEmails({
     } else {
       return CardService.newActionResponseBuilder()
         .setNavigation(
-          CardService.newNavigation().updateCard(buildErrorCard(failedSends))
+          CardService.newNavigation().updateCard(buildErrorCard(failedSends)),
         )
         .build();
     }
   } else {
     message = `Failed to send emails. code=${code} body=${response.getContentText()} args=${JSON.stringify(
-      Array.from(arguments)
+      Array.from(arguments),
     )}`;
   }
 
@@ -113,10 +113,10 @@ function buildErrorCard(failedSends: string[]) {
     CardService.newCardSection()
       .addWidget(
         CardService.newTextParagraph().setText(
-          `${failedSends.length} emails failed to send -- tell Ben!`
-        )
+          `${failedSends.length} emails failed to send -- tell Ben!`,
+        ),
       )
-      .addWidget(CardService.newTextParagraph().setText('Emails that failed:'))
+      .addWidget(CardService.newTextParagraph().setText('Emails that failed:')),
   );
 
   let emailsSection = CardService.newCardSection();

@@ -9,7 +9,7 @@ function prepareNewWeek() {
   if (existing) {
     existing.activate();
     return createNotificationResponse(
-      'You already have a pending week -- see "Orders (pending)" sheet'
+      'You already have a pending week -- see "Orders (pending)" sheet',
     );
   }
 
@@ -20,6 +20,6 @@ function prepareNewWeek() {
   orderSheet.addDeveloperMetadata('orderSheet', new Date().toISOString());
 
   return createNotificationResponse(
-    'New week created. Set product availability in "Orders (pending)" sheet and then open orders when ready.'
+    'New week created. Set product availability in "Orders (pending)" sheet and then open orders when ready.',
   );
 }

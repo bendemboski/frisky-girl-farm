@@ -8,12 +8,12 @@ function openOrders() {
   let sheet = spreadsheet.getSheetByName('Orders (pending)');
   if (!sheet) {
     return createNotificationResponse(
-      'There is no "Orders (pending)" sheet. You need to prepare a week before you can open orders.'
+      'There is no "Orders (pending)" sheet. You need to prepare a week before you can open orders.',
     );
   }
   if (spreadsheet.getSheetByName('Orders')) {
     return createNotificationResponse(
-      'There is already an "Orders" sheet. You need to close orders for that week before opening a new week.'
+      'There is already an "Orders" sheet. You need to close orders for that week before opening a new week.',
     );
   }
 

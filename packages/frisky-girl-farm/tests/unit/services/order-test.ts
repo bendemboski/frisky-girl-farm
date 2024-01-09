@@ -7,7 +7,7 @@ import loginUser from '../../helpers/login-user';
 import setProducts from '../../helpers/set-products';
 
 import OrderService from 'frisky-girl-farm/services/order';
-import { ProductOrder } from 'frisky-girl-farm-api/src/types';
+import { type ProductOrder } from 'frisky-girl-farm-api/src/types';
 
 module('Unit | Service | order', function (hooks) {
   setupTest(hooks);
@@ -72,7 +72,8 @@ module('Unit | Service | order', function (hooks) {
       assert.ok(service.isOrderingOpen);
       assert.deepEqual(service.products, products);
       assert.notOk(
-        getPretenderState().getProductsStub.firstCall.args[0].queryParams.userId
+        getPretenderState().getProductsStub.firstCall.args[0].queryParams
+          .userId,
       );
     });
 
@@ -119,7 +120,7 @@ module('Unit | Service | order', function (hooks) {
       assert.strictEqual(
         getPretenderState().getProductsStub.firstCall.args[0].queryParams
           .userId,
-        'ashley@friskygirlfarm.com'
+        'ashley@friskygirlfarm.com',
       );
     });
 
@@ -173,36 +174,36 @@ module('Unit | Service | order', function (hooks) {
     });
 
     test('it works', async function (assert) {
-      await service.setProductOrder.perform(service.products![0], 3);
-      products[0].ordered += 3;
+      await service.setProductOrder.perform(service.products![0]!, 3);
+      products[0]!.ordered += 3;
       assert.deepEqual(service.products, products);
       assert.strictEqual(
         getPretenderState().putProductStub.firstCall.args[0].queryParams.userId,
-        'ashley@friskygirlfarm.com'
+        'ashley@friskygirlfarm.com',
       );
     });
 
     test('it works on products with unlimited quantities', async function (assert) {
-      await service.setProductOrder.perform(service.products![3], 2);
-      products[3].ordered += 2;
+      await service.setProductOrder.perform(service.products![3]!, 2);
+      products[3]!.ordered += 2;
       assert.deepEqual(service.products, products);
       assert.strictEqual(
         getPretenderState().putProductStub.firstCall.args[0].queryParams.userId,
-        'ashley@friskygirlfarm.com'
+        'ashley@friskygirlfarm.com',
       );
     });
 
     test('it errors when the quantity is not available', async function (assert) {
       let error;
       try {
-        await service.setProductOrder.perform(service.products![2], 50);
+        await service.setProductOrder.perform(service.products![2]!, 50);
       } catch (e) {
-        error = e;
+        error = e as { code: string; extra: Record<string, unknown> };
       }
 
       assert.ok(error);
-      assert.strictEqual(error.code, 'quantityNotAvailable');
-      assert.deepEqual(error.extra, { available: 25 });
+      assert.strictEqual(error!.code, 'quantityNotAvailable');
+      assert.deepEqual(error!.extra, { available: 25 });
     });
   });
 
@@ -246,13 +247,13 @@ module('Unit | Service | order', function (hooks) {
     await service.loadProducts.perform();
     assert.strictEqual(service.spent, 0);
 
-    await service.setProductOrder.perform(service.products![0], 3);
+    await service.setProductOrder.perform(service.products![0]!, 3);
     assert.strictEqual(service.spent, 10.5);
 
-    await service.setProductOrder.perform(service.products![2], 5);
+    await service.setProductOrder.perform(service.products![2]!, 5);
     assert.strictEqual(service.spent, 75.5);
 
-    await service.setProductOrder.perform(service.products![3], 2);
+    await service.setProductOrder.perform(service.products![3]!, 2);
     assert.strictEqual(service.spent, 83.5);
   });
 });

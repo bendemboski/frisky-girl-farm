@@ -20,8 +20,8 @@ function createHomepageCard() {
   return CardService.newCardBuilder()
     .addSection(
       CardService.newCardSection().addWidget(
-        CardService.newImage().setImageUrl(friskyGirlLogo)
-      )
+        CardService.newImage().setImageUrl(friskyGirlLogo),
+      ),
     )
     .addSection(
       CardService.newCardSection()
@@ -29,14 +29,14 @@ function createHomepageCard() {
           CardService.newTextButton()
             .setText('Prepare new week')
             .setOnClickAction(
-              CardService.newAction().setFunctionName(prepareNewWeek.name)
-            )
+              CardService.newAction().setFunctionName(prepareNewWeek.name),
+            ),
         )
         .addWidget(
           CardService.newTextParagraph().setText(
-            'Create a new sheet to prepare to open orders'
-          )
-        )
+            'Create a new sheet to prepare to open orders',
+          ),
+        ),
     )
     .addSection(
       CardService.newCardSection()
@@ -44,14 +44,14 @@ function createHomepageCard() {
           CardService.newTextButton()
             .setText('Open orders')
             .setOnClickAction(
-              CardService.newAction().setFunctionName(openOrders.name)
-            )
+              CardService.newAction().setFunctionName(openOrders.name),
+            ),
         )
         .addWidget(
           CardService.newTextParagraph().setText(
-            'Open ordering on the web site'
-          )
-        )
+            'Open ordering on the web site',
+          ),
+        ),
     )
     .addSection(
       CardService.newCardSection()
@@ -59,14 +59,14 @@ function createHomepageCard() {
           CardService.newTextButton()
             .setText('Close orders')
             .setOnClickAction(
-              CardService.newAction().setFunctionName(closeOrders.name)
-            )
+              CardService.newAction().setFunctionName(closeOrders.name),
+            ),
         )
         .addWidget(
           CardService.newTextParagraph().setText(
-            'Close ordering on the web site'
-          )
-        )
+            'Close ordering on the web site',
+          ),
+        ),
     )
     .addSection(
       CardService.newCardSection()
@@ -74,14 +74,16 @@ function createHomepageCard() {
           CardService.newTextButton()
             .setText('Generate harvest lists')
             .setOnClickAction(
-              CardService.newAction().setFunctionName(generateHarvestLists.name)
-            )
+              CardService.newAction().setFunctionName(
+                generateHarvestLists.name,
+              ),
+            ),
         )
         .addWidget(
           CardService.newTextParagraph().setText(
-            'Generate a harvest list from the currently-active orders sheet'
-          )
-        )
+            'Generate a harvest list from the currently-active orders sheet',
+          ),
+        ),
     )
     .addSection(
       CardService.newCardSection()
@@ -90,15 +92,15 @@ function createHomepageCard() {
             .setText('Send confirmation emails')
             .setOnClickAction(
               CardService.newAction().setFunctionName(
-                sendConfirmationEmails.name
-              )
-            )
+                sendConfirmationEmails.name,
+              ),
+            ),
         )
         .addWidget(
           CardService.newTextParagraph().setText(
-            'Send confirmation emails to all users that have ordered anything on the currently-active orders sheet'
-          )
-        )
+            'Send confirmation emails to all users that have ordered anything on the currently-active orders sheet',
+          ),
+        ),
     )
     .build();
 }

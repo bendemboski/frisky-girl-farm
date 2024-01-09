@@ -1,4 +1,9 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, {
+  type Express,
+  NextFunction,
+  Request,
+  Response,
+} from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import asyncHandler from 'express-async-handler';
@@ -27,14 +32,14 @@ function serializeProducts(products: ProductOrderMap): ProductsResponse {
 
 export default function buildApp(
   spreadsheetFactory: () => Spreadsheet,
-  awsFactory: AWSFactory
-) {
+  awsFactory: AWSFactory,
+): Express {
   let app = express();
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(
     bodyParser.json({
       type: ['application/json'],
-    })
+    }),
   );
   app.use(cors());
 
@@ -56,7 +61,7 @@ export default function buildApp(
         }
         throw e;
       }
-    })
+    }),
   );
 
   //
@@ -71,7 +76,7 @@ export default function buildApp(
       let products = await spreadsheet.getProducts(userId);
       let response: ProductsResponse = serializeProducts(products);
       res.status(200).json(response);
-    })
+    }),
   );
 
   //
@@ -100,11 +105,11 @@ export default function buildApp(
       let products = await spreadsheet.setProductOrder(
         userId,
         parseInt(productId, 10),
-        ordered
+        ordered,
       );
       let response: ProductsResponse = serializeProducts(products);
       res.status(200).json(response);
-    })
+    }),
   );
 
   //
@@ -123,7 +128,7 @@ export default function buildApp(
           .map(({ id, date }) => ({ id, date: date.toISOString() })),
       };
       res.status(200).json(response);
-    })
+    }),
   );
 
   app.get(
@@ -145,11 +150,11 @@ export default function buildApp(
         products: Array.from(products.values()).map(
           ({ name, imageUrl, price, ordered }) => {
             return { name, imageUrl, price, ordered };
-          }
+          },
         ),
       };
       res.status(200).json(response);
-    })
+    }),
   );
 
   //
@@ -194,7 +199,7 @@ export default function buildApp(
       let failedSends = await sendConfirmationEmails(
         awsFactory,
         users,
-        locations
+        locations,
       );
 
       if (failedSends.length > 0) {
@@ -202,7 +207,7 @@ export default function buildApp(
       }
 
       res.status(200).json({ failedSends });
-    })
+    }),
   );
 
   // Log errors
@@ -210,7 +215,7 @@ export default function buildApp(
     err: Error,
     _req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     if (err instanceof SheetsError) {
       // One of our sheets errors

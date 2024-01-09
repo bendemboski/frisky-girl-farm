@@ -1,0 +1,33 @@
+diff --git a/index.js b/index.js
+index 8b380f1c5701f2959640804299d1430d13ae6eeb..a859d3cdcfbe9292c7bdf2b12a9433a5cc5b0d85 100644
+--- a/index.js
++++ b/index.js
+@@ -28,11 +28,7 @@ module.exports = {
+ 
+   treeForVendor(vendorTree) {
+     const iconRollups = [];
+-    const pathToCore = path.join(
+-      this._nodeModulesPath,
+-      '@fortawesome',
+-      'fontawesome-svg-core',
+-    );
++    const pathToCore = path.dirname(require.resolve('@fortawesome/fontawesome-svg-core/package.json'));
+ 
+     Object.keys(this.fontawesomeConfig.icons).forEach((pack) => {
+       const iconExportsFile = `exports-${pack}.js`;
+@@ -55,7 +51,6 @@ module.exports = {
+           },
+           plugins: [nodeResolve()],
+         },
+-        nodeModulesPath: this._nodeModulesPath,
+         name: `${pack}-rollup`,
+       });
+       iconRollups.push(rollupNode);
+@@ -85,7 +80,6 @@ module.exports = {
+         },
+         plugins: [nodeResolve()],
+       },
+-      nodeModulesPath: this._nodeModulesPath,
+       name: 'fontawesome-svg-core',
+     });
+ 

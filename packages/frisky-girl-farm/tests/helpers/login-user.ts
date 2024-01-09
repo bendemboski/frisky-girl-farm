@@ -14,7 +14,7 @@ export default function loginUser(user: User) {
   createUser(user);
   (
     (getContext() as TestContext).owner.lookup(
-      'service:local-settings'
+      'service:local-settings',
     ) as LocalSettings
   ).set('settings.userEmail', user.email);
 }

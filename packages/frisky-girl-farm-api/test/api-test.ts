@@ -1,13 +1,14 @@
-import './support/setup';
-import chai, { expect } from 'chai';
+import { describe, beforeEach, afterEach, test, expect } from 'vitest';
+import { type Express } from 'express';
 import sinon, { SinonStub } from 'sinon';
 import buildApp from '../src/build-app';
+import request from 'supertest';
 import MockSheetsClient, { MockSheet } from './support/mock-sheets-client';
 import Spreadsheet from '../src/sheets/spreadsheet';
 
 describe('API', function () {
   let client: MockSheetsClient;
-  let api: ChaiHttp.Agent;
+  let app: Express;
   let sendEmailsStub: SinonStub;
 
   class SESStub {
@@ -15,18 +16,15 @@ describe('API', function () {
       return { promise: () => sendEmailsStub(...args) };
     }
   }
-  const awsFactory = () => ({ SES: SESStub } as typeof import('aws-sdk'));
+  const awsFactory = () => ({ SES: SESStub }) as typeof import('aws-sdk');
 
   beforeEach(function () {
     client = new MockSheetsClient();
     client.setUsers();
-
-    api = chai.request(
-      buildApp(() => {
-        let spreadsheet = new Spreadsheet('ssid', client.asSheets());
-        return spreadsheet;
-      }, awsFactory)
-    );
+    app = buildApp(() => {
+      let spreadsheet = new Spreadsheet('ssid', client.asSheets());
+      return spreadsheet;
+    }, awsFactory);
 
     sendEmailsStub = sinon.stub();
   });
@@ -36,9 +34,9 @@ describe('API', function () {
   });
 
   describe('GET /users/:id', function () {
-    it('works', async function () {
-      let res = await api.get('/users/ashley@friskygirlfarm.com');
-      expect(res).to.have.status(200);
+    test('works', async function () {
+      let res = await request(app).get('/users/ashley@friskygirlfarm.com');
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({
         email: 'ashley@friskygirlfarm.com',
         name: 'Ashley Wilson',
@@ -47,23 +45,25 @@ describe('API', function () {
       });
     });
 
-    it('fails when the user is not found', async function () {
-      let res = await api.get('/users/becky@friskygirlfarm.com');
-      expect(res).to.have.status(404);
+    test('fails when the user is not found', async function () {
+      let res = await request(app).get('/users/becky@friskygirlfarm.com');
+      expect(res.status).toEqual(404);
       expect(res.body).to.include({ code: 'unknownUser' });
     });
   });
 
   describe('GET /products', function () {
-    it('works', async function () {
+    test('works', async function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
-      let res = await api.get('/products?userId=ashley@friskygirlfarm.com');
-      expect(res).to.have.status(200);
+      let res = await request(app).get(
+        '/products?userId=ashley@friskygirlfarm.com',
+      );
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({
         products: [
           {
@@ -94,15 +94,17 @@ describe('API', function () {
       });
     });
 
-    it('works with 0/unlimited quantities', async function () {
+    test('works with 0/unlimited quantities', async function () {
       client.setOrders(
         [0, -1, 2],
         ['ashley@friskygirlfarm.com', 0, 2, 1],
-        ['ellen@friskygirlfarm.com', 0, 0, 1]
+        ['ellen@friskygirlfarm.com', 0, 0, 1],
       );
 
-      let res = await api.get('/products?userId=ashley@friskygirlfarm.com');
-      expect(res).to.have.status(200);
+      let res = await request(app).get(
+        '/products?userId=ashley@friskygirlfarm.com',
+      );
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({
         products: [
           {
@@ -125,27 +127,29 @@ describe('API', function () {
       });
     });
 
-    it('fails if ordering is not open', async function () {
+    test('fails if ordering is not open', async function () {
       client.setNoOrders();
-      let res = await api.get('/products?userId=ashley@friskygirlfarm.com');
-      expect(res).to.have.status(404);
+      let res = await request(app).get(
+        '/products?userId=ashley@friskygirlfarm.com',
+      );
+      expect(res.status).toEqual(404);
       expect(res.body).to.include({ code: 'ordersNotOpen' });
     });
   });
 
   describe('PUT /products/:id', async function () {
-    it('works', async function () {
+    test('works', async function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
       client.stubUpdateOrder();
 
-      let res = await api
+      let res = await request(app)
         .put('/products/3?userId=ashley@friskygirlfarm.com')
         .send({ ordered: 3 });
-      expect(res).to.have.status(200);
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({
         products: [
           {
@@ -175,26 +179,30 @@ describe('API', function () {
         ],
       });
 
-      expect(client.spreadsheets.values.update).to.have.been.calledOnce;
-      expect(client.spreadsheets.values.update).to.have.been.calledWithMatch({
-        spreadsheetId: 'ssid',
-        range: 'Orders!D6',
-        requestBody: { values: [[3]] },
-      });
+      expect(client.spreadsheets.values.update.callCount).toEqual(1);
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0]?.spreadsheetId,
+      ).toEqual('ssid');
+      expect(client.spreadsheets.values.update.lastCall.args[0]?.range).toEqual(
+        'Orders!D6',
+      );
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0]?.requestBody,
+      ).toEqual({ values: [[3]] });
     });
 
-    it('works with unlimited quantities', async function () {
+    test('works with unlimited quantities', async function () {
       client.setOrders(
         [-1, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
       client.stubUpdateOrder();
 
-      let res = await api
+      let res = await request(app)
         .put('/products/1?userId=ashley@friskygirlfarm.com')
         .send({ ordered: 7 });
-      expect(res).to.have.status(200);
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({
         products: [
           {
@@ -224,119 +232,123 @@ describe('API', function () {
         ],
       });
 
-      expect(client.spreadsheets.values.update).to.have.been.calledOnce;
-      expect(client.spreadsheets.values.update).to.have.been.calledWithMatch({
-        spreadsheetId: 'ssid',
-        range: 'Orders!B6',
-        requestBody: { values: [[7]] },
-      });
+      expect(client.spreadsheets.values.update.callCount).toEqual(1);
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0]?.spreadsheetId,
+      ).toEqual('ssid');
+      expect(client.spreadsheets.values.update.lastCall.args[0]?.range).toEqual(
+        'Orders!B6',
+      );
+      expect(
+        client.spreadsheets.values.update.lastCall.args[0]?.requestBody,
+      ).toEqual({ values: [[7]] });
     });
 
-    it('fails if the user is unknown', async function () {
+    test('fails if the user is unknown', async function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
-      let res = await api
+      let res = await request(app)
         .put('/products/3?userId=becky@friskygirlfarm.com')
         .send({ ordered: 3 });
-      expect(res).to.have.status(401);
+      expect(res.status).toEqual(401);
       expect(res.body).to.include({ code: 'unknownUser' });
     });
 
-    it('fails if `ordered` is missing', async function () {
+    test('fails if `ordered` is missing', async function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
-      let res = await api
+      let res = await request(app)
         .put('/products/3?userId=ashley@friskygirlfarm.com')
         .send({ blurble: 3 });
-      expect(res).to.have.status(400);
+      expect(res.status).toEqual(400);
       expect(res.body).to.include({ code: 'badInput' });
     });
 
-    it('fails if `ordered` is not a number', async function () {
+    test('fails if `ordered` is not a number', async function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
-      let res = await api
+      let res = await request(app)
         .put('/products/3?userId=ashley@friskygirlfarm.com')
         .send({ ordered: 'foo' });
-      expect(res).to.have.status(400);
+      expect(res.status).toEqual(400);
       expect(res.body).to.include({ code: 'badInput' });
     });
 
-    it('fails if `ordered` is negative', async function () {
+    test('fails if `ordered` is negative', async function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
-      let res = await api
+      let res = await request(app)
         .put('/products/3?userId=ashley@friskygirlfarm.com')
         .send({ ordered: -2 });
-      expect(res).to.have.status(400);
+      expect(res.status).toEqual(400);
       expect(res.body).to.include({ code: 'badInput' });
     });
 
-    it('fails if ordering is not open', async function () {
+    test('fails if ordering is not open', async function () {
       client.setNoOrders();
 
-      let res = await api
+      let res = await request(app)
         .put('/products/3?userId=ashley@friskygirlfarm.com')
         .send({ ordered: 3 });
-      expect(res).to.have.status(404);
+      expect(res.status).toEqual(404);
       expect(res.body).to.include({ code: 'ordersNotOpen' });
     });
 
-    it('fails if the product is not found', async function () {
+    test('fails if the product is not found', async function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
-      let res = await api
+      let res = await request(app)
         .put('/products/9?userId=ashley@friskygirlfarm.com')
         .send({ ordered: 3 });
-      expect(res).to.have.status(404);
+      expect(res.status).toEqual(404);
       expect(res.body).to.include({ code: 'productNotFound' });
     });
 
-    it('fails if the product is not available', async function () {
+    test('fails if the product is not available', async function () {
       client.setOrders(
         [7, 3, 0],
         ['ashley@friskygirlfarm.com', 4, 0, 0],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
-      let res = await api
+      let res = await request(app)
         .put('/products/3?userId=ashley@friskygirlfarm.com')
         .send({ ordered: 3 });
-      expect(res).to.have.status(404);
+      expect(res.status).toEqual(404);
       expect(res.body).to.include({ code: 'productNotFound' });
     });
 
-    it('fails if the order exceeds the quantity available', async function () {
+    test('fails if the order exceeds the quantity available', async function () {
       client.setOrders(
         [7, 3, 4],
         ['ashley@friskygirlfarm.com', 4, 0, 0],
-        ['ellen@friskygirlfarm.com', 3, 2, 2]
+        ['ellen@friskygirlfarm.com', 3, 2, 2],
       );
 
-      let res = await api
+      let res = await request(app)
         .put('/products/3?userId=ashley@friskygirlfarm.com')
         .send({ ordered: 3 });
-      expect(res).to.have.status(409);
+      expect(res.status).toEqual(409);
       expect(res.body).to.deep.include({
         code: 'quantityNotAvailable',
         extra: { available: 2 },
@@ -345,7 +357,7 @@ describe('API', function () {
   });
 
   describe('GET /orders', function () {
-    it('works', async function () {
+    test('works', async function () {
       client.setSheetsAndValuesFilterQuery({
         [1]: {
           developerMetadata: [
@@ -385,8 +397,10 @@ describe('API', function () {
         },
       });
 
-      let res = await api.get('/orders?userId=ashley@friskygirlfarm.com');
-      expect(res).to.have.status(200);
+      let res = await request(app).get(
+        '/orders?userId=ashley@friskygirlfarm.com',
+      );
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({
         orders: [
           {
@@ -401,7 +415,7 @@ describe('API', function () {
       });
     });
 
-    it('sorts by date', async function () {
+    test('sorts by date', async function () {
       client.setSheetsAndValuesFilterQuery({
         [1]: {
           developerMetadata: [
@@ -441,8 +455,10 @@ describe('API', function () {
         },
       });
 
-      let res = await api.get('/orders?userId=ashley@friskygirlfarm.com');
-      expect(res).to.have.status(200);
+      let res = await request(app).get(
+        '/orders?userId=ashley@friskygirlfarm.com',
+      );
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({
         orders: [
           {
@@ -461,11 +477,13 @@ describe('API', function () {
       });
     });
 
-    it('works if the user has not placed any orders', async function () {
+    test('works if the user has not placed any orders', async function () {
       client.setSheetsAndValuesFilterQuery({});
 
-      let res = await api.get('/orders?userId=ashley@friskygirlfarm.com');
-      expect(res).to.have.status(200);
+      let res = await request(app).get(
+        '/orders?userId=ashley@friskygirlfarm.com',
+      );
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({ orders: [] });
     });
   });
@@ -477,7 +495,7 @@ describe('API', function () {
       getStub = client.spreadsheets.getByDataFilter;
     });
 
-    it('works', async function () {
+    test('works', async function () {
       getStub.resolves({
         data: {
           sheets: [
@@ -498,17 +516,19 @@ describe('API', function () {
         'Orders 6-25',
         [7, 3, 5],
         ['ellen@friskygirlfarm.com', 3, 2, 0],
-        ['ashley@friskygirlfarm.com', 4, 0, 1]
+        ['ashley@friskygirlfarm.com', 4, 0, 1],
       );
 
-      let res = await api.get('/orders/12345?userId=ashley@friskygirlfarm.com');
+      let res = await request(app).get(
+        '/orders/12345?userId=ashley@friskygirlfarm.com',
+      );
 
-      expect(getStub).to.have.been.calledOnce;
-      expect(getStub.firstCall.args[0].requestBody?.dataFilters).to.deep.equal([
+      expect(getStub.callCount).toEqual(1);
+      expect(getStub.firstCall.args[0].requestBody?.dataFilters).toEqual([
         { gridRange: { sheetId: 12345 } },
       ]);
 
-      expect(res).to.have.status(200);
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({
         products: [
           {
@@ -533,16 +553,18 @@ describe('API', function () {
       });
     });
 
-    it('works if the sheet is not found', async function () {
+    test('works if the sheet is not found', async function () {
       getStub.resolves({
         data: {
           sheets: [],
         },
       });
 
-      let res = await api.get('/orders/12345?userId=ashley@friskygirlfarm.com');
+      let res = await request(app).get(
+        '/orders/12345?userId=ashley@friskygirlfarm.com',
+      );
 
-      expect(res).to.have.status(404);
+      expect(res.status).toEqual(404);
     });
   });
 
@@ -557,7 +579,7 @@ describe('API', function () {
       getStub.resolves({ data: { sheets } });
     }
 
-    it('it works', async function () {
+    test('it works', async function () {
       stubSheets([
         {
           properties: { title: 'Orders 4-20' },
@@ -581,51 +603,53 @@ describe('API', function () {
         [1, 0, 1],
         ['ashley@friskygirlfarm.com', 0, 0, 1],
         ['ellen@friskygirlfarm.com', 0, 0, 0],
-        ['herbie@friskygirlfarm.com', 1, 0, 1]
+        ['herbie@friskygirlfarm.com', 1, 0, 1],
       );
 
       sendEmailsStub.resolves({
         Status: [{ Status: 'Success' }, { Status: 'Success' }],
       });
 
-      let res = await api
+      let res = await request(app)
         .post('/admin/confirmation-emails')
         .send({ sheetId: 123 });
-      expect(res).to.have.status(200);
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({ failedSends: [] });
 
-      expect(getStub).to.have.been.calledOnce;
-      expect(getStub).to.have.been.calledWithMatch({
-        spreadsheetId: 'ssid',
-        requestBody: {
-          dataFilters: [{ gridRange: { sheetId: 123 } }],
-        },
-      });
+      expect(getStub.callCount).toEqual(1);
+      expect(getStub.lastCall.args[0].spreadsheetId).toEqual('ssid');
+      expect(getStub.lastCall.args[0].requestBody?.dataFilters).toEqual([
+        { gridRange: { sheetId: 123 } },
+      ]);
 
-      expect(sendEmailsStub).to.have.been.calledOnce;
-      expect(sendEmailsStub).to.have.been.calledWithMatch({
-        Source: 'friskygirlfarm@gmail.com',
-        Template: 'order_confirmation',
-        ConfigurationSetName: 'default',
-        Destinations: [
-          {
-            Destination: { ToAddresses: ['ashley@friskygirlfarm.com'] },
-            ReplacementTemplateData: JSON.stringify({
-              pickupInstructions:
-                'Come for the veggies, stay for the neighborhood character',
-            }),
-          },
-          {
-            Destination: { ToAddresses: ['herbie@friskygirlfarm.com'] },
-            ReplacementTemplateData: JSON.stringify({
-              pickupInstructions: 'Like a city, but also a lake',
-            }),
-          },
-        ],
-      });
+      expect(sendEmailsStub.callCount).toEqual(1);
+      expect(sendEmailsStub.lastCall.args[0].Source).toEqual(
+        'friskygirlfarm@gmail.com',
+      );
+      expect(sendEmailsStub.lastCall.args[0].Template).toEqual(
+        'order_confirmation',
+      );
+      expect(sendEmailsStub.lastCall.args[0].ConfigurationSetName).toEqual(
+        'default',
+      );
+      expect(sendEmailsStub.lastCall.args[0].Destinations).toEqual([
+        {
+          Destination: { ToAddresses: ['ashley@friskygirlfarm.com'] },
+          ReplacementTemplateData: JSON.stringify({
+            pickupInstructions:
+              'Come for the veggies, stay for the neighborhood character',
+          }),
+        },
+        {
+          Destination: { ToAddresses: ['herbie@friskygirlfarm.com'] },
+          ReplacementTemplateData: JSON.stringify({
+            pickupInstructions: 'Like a city, but also a lake',
+          }),
+        },
+      ]);
     });
 
-    it('it reports send errors', async function () {
+    test('it reports send errors', async function () {
       stubSheets([
         {
           properties: { title: 'Orders 4-20' },
@@ -638,43 +662,43 @@ describe('API', function () {
         'Orders 4-20',
         [1, 0, 1],
         ['ashley@friskygirlfarm.com', 0, 0, 1],
-        ['ellen@friskygirlfarm.com', 1, 0, 0]
+        ['ellen@friskygirlfarm.com', 1, 0, 0],
       );
 
       sendEmailsStub.resolves({
         Status: [{ Status: 'MessageRejected' }, { Status: 'MessageRejected' }],
       });
 
-      let res = await api
+      let res = await request(app)
         .post('/admin/confirmation-emails')
         .send({ sheetId: 123 });
-      expect(res).to.have.status(200);
+      expect(res.status).toEqual(200);
       expect(res.body).to.deep.equal({
         failedSends: ['ellen@friskygirlfarm.com', 'ashley@friskygirlfarm.com'],
       });
     });
 
-    it('it fails if the sheet id is not specified', async function () {
-      let res = await api.post('/admin/confirmation-emails').send();
-      expect(res).to.have.status(400);
+    test('it fails if the sheet id is not specified', async function () {
+      let res = await request(app).post('/admin/confirmation-emails').send();
+      expect(res.status).toEqual(400);
     });
 
-    it('it fails if the sheet is not found', async function () {
+    test('it fails if the sheet is not found', async function () {
       stubSheets([]);
 
-      let res = await api
+      let res = await request(app)
         .post('/admin/confirmation-emails')
         .send({ sheetId: 99999 });
-      expect(res).to.have.status(400);
+      expect(res.status).toEqual(400);
     });
 
-    it('it fails if the sheet id is not an orders sheet', async function () {
+    test('it fails if the sheet id is not an orders sheet', async function () {
       stubSheets([{ properties: { title: 'Orders 4-20' } }]);
 
-      let res = await api
+      let res = await request(app)
         .post('/admin/confirmation-emails')
         .send({ sheetId: 99999 });
-      expect(res).to.have.status(400);
+      expect(res.status).toEqual(400);
     });
   });
 });

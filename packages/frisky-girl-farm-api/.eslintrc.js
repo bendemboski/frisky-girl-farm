@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  parser: '@babel/eslint-parser',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2021,
     requireConfigFile: false,
@@ -9,23 +9,21 @@ module.exports = {
     es6: true,
     node: true,
   },
-  plugins: ['@typescript-eslint', 'prettier', 'node'],
+  plugins: ['prettier'],
   extends: [
     'eslint:recommended',
-    'plugin:node/recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
     'plugin:prettier/recommended',
+    'plugin:n/recommended',
   ],
   overrides: [
     // typescript
     {
       files: ['*.ts'],
-      parser: '@typescript-eslint/parser',
       rules: {
         'prefer-const': 'off',
-        'no-undef': 'off',
         'no-unused-vars': 'off',
-        'node/no-unsupported-features/es-syntax': 'off',
-        'node/no-missing-import': 'off',
+        'n/no-missing-import': 'off',
       },
     },
     {

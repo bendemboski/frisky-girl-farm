@@ -1,48 +1,28 @@
 {
+  "extends": "@tsconfig/ember/tsconfig.json",
   "compilerOptions": {
-    "target": "es2020",
-    "allowJs": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noEmitOnError": true,
-    "noEmit": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
+    // The combination of `baseUrl` with `paths` allows Ember's classic package
+    // layout, which is not resolvable with the Node resolution algorithm, to
+    // work with TypeScript.
     "baseUrl": ".",
-    "module": "es6",
-    "experimentalDecorators": true,
-    "skipLibCheck": true,
     "paths": {
-      "frisky-girl-farm/tests/*": [
-        "tests/*"
-      ],
-      "frisky-girl-farm/*": [
-        "app/*"
-      ],
-      "*": [
-        "types/*"
-      ],
-      "fetch": [
-        "../../node_modules/ember-fetch"
-      ]
-    },
+      "frisky-girl-farm/tests/*": ["tests/*"],
+      "frisky-girl-farm/*": ["app/*"],
+      "*": ["types/*"],
+    }
   },
   "include": [
     "app/**/*",
     "tests/**/*",
-    "types/**/*"
+    "types/**/*",
+    "node_modules/@gavant/glint-template-types/types/ember-truth-helpers/*",
+    "node_modules/@gavant/glint-template-types/types/ember-concurrency/**/*",
+    "node_modules/@gavant/glint-template-types/types/ember-on-helper/**/*",
+    "node_modules/@gavant/glint-template-types/types/@fortawesome/ember-fontawesome/**/*",
+    "node_modules/@gavant/glint-template-types/types/ember-click-outside/**/*",
+    "node_modules/@gavant/glint-template-types/types/ember-modal-dialog/**/*",
   ],
-
   "glint": {
-    "environment": "ember-loose",
+    "environment": "ember-loose"
   }
 }

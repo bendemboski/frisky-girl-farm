@@ -1,6 +1,5 @@
 import Service, { inject as service } from '@ember/service';
 import ENV from '../config/environment';
-import fetch from 'fetch';
 
 import type UserService from './user';
 import type {
@@ -10,6 +9,7 @@ import type {
   ProductsResponse,
   User,
 } from 'frisky-girl-farm-api/src/types';
+import { waitForPromise } from '@ember/test-waiters';
 
 const {
   api: { host, namespace },
@@ -38,7 +38,7 @@ export default class ApiService extends Service {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ordered: quantity }),
-      }
+      },
     );
     return data.products;
   }
@@ -49,7 +49,7 @@ export default class ApiService extends Service {
     return data.orders.map(({ id, date }) => ({ id, date: new Date(date) }));
   }
 
-  async getPastOrderProducts(pastOrderId: string) {
+  async getPastOrderProducts(pastOrderId: number) {
     let relUrl = `/orders/${pastOrderId}?${this.authQueryParam}`;
     let data = await apiFetch<PastOrderProductsResponse>(relUrl);
     return data.products;
@@ -70,12 +70,17 @@ export class ApiError extends Error {
   constructor(
     readonly code: string,
     readonly extra: Record<string, unknown>,
-    message?: string
+    message?: string,
   ) {
     super(message);
     this.code = code;
     this.extra = extra;
-    Error.captureStackTrace(this, ApiError);
+    try {
+      // @ts-expect-error captureStackTrace is a v8 extension
+      Error.captureStackTrace(this, ApiError);
+    } catch (e) {
+      // ignore
+    }
   }
 
   get isOrdersNotOpen() {
@@ -114,13 +119,13 @@ async function apiFetch<T>(relUrl: string, options?: RequestInit): Promise<T> {
   }
   url = `${url}${relUrl}`;
 
-  let response = await fetch(url, options);
+  let response = await waitForPromise(fetch(url, options));
   if (response.ok) {
-    return await response.json();
+    return await waitForPromise(response.json());
   }
   let toThrow;
   try {
-    let { code, extra } = await response.json();
+    let { code, extra } = await waitForPromise(response.json());
     toThrow = new ApiError(code, extra);
   } catch (e) {
     toThrow = new Error(`Error logging in: ${response.status}`);

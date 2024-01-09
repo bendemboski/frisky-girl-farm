@@ -15,10 +15,10 @@ module.exports = {
         writeFileSync(keyPath, process.env.GOOGLE_CONFIG!);
         return new Spreadsheet(
           process.env.GOOGLE_SPREADSHEET_ID!,
-          createClient(keyPath)
+          createClient(keyPath),
         );
       },
-      () => AWS
-    )
+      () => AWS,
+    ),
   ),
 };

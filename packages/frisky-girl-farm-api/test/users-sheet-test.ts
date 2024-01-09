@@ -1,5 +1,4 @@
-import './support/setup';
-import { expect } from 'chai';
+import { describe, beforeEach, afterEach, test, expect } from 'vitest';
 import sinon from 'sinon';
 import UsersSheet from '../src/sheets/users-sheet';
 import { UnknownUserError } from '../src/sheets/errors';
@@ -32,7 +31,7 @@ describe('UsersSheet', function () {
   });
 
   describe('getUser', function () {
-    it('works', async function () {
+    test('works', async function () {
       expect(await sheet.getUser('ashley@friskygirlfarm.com')).to.deep.equal({
         email: 'ashley@friskygirlfarm.com',
         name: 'Ashley Wilson',
@@ -41,7 +40,7 @@ describe('UsersSheet', function () {
       });
     });
 
-    it('matches with extra whitespace', async function () {
+    test('matches with extra whitespace', async function () {
       expect(await sheet.getUser(' ashley@friskygirlfarm.com ')).to.deep.equal({
         email: 'ashley@friskygirlfarm.com',
         name: 'Ashley Wilson',
@@ -57,7 +56,7 @@ describe('UsersSheet', function () {
       });
 
       expect(
-        await sheet.getUser(' spacey@friskygirlfarm.com     ')
+        await sheet.getUser(' spacey@friskygirlfarm.com     '),
       ).to.deep.equal({
         email: 'spacey@friskygirlfarm.com',
         name: 'Spacey McWhitespace',
@@ -66,19 +65,19 @@ describe('UsersSheet', function () {
       });
     });
 
-    it('throws when the user is not found', async function () {
-      expect(
-        sheet.getUser('becky@friskygirlfarm.com')
-      ).to.eventually.be.rejectedWith(UnknownUserError);
+    test('throws when the user is not found', async function () {
+      expect(sheet.getUser('becky@friskygirlfarm.com')).rejects.toThrow(
+        UnknownUserError,
+      );
     });
   });
 
-  it('getUsers', async function () {
+  test('getUsers', async function () {
     expect(
       await sheet.getUsers([
         'spacey@friskygirlfarm.com',
         'ellen@friskygirlfarm.com',
-      ])
+      ]),
     ).to.deep.equal([
       {
         email: 'ellen@friskygirlfarm.com',

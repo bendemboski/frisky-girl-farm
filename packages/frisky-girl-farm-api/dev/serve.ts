@@ -14,6 +14,6 @@ process.env.AWS_REGION = serverlessConfig.provider.region;
 
 let app = buildApp(
   () => createSpreadsheet(stage),
-  () => AWS
+  () => AWS,
 );
 app.listen(3000);

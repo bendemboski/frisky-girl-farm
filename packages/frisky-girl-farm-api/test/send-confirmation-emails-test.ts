@@ -1,5 +1,4 @@
-import './support/setup';
-import { expect } from 'chai';
+import { describe, beforeEach, afterEach, test, expect } from 'vitest';
 import sinon, { SinonStub } from 'sinon';
 import sendConfirmationEmails from '../src/send-confirmation-emails';
 import type { User } from '../src/types';
@@ -25,7 +24,7 @@ describe('sendConfirmationEmails', function () {
     }
   }
   const awsFactory = () =>
-    ({ SES: SESStub } as unknown as typeof import('aws-sdk'));
+    ({ SES: SESStub }) as unknown as typeof import('aws-sdk');
 
   const locations = [
     {
@@ -60,7 +59,7 @@ describe('sendConfirmationEmails', function () {
     },
   ];
 
-  it('works', async function () {
+  test('works', async function () {
     sendStub.resolves({
       Status: [
         { Status: 'Success' },
@@ -70,38 +69,38 @@ describe('sendConfirmationEmails', function () {
     });
 
     await expect(
-      sendConfirmationEmails(awsFactory, users, locations)
-    ).to.eventually.deep.equal([]);
-    expect(sendStub).to.have.been.calledOnce;
-    expect(sendStub).to.have.been.calledWithMatch({
-      Source: 'friskygirlfarm@gmail.com',
-      Template: 'order_confirmation',
-      ConfigurationSetName: 'default',
-      Destinations: [
-        {
-          Destination: { ToAddresses: ['ashley@friskygirlfarm.com'] },
-          ReplacementTemplateData: JSON.stringify({
-            pickupInstructions: 'Get it before the elk do!',
-          }),
-        },
-        {
-          Destination: { ToAddresses: ['ellen@friskygirlfarm.com'] },
-          ReplacementTemplateData: JSON.stringify({
-            pickupInstructions:
-              'Come for the veggies, stay for the neighborhood character',
-          }),
-        },
-        {
-          Destination: { ToAddresses: ['herbie@friskygirlfarm.com'] },
-          ReplacementTemplateData: JSON.stringify({
-            pickupInstructions: 'Get it before the elk do!',
-          }),
-        },
-      ],
-    });
+      sendConfirmationEmails(awsFactory, users, locations),
+    ).resolves.toEqual([]);
+    expect(sendStub.callCount).toEqual(1);
+    expect(sendStub.lastCall.args[0].Source).toEqual(
+      'friskygirlfarm@gmail.com',
+    );
+    expect(sendStub.lastCall.args[0].Template).toEqual('order_confirmation');
+    expect(sendStub.lastCall.args[0].ConfigurationSetName).toEqual('default');
+    expect(sendStub.lastCall.args[0].Destinations).toEqual([
+      {
+        Destination: { ToAddresses: ['ashley@friskygirlfarm.com'] },
+        ReplacementTemplateData: JSON.stringify({
+          pickupInstructions: 'Get it before the elk do!',
+        }),
+      },
+      {
+        Destination: { ToAddresses: ['ellen@friskygirlfarm.com'] },
+        ReplacementTemplateData: JSON.stringify({
+          pickupInstructions:
+            'Come for the veggies, stay for the neighborhood character',
+        }),
+      },
+      {
+        Destination: { ToAddresses: ['herbie@friskygirlfarm.com'] },
+        ReplacementTemplateData: JSON.stringify({
+          pickupInstructions: 'Get it before the elk do!',
+        }),
+      },
+    ]);
   });
 
-  it('reports individual errors', async function () {
+  test('reports individual errors', async function () {
     sendStub.resolves({
       Status: [
         { Status: 'MessageRejected' },
@@ -112,27 +111,27 @@ describe('sendConfirmationEmails', function () {
 
     sinon.stub(console, 'error');
     await expect(
-      sendConfirmationEmails(awsFactory, users, locations)
-    ).to.eventually.deep.equal([
+      sendConfirmationEmails(awsFactory, users, locations),
+    ).resolves.toEqual([
       'ashley@friskygirlfarm.com',
       'ellen@friskygirlfarm.com',
     ]);
   });
 
-  it('reports api errors', async function () {
+  test('reports api errors', async function () {
     sendStub.rejects();
 
     sinon.stub(console, 'error');
     await expect(
-      sendConfirmationEmails(awsFactory, users, locations)
-    ).to.eventually.deep.equal([
+      sendConfirmationEmails(awsFactory, users, locations),
+    ).resolves.toEqual([
       'ashley@friskygirlfarm.com',
       'ellen@friskygirlfarm.com',
       'herbie@friskygirlfarm.com',
     ]);
   });
 
-  it('chunks users', async function () {
+  test('chunks users', async function () {
     let users: User[] = [];
     for (let i = 0; i < 102; i++) {
       users.push({
@@ -154,17 +153,17 @@ describe('sendConfirmationEmails', function () {
     });
 
     await expect(
-      sendConfirmationEmails(awsFactory, users, locations)
-    ).to.eventually.deep.equal([]);
-    expect(sendStub).to.have.been.calledThrice;
+      sendConfirmationEmails(awsFactory, users, locations),
+    ).resolves.toEqual([]);
+    expect(sendStub.callCount).toEqual(3);
 
-    expect(sendStub.firstCall).to.have.been.calledWithMatch({
-      Source: 'friskygirlfarm@gmail.com',
-      Template: 'order_confirmation',
-      ConfigurationSetName: 'default',
-    });
-    expect(sendStub.firstCall.args[0].Destinations.length).to.equal(50);
-    expect(sendStub.firstCall.args[0].Destinations[0]).to.deep.equal({
+    expect(sendStub.firstCall.args[0].Source).toEqual(
+      'friskygirlfarm@gmail.com',
+    );
+    expect(sendStub.firstCall.args[0].Template).toEqual('order_confirmation');
+    expect(sendStub.firstCall.args[0].ConfigurationSetName).toEqual('default');
+    expect(sendStub.firstCall.args[0].Destinations.length).toEqual(50);
+    expect(sendStub.firstCall.args[0].Destinations[0]).toEqual({
       Destination: { ToAddresses: ['user0@friskygirlfarm.com'] },
       ReplacementTemplateData: JSON.stringify({
         pickupInstructions: 'Get it before the elk do!',
@@ -191,11 +190,11 @@ describe('sendConfirmationEmails', function () {
       }),
     });
 
-    expect(sendStub.secondCall).to.have.been.calledWithMatch({
-      Source: 'friskygirlfarm@gmail.com',
-      Template: 'order_confirmation',
-      ConfigurationSetName: 'default',
-    });
+    expect(sendStub.secondCall.args[0].Source).toEqual(
+      'friskygirlfarm@gmail.com',
+    );
+    expect(sendStub.secondCall.args[0].Template).toEqual('order_confirmation');
+    expect(sendStub.secondCall.args[0].ConfigurationSetName).toEqual('default');
     expect(sendStub.secondCall.args[0].Destinations.length).to.equal(50);
     expect(sendStub.secondCall.args[0].Destinations[0]).to.deep.equal({
       Destination: { ToAddresses: ['user50@friskygirlfarm.com'] },
@@ -224,29 +223,29 @@ describe('sendConfirmationEmails', function () {
       }),
     });
 
-    expect(sendStub.thirdCall).to.have.been.calledWithMatch({
-      Source: 'friskygirlfarm@gmail.com',
-      Template: 'order_confirmation',
-      ConfigurationSetName: 'default',
-      Destinations: [
-        {
-          Destination: { ToAddresses: ['user100@friskygirlfarm.com'] },
-          ReplacementTemplateData: JSON.stringify({
-            pickupInstructions: 'Get it before the elk do!',
-          }),
-        },
-        {
-          Destination: { ToAddresses: ['user101@friskygirlfarm.com'] },
-          ReplacementTemplateData: JSON.stringify({
-            pickupInstructions:
-              'Come for the veggies, stay for the neighborhood character',
-          }),
-        },
-      ],
-    });
+    expect(sendStub.thirdCall.args[0].Source).toEqual(
+      'friskygirlfarm@gmail.com',
+    );
+    expect(sendStub.thirdCall.args[0].Template).toEqual('order_confirmation');
+    expect(sendStub.thirdCall.args[0].ConfigurationSetName).toEqual('default');
+    expect(sendStub.thirdCall.args[0].Destinations).toEqual([
+      {
+        Destination: { ToAddresses: ['user100@friskygirlfarm.com'] },
+        ReplacementTemplateData: JSON.stringify({
+          pickupInstructions: 'Get it before the elk do!',
+        }),
+      },
+      {
+        Destination: { ToAddresses: ['user101@friskygirlfarm.com'] },
+        ReplacementTemplateData: JSON.stringify({
+          pickupInstructions:
+            'Come for the veggies, stay for the neighborhood character',
+        }),
+      },
+    ]);
   });
 
-  it('handles errors when chunking users', async function () {
+  test('handles errors when chunking users', async function () {
     let users: User[] = [];
     for (let i = 0; i < 102; i++) {
       users.push({
@@ -270,8 +269,8 @@ describe('sendConfirmationEmails', function () {
     });
 
     await expect(
-      sendConfirmationEmails(awsFactory, users, locations)
-    ).to.eventually.deep.equal([
+      sendConfirmationEmails(awsFactory, users, locations),
+    ).resolves.toEqual([
       'user3@friskygirlfarm.com',
       'user25@friskygirlfarm.com',
       ...users

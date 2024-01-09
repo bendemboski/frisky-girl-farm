@@ -2,7 +2,7 @@ import Pretender from 'pretender';
 import sinon from 'sinon';
 import { getContext } from '@ember/test-helpers';
 
-import { User, ProductOrder } from 'frisky-girl-farm-api/src/types';
+import { type User, type ProductOrder } from 'frisky-girl-farm-api/src/types';
 
 export class PretenderState {
   users: Record<string, User> = {};
@@ -20,11 +20,11 @@ class TestState {
 const state: WeakMap<object, TestState> = new WeakMap();
 
 function getPretender(): Pretender {
-  return state.get(getContext())!.pretender;
+  return state.get(getContext()!)!.pretender;
 }
 
 export function getPretenderState(): PretenderState {
-  return state.get(getContext())!.pretenderState;
+  return state.get(getContext()!)!.pretenderState;
 }
 
 //
@@ -32,7 +32,7 @@ export function getPretenderState(): PretenderState {
 //
 export default function setupPretender(hooks: NestedHooks) {
   hooks.beforeEach(function () {
-    state.set(getContext(), new TestState());
+    state.set(getContext()!, new TestState());
 
     let pretender = getPretender();
     let pretenderState = getPretenderState();
@@ -53,7 +53,7 @@ export default function setupPretender(hooks: NestedHooks) {
             JSON.stringify({ code: 'unknownUser' }),
           ];
         }
-      })
+      }),
     );
 
     pretender.get(
@@ -72,7 +72,7 @@ export default function setupPretender(hooks: NestedHooks) {
             JSON.stringify({ code: 'ordersNotOpen' }),
           ];
         }
-      })
+      }),
     );
 
     pretender.put(
@@ -88,7 +88,7 @@ export default function setupPretender(hooks: NestedHooks) {
           }
 
           let product = pretenderState.products.find(
-            ({ id }) => id === productId
+            ({ id }) => id === productId,
           );
           if (!product) {
             return [
@@ -116,8 +116,8 @@ export default function setupPretender(hooks: NestedHooks) {
             { 'Content-Type': 'application/json' },
             JSON.stringify({ products: pretenderState.products }),
           ];
-        }
-      )
+        },
+      ),
     );
   });
 

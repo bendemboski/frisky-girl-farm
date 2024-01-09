@@ -9,7 +9,7 @@ import type { User } from './types';
 export default async function sendConfirmationEmails(
   awsFactory: AWSFactory,
   users: ReadonlyArray<User>,
-  locations: ReadonlyArray<Location>
+  locations: ReadonlyArray<Location>,
 ) {
   // Split the users into chunks of 50 -- the maximum number of destinations
   // SES will let us send to at once
@@ -59,7 +59,7 @@ export default async function sendConfirmationEmails(
           console.error(
             'Failed to send to user',
             email,
-            JSON.stringify(status)
+            JSON.stringify(status),
           );
           failedSends.push(email);
         }

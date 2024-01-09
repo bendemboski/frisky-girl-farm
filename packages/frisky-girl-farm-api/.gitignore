@@ -2,5 +2,7 @@ node_modules
 .serverless
 .build
 .env
+.eslintcache
+coverage
 
 config.*.json
