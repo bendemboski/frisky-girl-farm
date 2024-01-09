@@ -49,7 +49,7 @@ export default class ApiService extends Service {
     return data.orders.map(({ id, date }) => ({ id, date: new Date(date) }));
   }
 
-  async getPastOrderProducts(pastOrderId: string) {
+  async getPastOrderProducts(pastOrderId: number) {
     let relUrl = `/orders/${pastOrderId}?${this.authQueryParam}`;
     let data = await apiFetch<PastOrderProductsResponse>(relUrl);
     return data.products;

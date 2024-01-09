@@ -2,7 +2,6 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
-import { taskFor } from 'ember-concurrency-ts';
 import { waitFor } from '@ember/test-waiters';
 import { modifier } from 'ember-modifier';
 
@@ -132,36 +131,37 @@ export default class ProductOrderComponent extends Component<ProductOrderArgumen
     this.availabilityError = null;
   }
 
-  @task
-  @waitFor
-  private *_setOrdered(ordered: number) {
-    this.availabilityError = null;
-
-    if (
-      this.args.product.available !== -1 &&
-      ordered > this.args.product.available
-    ) {
-      this.availabilityError = { available: this.args.product.available };
-      return false;
-    }
-
-    try {
-      yield this.args.setOrder(ordered);
-      this.controlsDisplayMode = 'select';
-      return true;
-    } catch (e) {
-      if (e instanceof ApiError && e.isQuantityNotAvailable) {
-        this.availabilityError = { available: e.extra['available'] as number };
-        return false;
-      } else {
-        throw e;
-      }
-    }
-  }
   /**
    * Set the ordered quantity
    */
-  readonly setOrdered = taskFor(this._setOrdered);
+  private readonly setOrdered = task(
+    waitFor(async (ordered: number) => {
+      this.availabilityError = null;
+
+      if (
+        this.args.product.available !== -1 &&
+        ordered > this.args.product.available
+      ) {
+        this.availabilityError = { available: this.args.product.available };
+        return false;
+      }
+
+      try {
+        await this.args.setOrder(ordered);
+        this.controlsDisplayMode = 'select';
+        return true;
+      } catch (e) {
+        if (e instanceof ApiError && e.isQuantityNotAvailable) {
+          this.availabilityError = {
+            available: e.extra['available'] as number,
+          };
+          return false;
+        } else {
+          throw e;
+        }
+      }
+    }),
+  );
 }
 
 declare module '@glint/environment-ember-loose/registry' {

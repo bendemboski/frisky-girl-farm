@@ -1,8 +1,7 @@
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { alias } from 'macro-decorators';
-import { task, type TaskGenerator } from 'ember-concurrency';
-import { taskFor } from 'ember-concurrency-ts';
+import { task } from 'ember-concurrency';
 import { ApiError } from './api';
 
 import ApiService from './api';
@@ -21,16 +20,15 @@ export default class UserService extends Service {
   @tracked location: string | null = null;
   @tracked balance: number | null = null;
 
-  //
-  // Check if we're logged in (and our login is still valid)
-  //
-  @task
-  private *_checkLoggedIn() {
+  /**
+   * Check if we're logged in (and our login is still valid)
+   */
+  readonly checkLoggedIn = task(async () => {
     if (!this.email) {
       return false;
     }
 
-    let data: User | null = yield this.fetchData.perform(this.email);
+    let data = await this.fetchData.perform(this.email);
     if (!data) {
       this.logout();
       return false;
@@ -38,15 +36,13 @@ export default class UserService extends Service {
 
     this._setData(data);
     return true;
-  }
-  readonly checkLoggedIn = taskFor(this._checkLoggedIn);
+  });
 
-  //
-  // Log in
-  //
-  @task
-  private *_login(email: string) {
-    let data: User | null = yield this.fetchData.perform(email);
+  /**
+   * Log in
+   */
+  readonly login = task(async (email: string) => {
+    let data = await this.fetchData.perform(email);
     if (!data) {
       return false;
     }
@@ -54,12 +50,11 @@ export default class UserService extends Service {
     this._setData(data);
     this.email = email;
     return true;
-  }
-  readonly login = taskFor(this._login);
+  });
 
-  //
-  // Log out
-  //
+  /**
+   * Log out
+   */
   logout() {
     this.email = null;
     this.name = null;
@@ -67,18 +62,16 @@ export default class UserService extends Service {
     this.balance = null;
   }
 
-  @task
-  private *_fetchData(email: string): TaskGenerator<User | null> {
+  readonly fetchData = task(async (email: string) => {
     try {
-      return yield this.api.getUser(email);
+      return await this.api.getUser(email);
     } catch (e) {
       if (e instanceof ApiError && e.isUnknownUser) {
         return null;
       }
       throw e;
     }
-  }
-  readonly fetchData = taskFor(this._fetchData);
+  });
 
   private _setData({ name, location, balance }: User) {
     this.name = name;
