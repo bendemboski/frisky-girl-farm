@@ -74,7 +74,6 @@
     "ember-click-outside": "^5.0.1",
     "ember-concurrency": "^3.1.1",
     "ember-concurrency-ts": "^0.3.1",
-    "ember-fetch": "^8.1.2",
     "ember-load-initializers": "^2.1.2",
     "ember-local-settings": "^3.0.0",
     "ember-math-helpers": "^2.18.2",

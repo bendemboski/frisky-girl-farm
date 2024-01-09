@@ -9,7 +9,6 @@
       "frisky-girl-farm/tests/*": ["tests/*"],
       "frisky-girl-farm/*": ["app/*"],
       "*": ["types/*"],
-      "fetch": ["node_modules/ember-fetch"]
     }
   },
   "include": [

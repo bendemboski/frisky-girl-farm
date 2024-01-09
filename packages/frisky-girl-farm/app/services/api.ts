@@ -1,6 +1,5 @@
 import Service, { inject as service } from '@ember/service';
 import ENV from '../config/environment';
-import fetch from 'fetch';
 
 import type UserService from './user';
 import type {
@@ -10,6 +9,7 @@ import type {
   ProductsResponse,
   User,
 } from 'frisky-girl-farm-api/src/types';
+import { waitForPromise } from '@ember/test-waiters';
 
 const {
   api: { host, namespace },
@@ -119,13 +119,13 @@ async function apiFetch<T>(relUrl: string, options?: RequestInit): Promise<T> {
   }
   url = `${url}${relUrl}`;
 
-  let response = await fetch(url, options);
+  let response = await waitForPromise(fetch(url, options));
   if (response.ok) {
-    return await response.json();
+    return await waitForPromise(response.json());
   }
   let toThrow;
   try {
-    let { code, extra } = await response.json();
+    let { code, extra } = await waitForPromise(response.json());
     toThrow = new ApiError(code, extra);
   } catch (e) {
     toThrow = new Error(`Error logging in: ${response.status}`);
