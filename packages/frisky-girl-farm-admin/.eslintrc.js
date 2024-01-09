@@ -2,7 +2,7 @@ module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2019,
+    ecmaVersion: 'latest',
   },
   plugins: ['prettier', 'googleappsscript'],
   extends: [
@@ -11,7 +11,6 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   env: {
-    es6: true,
     node: true,
   },
   overrides: [

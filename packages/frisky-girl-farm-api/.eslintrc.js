@@ -2,11 +2,9 @@ module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2021,
-    requireConfigFile: false,
+    ecmaVersion: 'latest',
   },
   env: {
-    es6: true,
     node: true,
   },
   plugins: ['prettier'],
