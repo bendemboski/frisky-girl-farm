@@ -79,7 +79,7 @@ type HarvestQuantities = [string, number];
 //
 function getUserOrders(
   orderSheet: GoogleAppsScript.Spreadsheet.Sheet,
-  locations: string[]
+  locations: string[],
 ) {
   let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
 

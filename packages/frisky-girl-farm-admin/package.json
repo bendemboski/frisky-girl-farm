@@ -8,7 +8,8 @@
   "license": "MIT",
   "scripts": {
     "deploy": "clasp push",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "private": true,
   "devDependencies": {

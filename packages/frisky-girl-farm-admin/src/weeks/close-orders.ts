@@ -8,7 +8,7 @@ function closeOrders() {
   let orderSheet = spreadsheet.getSheetByName('Orders');
   if (!orderSheet) {
     return createNotificationResponse(
-      'There is no "Orders" sheet to close out.'
+      'There is no "Orders" sheet to close out.',
     );
   }
 
@@ -17,7 +17,7 @@ function closeOrders() {
 
   if (spreadsheet.getSheetByName(newName)) {
     return createNotificationResponse(
-      `A sheet named "${newName}'" already exists. Please rename it and try again.`
+      `A sheet named "${newName}'" already exists. Please rename it and try again.`,
     );
   }
 
@@ -43,7 +43,7 @@ function closeOrders() {
     let rowNumber = emailToRow[email];
     if (!rowNumber) {
       return createNotificationResponse(
-        `The email address "${email} " was found in the order but not in the Users sheet. Please update it to match a user in the Users sheet or delete the row from the order sheet.`
+        `The email address "${email} " was found in the order but not in the Users sheet. Please update it to match a user in the Users sheet or delete the row from the order sheet.`,
       );
     }
 
