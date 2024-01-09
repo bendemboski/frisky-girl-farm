@@ -32,5 +32,10 @@ module.exports = function (defaults) {
     staticHelpers: true,
     staticModifiers: true,
     staticComponents: true,
+    packagerOptions: {
+      webpackConfig: {
+        devtool: 'source-map',
+      },
+    },
   });
 };
