@@ -15,7 +15,7 @@ describe('API', function () {
       return { promise: () => sendEmailsStub(...args) };
     }
   }
-  const awsFactory = () => ({ SES: SESStub } as typeof import('aws-sdk'));
+  const awsFactory = () => ({ SES: SESStub }) as typeof import('aws-sdk');
 
   beforeEach(function () {
     client = new MockSheetsClient();
@@ -25,7 +25,7 @@ describe('API', function () {
       buildApp(() => {
         let spreadsheet = new Spreadsheet('ssid', client.asSheets());
         return spreadsheet;
-      }, awsFactory)
+      }, awsFactory),
     );
 
     sendEmailsStub = sinon.stub();
@@ -59,7 +59,7 @@ describe('API', function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
       let res = await api.get('/products?userId=ashley@friskygirlfarm.com');
@@ -98,7 +98,7 @@ describe('API', function () {
       client.setOrders(
         [0, -1, 2],
         ['ashley@friskygirlfarm.com', 0, 2, 1],
-        ['ellen@friskygirlfarm.com', 0, 0, 1]
+        ['ellen@friskygirlfarm.com', 0, 0, 1],
       );
 
       let res = await api.get('/products?userId=ashley@friskygirlfarm.com');
@@ -138,7 +138,7 @@ describe('API', function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
       client.stubUpdateOrder();
 
@@ -187,7 +187,7 @@ describe('API', function () {
       client.setOrders(
         [-1, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
       client.stubUpdateOrder();
 
@@ -236,7 +236,7 @@ describe('API', function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
       let res = await api
@@ -250,7 +250,7 @@ describe('API', function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
       let res = await api
@@ -264,7 +264,7 @@ describe('API', function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
       let res = await api
@@ -278,7 +278,7 @@ describe('API', function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
       let res = await api
@@ -302,7 +302,7 @@ describe('API', function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
       let res = await api
@@ -316,7 +316,7 @@ describe('API', function () {
       client.setOrders(
         [7, 3, 0],
         ['ashley@friskygirlfarm.com', 4, 0, 0],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
 
       let res = await api
@@ -330,7 +330,7 @@ describe('API', function () {
       client.setOrders(
         [7, 3, 4],
         ['ashley@friskygirlfarm.com', 4, 0, 0],
-        ['ellen@friskygirlfarm.com', 3, 2, 2]
+        ['ellen@friskygirlfarm.com', 3, 2, 2],
       );
 
       let res = await api
@@ -498,7 +498,7 @@ describe('API', function () {
         'Orders 6-25',
         [7, 3, 5],
         ['ellen@friskygirlfarm.com', 3, 2, 0],
-        ['ashley@friskygirlfarm.com', 4, 0, 1]
+        ['ashley@friskygirlfarm.com', 4, 0, 1],
       );
 
       let res = await api.get('/orders/12345?userId=ashley@friskygirlfarm.com');
@@ -581,7 +581,7 @@ describe('API', function () {
         [1, 0, 1],
         ['ashley@friskygirlfarm.com', 0, 0, 1],
         ['ellen@friskygirlfarm.com', 0, 0, 0],
-        ['herbie@friskygirlfarm.com', 1, 0, 1]
+        ['herbie@friskygirlfarm.com', 1, 0, 1],
       );
 
       sendEmailsStub.resolves({
@@ -638,7 +638,7 @@ describe('API', function () {
         'Orders 4-20',
         [1, 0, 1],
         ['ashley@friskygirlfarm.com', 0, 0, 1],
-        ['ellen@friskygirlfarm.com', 1, 0, 0]
+        ['ellen@friskygirlfarm.com', 1, 0, 0],
       );
 
       sendEmailsStub.resolves({

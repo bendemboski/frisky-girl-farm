@@ -25,7 +25,7 @@ describe('sendConfirmationEmails', function () {
     }
   }
   const awsFactory = () =>
-    ({ SES: SESStub } as unknown as typeof import('aws-sdk'));
+    ({ SES: SESStub }) as unknown as typeof import('aws-sdk');
 
   const locations = [
     {
@@ -70,7 +70,7 @@ describe('sendConfirmationEmails', function () {
     });
 
     await expect(
-      sendConfirmationEmails(awsFactory, users, locations)
+      sendConfirmationEmails(awsFactory, users, locations),
     ).to.eventually.deep.equal([]);
     expect(sendStub).to.have.been.calledOnce;
     expect(sendStub).to.have.been.calledWithMatch({
@@ -112,7 +112,7 @@ describe('sendConfirmationEmails', function () {
 
     sinon.stub(console, 'error');
     await expect(
-      sendConfirmationEmails(awsFactory, users, locations)
+      sendConfirmationEmails(awsFactory, users, locations),
     ).to.eventually.deep.equal([
       'ashley@friskygirlfarm.com',
       'ellen@friskygirlfarm.com',
@@ -124,7 +124,7 @@ describe('sendConfirmationEmails', function () {
 
     sinon.stub(console, 'error');
     await expect(
-      sendConfirmationEmails(awsFactory, users, locations)
+      sendConfirmationEmails(awsFactory, users, locations),
     ).to.eventually.deep.equal([
       'ashley@friskygirlfarm.com',
       'ellen@friskygirlfarm.com',
@@ -154,7 +154,7 @@ describe('sendConfirmationEmails', function () {
     });
 
     await expect(
-      sendConfirmationEmails(awsFactory, users, locations)
+      sendConfirmationEmails(awsFactory, users, locations),
     ).to.eventually.deep.equal([]);
     expect(sendStub).to.have.been.calledThrice;
 
@@ -270,7 +270,7 @@ describe('sendConfirmationEmails', function () {
     });
 
     await expect(
-      sendConfirmationEmails(awsFactory, users, locations)
+      sendConfirmationEmails(awsFactory, users, locations),
     ).to.eventually.deep.equal([
       'user3@friskygirlfarm.com',
       'user25@friskygirlfarm.com',

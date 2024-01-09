@@ -37,7 +37,7 @@ export default class OrdersSheet extends Sheet {
   constructor(
     client: sheets_v4.Sheets,
     spreadsheetId: string,
-    sheetName = ordersSheetName
+    sheetName = ordersSheetName,
   ) {
     super(client, spreadsheetId, sheetName);
   }
@@ -136,7 +136,7 @@ export default class OrdersSheet extends Sheet {
       // Add 1 to row index because the rows in the A1 notation are 1-based
       await this.update(
         `${indexToColumn(productId)}${firstUserRowIndex + userRowIndex + 1}`,
-        [[quantity]]
+        [[quantity]],
       );
     } else {
       let row: Array<number | string> = [userId];

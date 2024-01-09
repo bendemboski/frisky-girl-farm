@@ -21,7 +21,7 @@ describe('Spreadsheet', function () {
     client.setOrders(
       [7, 3, 5],
       ['ellen@friskygirlfarm.com', 4, 0, 1],
-      ['ashley@friskygirlfarm.com', 3, 2, 0]
+      ['ashley@friskygirlfarm.com', 3, 2, 0],
     );
 
     spreadsheet = new Spreadsheet('ssid', client.asSheets());
@@ -48,7 +48,7 @@ describe('Spreadsheet', function () {
   describe('getUser', function () {
     it('works', async function () {
       expect(
-        await spreadsheet.getUser('ashley@friskygirlfarm.com')
+        await spreadsheet.getUser('ashley@friskygirlfarm.com'),
       ).to.deep.equal({
         email: 'ashley@friskygirlfarm.com',
         name: 'Ashley Wilson',
@@ -59,7 +59,7 @@ describe('Spreadsheet', function () {
 
     it('propagates errors', async function () {
       expect(
-        spreadsheet.getUser('becky@friskygirlfarm.com')
+        spreadsheet.getUser('becky@friskygirlfarm.com'),
       ).to.eventually.be.rejectedWith(UnknownUserError);
     });
   });
@@ -67,8 +67,8 @@ describe('Spreadsheet', function () {
   it('getUsers', async function () {
     expect(
       (await spreadsheet.getUsers(['ellen@friskygirlfarm.com'])).map(
-        (u) => u.email
-      )
+        (u) => u.email,
+      ),
     ).to.deep.equal(['ellen@friskygirlfarm.com']);
   });
 
@@ -97,7 +97,7 @@ describe('Spreadsheet', function () {
     it('propagates errors', async function () {
       client.setNoOrders();
       await expect(
-        spreadsheet.getProducts('ashley@friskygirlfarm.com')
+        spreadsheet.getProducts('ashley@friskygirlfarm.com'),
       ).to.eventually.be.rejectedWith(OrdersNotOpenError);
     });
   });
@@ -109,7 +109,7 @@ describe('Spreadsheet', function () {
       let ret = await spreadsheet.setProductOrder(
         'ashley@friskygirlfarm.com',
         3,
-        3
+        3,
       );
       expect(Object.fromEntries(ret.entries())).to.deep.nested.include({
         '1.available': 3,
@@ -123,7 +123,7 @@ describe('Spreadsheet', function () {
 
     it('propagates errors', async function () {
       await expect(
-        spreadsheet.setProductOrder('ashley@friskygirlfarm.com', 3, 6)
+        spreadsheet.setProductOrder('ashley@friskygirlfarm.com', 3, 6),
       )
         .to.eventually.be.rejectedWith(QuantityNotAvailableError)
         .with.nested.property('extra.available', 4);
@@ -132,7 +132,7 @@ describe('Spreadsheet', function () {
       client.setNoOrders();
 
       await expect(
-        spreadsheet.setProductOrder('ashley@friskygirlfarm.com', 3, 1)
+        spreadsheet.setProductOrder('ashley@friskygirlfarm.com', 3, 1),
       ).to.eventually.be.rejectedWith(OrdersNotOpenError);
     });
   });
@@ -179,7 +179,7 @@ describe('Spreadsheet', function () {
       });
 
       await expect(
-        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com'),
       ).to.eventually.deep.equal([
         {
           id: 1,
@@ -193,7 +193,7 @@ describe('Spreadsheet', function () {
 
       expect(client.spreadsheets.getByDataFilter).to.have.been.calledOnce;
       expect(
-        client.spreadsheets.getByDataFilter.firstCall.args[0]
+        client.spreadsheets.getByDataFilter.firstCall.args[0],
       ).to.deep.equal({
         spreadsheetId: 'ssid',
         requestBody: {
@@ -219,7 +219,7 @@ describe('Spreadsheet', function () {
       expect(client.spreadsheets.values.batchGetByDataFilter).to.have.been
         .calledOnce;
       expect(
-        client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0]
+        client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0],
       ).to.deep.equal({
         spreadsheetId: 'ssid',
         requestBody: {
@@ -275,7 +275,7 @@ describe('Spreadsheet', function () {
       });
 
       await expect(
-        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com'),
       ).to.eventually.deep.equal([
         {
           id: 1,
@@ -286,8 +286,8 @@ describe('Spreadsheet', function () {
       // Verify that the get values queried sheet1
       expect(
         client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0].requestBody!.dataFilters!.map(
-          (f) => f.gridRange?.sheetId
-        )
+          (f) => f.gridRange?.sheetId,
+        ),
       ).to.deep.equal([1]);
     });
 
@@ -350,7 +350,7 @@ describe('Spreadsheet', function () {
       });
 
       await expect(
-        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com'),
       ).to.eventually.deep.equal([
         {
           id: 1,
@@ -362,8 +362,8 @@ describe('Spreadsheet', function () {
       // sheet3
       expect(
         client.spreadsheets.values.batchGetByDataFilter.firstCall.args[0].requestBody!.dataFilters!.map(
-          (f) => f.gridRange?.sheetId
-        )
+          (f) => f.gridRange?.sheetId,
+        ),
       ).to.deep.equal([1]);
     });
 
@@ -371,7 +371,7 @@ describe('Spreadsheet', function () {
       client.setSheetsAndValuesFilterQuery({});
 
       await expect(
-        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com'),
       ).to.eventually.deep.equal([]);
 
       // Verify that no values query was issued
@@ -409,7 +409,7 @@ describe('Spreadsheet', function () {
       });
 
       await expect(
-        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com'),
       ).to.eventually.deep.equal([]);
     });
 
@@ -430,7 +430,7 @@ describe('Spreadsheet', function () {
       });
 
       await expect(
-        spreadsheet.getUserOrders('ashley@friskygirlfarm.com')
+        spreadsheet.getUserOrders('ashley@friskygirlfarm.com'),
       ).to.eventually.deep.equal([]);
     });
   });
@@ -468,10 +468,10 @@ describe('Spreadsheet', function () {
         { gridRange: { sheetId: 12345 } },
       ]);
       expect(getStub.firstCall.args[0].fields?.split(',')).to.include(
-        'sheets.properties'
+        'sheets.properties',
       );
       expect(getStub.firstCall.args[0].fields?.split(',')).to.include(
-        'sheets.developerMetadata'
+        'sheets.developerMetadata',
       );
 
       // Make sure the returned sheet works
@@ -480,7 +480,7 @@ describe('Spreadsheet', function () {
         [1, 0, 1],
         ['hasorder@friskygirlfarm.com', 0, 0, 1],
         ['hasnoorder@friskygirlfarm.com', 0, 0, 0],
-        ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
+        ['alsohasorder@friskygirlfarm.com', 1, 0, 1],
       );
 
       let ret = await sheet!.getUsersWithOrders();
@@ -524,7 +524,7 @@ describe('Spreadsheet', function () {
         [1, 0, 1],
         ['hasorder@friskygirlfarm.com', 0, 0, 1],
         ['hasnoorder@friskygirlfarm.com', 0, 0, 0],
-        ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
+        ['alsohasorder@friskygirlfarm.com', 1, 0, 1],
       );
 
       let ret = await sheet!.getUsersWithOrders();

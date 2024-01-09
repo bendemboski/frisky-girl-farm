@@ -211,7 +211,7 @@ export default class MockSheetsClient {
               developerMetadata,
               properties: { ...properties, sheetId: parseInt(sheetId, 10) },
             };
-          }
+          },
         ),
       },
     });
@@ -288,7 +288,7 @@ export default class MockSheetsClient {
         sinon.match({
           spreadsheetId: 'ssid',
           range: 'Orders!A6',
-        })
+        }),
       )
       .resolves({ data: { updates: { updatedRange: 'Orders!A8:D8' } } });
   }

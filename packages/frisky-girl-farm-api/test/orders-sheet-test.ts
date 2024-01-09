@@ -74,7 +74,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 5],
         ['uid1', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 2]
+        ['ellen@friskygirlfarm.com', 3, 2, 2],
       );
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
@@ -93,7 +93,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 2]
+        ['ellen@friskygirlfarm.com', 3, 2, 2],
       );
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
@@ -112,7 +112,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 5],
         ['ashley@friskygirlfarm.com', 4, '', 1],
-        ['ellen@friskygirlfarm.com', 3, 2, '']
+        ['ellen@friskygirlfarm.com', 3, 2, ''],
       );
 
       let ret = await sheet.getForUser('ashley@friskygirlfarm.com');
@@ -130,7 +130,7 @@ describe('OrdersSheet', function () {
     it('fails if there is no orders sheet', async function () {
       client.setNoOrders();
       await expect(
-        sheet.getForUser('ashley@friskygirlfarm.com')
+        sheet.getForUser('ashley@friskygirlfarm.com'),
       ).to.eventually.be.rejectedWith(OrdersNotOpenError);
     });
   });
@@ -144,7 +144,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 5],
         ['uid1', 4, 0, 1],
-        ['ellen@friskygirlfarm.com', 3, 2, 0]
+        ['ellen@friskygirlfarm.com', 3, 2, 0],
       );
       client.stubAppendOrder();
 
@@ -164,7 +164,7 @@ describe('OrdersSheet', function () {
         range: 'Orders!A6',
       });
       expect(
-        client.spreadsheets.values.append.firstCall.args[0].requestBody
+        client.spreadsheets.values.append.firstCall.args[0].requestBody,
       ).to.deep.equal({
         values: [['ashley@friskygirlfarm.com', undefined, undefined, 2]],
       });
@@ -174,7 +174,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 5],
         ['uid1', 4, 0, 1],
-        ['ashley@friskygirlfarm.com', 3, 0, 0]
+        ['ashley@friskygirlfarm.com', 3, 0, 0],
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 2);
@@ -199,7 +199,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 1],
-        ['ashley@friskygirlfarm.com', 3, 0, 1]
+        ['ashley@friskygirlfarm.com', 3, 0, 1],
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 3);
@@ -224,7 +224,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 1],
-        ['ashley@friskygirlfarm.com', 3, 0, 3]
+        ['ashley@friskygirlfarm.com', 3, 0, 3],
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 2);
@@ -249,7 +249,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 1],
-        ['ashley@friskygirlfarm.com', 3, 0, 3]
+        ['ashley@friskygirlfarm.com', 3, 0, 3],
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 0);
@@ -274,7 +274,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 1],
-        ['ashley@friskygirlfarm.com', 3, 0, 0]
+        ['ashley@friskygirlfarm.com', 3, 0, 0],
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 5);
@@ -299,7 +299,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 1],
-        ['ashley@friskygirlfarm.com', 3, 0, 3]
+        ['ashley@friskygirlfarm.com', 3, 0, 3],
       );
 
       let ret = await sheet.setOrdered('ashley@friskygirlfarm.com', 3, 4);
@@ -324,14 +324,14 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 5],
         ['uid1', 4, 0, 1],
-        ['ashley@friskygirlfarm.com', 3, 0, 0]
+        ['ashley@friskygirlfarm.com', 3, 0, 0],
       );
 
       await expect(
-        sheet.setOrdered('ashley@friskygirlfarm.com', 3, -2)
+        sheet.setOrdered('ashley@friskygirlfarm.com', 3, -2),
       ).to.eventually.be.rejectedWith(NegativeQuantityError);
       await expect(
-        sheet.setOrdered('ashley@friskygirlfarm.com', 7, 3)
+        sheet.setOrdered('ashley@friskygirlfarm.com', 7, 3),
       ).to.eventually.be.rejectedWith(ProductNotFoundError);
       expect(client.spreadsheets.values.update).to.not.have.been.called;
     });
@@ -340,11 +340,11 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 0],
         ['uid1', 4, 0, 0],
-        ['ashley@friskygirlfarm.com', 3, 0, 0]
+        ['ashley@friskygirlfarm.com', 3, 0, 0],
       );
 
       await expect(
-        sheet.setOrdered('ashley@friskygirlfarm.com', 3, 1)
+        sheet.setOrdered('ashley@friskygirlfarm.com', 3, 1),
       ).to.eventually.be.rejectedWith(ProductNotFoundError);
       expect(client.spreadsheets.values.update).to.not.have.been.called;
     });
@@ -353,7 +353,7 @@ describe('OrdersSheet', function () {
       client.setOrders(
         [7, 3, 6],
         ['uid1', 4, 0, 2],
-        ['ashley@friskygirlfarm.com', 3, 0, 3]
+        ['ashley@friskygirlfarm.com', 3, 0, 3],
       );
 
       await expect(sheet.setOrdered('ashley@friskygirlfarm.com', 3, 5))
@@ -365,7 +365,7 @@ describe('OrdersSheet', function () {
     it('fails if there is no orders sheet', async function () {
       client.setNoOrders();
       await expect(
-        sheet.setOrdered('ashley@friskygirlfarm.com', 3, 3)
+        sheet.setOrdered('ashley@friskygirlfarm.com', 3, 3),
       ).to.eventually.be.rejectedWith(OrdersNotOpenError);
     });
   });
@@ -375,7 +375,7 @@ describe('OrdersSheet', function () {
       [1, 0, 1],
       ['hasorder@friskygirlfarm.com', 0, 0, 1],
       ['hasnoorder@friskygirlfarm.com', 0, 0, 0],
-      ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
+      ['alsohasorder@friskygirlfarm.com', 1, 0, 1],
     );
 
     let ret = await sheet.getUsersWithOrders();
@@ -393,7 +393,7 @@ describe('OrdersSheet', function () {
       [1, 0, 1],
       ['hasorder@friskygirlfarm.com', 0, 0, 1],
       ['hasnoorder@friskygirlfarm.com', 0, 0, 0],
-      ['alsohasorder@friskygirlfarm.com', 1, 0, 1]
+      ['alsohasorder@friskygirlfarm.com', 1, 0, 1],
     );
 
     let ret = await sheet.getUsersWithOrders();

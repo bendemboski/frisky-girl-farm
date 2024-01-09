@@ -57,7 +57,7 @@ describe('UsersSheet', function () {
       });
 
       expect(
-        await sheet.getUser(' spacey@friskygirlfarm.com     ')
+        await sheet.getUser(' spacey@friskygirlfarm.com     '),
       ).to.deep.equal({
         email: 'spacey@friskygirlfarm.com',
         name: 'Spacey McWhitespace',
@@ -68,7 +68,7 @@ describe('UsersSheet', function () {
 
     it('throws when the user is not found', async function () {
       expect(
-        sheet.getUser('becky@friskygirlfarm.com')
+        sheet.getUser('becky@friskygirlfarm.com'),
       ).to.eventually.be.rejectedWith(UnknownUserError);
     });
   });
@@ -78,7 +78,7 @@ describe('UsersSheet', function () {
       await sheet.getUsers([
         'spacey@friskygirlfarm.com',
         'ellen@friskygirlfarm.com',
-      ])
+      ]),
     ).to.deep.equal([
       {
         email: 'ellen@friskygirlfarm.com',

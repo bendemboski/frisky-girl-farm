@@ -2,7 +2,7 @@ export abstract class SheetsError extends Error {
   constructor(
     readonly code: string,
     readonly statusCode: number,
-    readonly extra?: object
+    readonly extra?: object,
   ) {
     super(code);
   }

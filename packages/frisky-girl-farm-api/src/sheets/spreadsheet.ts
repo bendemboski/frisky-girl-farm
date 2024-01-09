@@ -12,7 +12,7 @@ export default class Spreadsheet {
 
   constructor(
     private readonly id: string,
-    private readonly client: sheets_v4.Sheets
+    private readonly client: sheets_v4.Sheets,
   ) {
     this.locations = new LocationsSheet(client, id);
     this.users = new UsersSheet(client, id);
@@ -39,7 +39,7 @@ export default class Spreadsheet {
   async setProductOrder(
     userId: string,
     productId: number,
-    quantity: number
+    quantity: number,
   ): Promise<ProductOrderMap> {
     try {
       log('setting order');
@@ -94,12 +94,12 @@ export default class Spreadsheet {
       // let's be defensive.
       let developerMetadata = sheet.developerMetadata || [];
       let metadata = developerMetadata.find(
-        (meta) => meta.metadataKey === orderSheetKey
+        (meta) => meta.metadataKey === orderSheetKey,
       );
       if (metadata) {
         sheetDates.set(
           sheet.properties!.sheetId!,
-          new Date(metadata.metadataValue!)
+          new Date(metadata.metadataValue!),
         );
       }
     }
