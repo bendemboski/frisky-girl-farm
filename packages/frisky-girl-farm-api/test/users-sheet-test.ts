@@ -15,6 +15,7 @@ describe('UsersSheet', function () {
         ' spacey@friskygirlfarm.com ',
         'Spacey McWhitespace',
         'Wallingford',
+        '4258675309',
         35.0,
         100.0,
         65.0,

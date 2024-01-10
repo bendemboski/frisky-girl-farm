@@ -7,7 +7,8 @@ const sheetName = 'Users';
 const emailColumnIndex = 0;
 const nameColumnIndex = 1;
 const locationColumnIndex = 2;
-const balanceColumnIndex = 3;
+// const phoneNumberColumnIndex = 3;
+const balanceColumnIndex = 4;
 
 export default class UsersSheet extends Sheet {
   constructor(client: sheets_v4.Sheets, spreadsheetId: string) {
