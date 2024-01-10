@@ -34,7 +34,7 @@ functions:
           cors: true
 
 plugins:
-  - serverless-plugin-typescript
+  - serverless-esbuild
   - '@haftahave/serverless-ses-template'
   - '@connected-home/serverless-plugin-stringify-variables'
 
