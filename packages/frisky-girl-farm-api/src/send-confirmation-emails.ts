@@ -26,31 +26,28 @@ export default async function sendConfirmationEmails(
 
   // Send the email, filling in the location-specific pickup instructions as
   // template replacement data
-  let aws = awsFactory();
-  let ses = new aws.SES();
+  let { ses } = awsFactory();
 
   let failedSends = [];
   for (let chunk of userChunks) {
     try {
-      let { Status: statuses } = await ses
-        .sendBulkTemplatedEmail({
-          Source: 'friskygirlfarm@gmail.com',
-          Template: 'order_confirmation',
-          ConfigurationSetName: 'default',
-          Destinations: chunk.map((user) => ({
-            Destination: {
-              ToAddresses: [user.email],
-            },
-            ReplacementTemplateData: JSON.stringify({
-              pickupInstructions: pickupInstructionsByLocation[user.location],
-            }),
-          })),
-          DefaultTemplateData: JSON.stringify({
-            pickupInstructions:
-              'Please contact Ashley and Ellen for pickup instructions.',
+      let { Status: statuses = [] } = await ses.sendBulkTemplatedEmail({
+        Source: 'friskygirlfarm@gmail.com',
+        Template: 'order_confirmation',
+        ConfigurationSetName: 'default',
+        Destinations: chunk.map((user) => ({
+          Destination: {
+            ToAddresses: [user.email],
+          },
+          ReplacementTemplateData: JSON.stringify({
+            pickupInstructions: pickupInstructionsByLocation[user.location],
           }),
-        })
-        .promise();
+        })),
+        DefaultTemplateData: JSON.stringify({
+          pickupInstructions:
+            'Please contact Ashley and Ellen for pickup instructions.',
+        }),
+      });
 
       for (let i = 0; i < statuses.length; i++) {
         let status = statuses[i];

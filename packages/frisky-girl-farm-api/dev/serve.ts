@@ -1,6 +1,6 @@
 import buildApp from '../src/build-app';
 import createSpreadsheet from './create-spreadsheet';
-import AWS from 'aws-sdk';
+import { SES } from '@aws-sdk/client-ses';
 import { readFileSync } from 'fs';
 import YAML from 'yaml';
 
@@ -14,6 +14,6 @@ process.env.AWS_REGION = serverlessConfig.provider.region;
 
 let app = buildApp(
   () => createSpreadsheet(stage),
-  () => AWS,
+  () => ({ ses: new SES() }),
 );
 app.listen(3000);
