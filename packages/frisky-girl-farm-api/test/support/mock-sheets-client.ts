@@ -124,7 +124,7 @@ export default class MockSheetsClient {
   }
 
   setNoOrders() {
-    this._stubGetOrders().rejects({ code: 400 });
+    this._stubGetOrders().rejects(Object.assign(new Error(), { code: 400 }));
   }
 
   setOrdersForSheet(

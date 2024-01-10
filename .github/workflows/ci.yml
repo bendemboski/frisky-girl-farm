@@ -53,14 +53,14 @@ jobs:
       - run: pnpm install
 
       - name: Deploy admin
-        run: echo ${{secrets.CLASP_OAUTH_CREDENTIALS}} | base64 -d > ~/.clasprc.json && pnpm deploy
+        run: echo ${{secrets.CLASP_OAUTH_CREDENTIALS}} | base64 -d > ~/.clasprc.json && pnpm run deploy
         working-directory: packages/frisky-girl-farm-admin
         timeout-minutes: 1
 
       - name: Deploy backend
-        run: echo ${{secrets.GOOGLE_SHEETS_CONFIG}} | base64 -d > config.prod.json && pnpm deploy
+        run: echo ${{secrets.GOOGLE_SHEETS_CONFIG}} | base64 -d > config.prod.json && pnpm run deploy
         working-directory: packages/frisky-girl-farm-api
 
       - name: Deploy frontend
-        run: pnpm deploy --activate production
+        run: pnpm run deploy --activate production
         working-directory: packages/frisky-girl-farm

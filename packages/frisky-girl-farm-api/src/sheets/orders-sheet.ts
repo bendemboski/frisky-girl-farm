@@ -69,7 +69,7 @@ export default class OrdersSheet extends Sheet {
     try {
       columns = await this.getAll({ majorDimension: 'COLUMNS' });
     } catch (e) {
-      if (e.code === 400 && !this.isPastOrders) {
+      if (is400Error(e) && !this.isPastOrders) {
         throw new OrdersNotOpenError();
       } else {
         throw e;
@@ -155,7 +155,7 @@ export default class OrdersSheet extends Sheet {
     try {
       rows = await this.getAll({ majorDimension: 'ROWS' });
     } catch (e) {
-      if (e.code === 400 && !this.isPastOrders) {
+      if (is400Error(e) && !this.isPastOrders) {
         throw new OrdersNotOpenError();
       } else {
         throw e;
@@ -171,4 +171,10 @@ export default class OrdersSheet extends Sheet {
     }
     return emails;
   }
+}
+
+function is400Error(e: unknown) {
+  return (
+    e instanceof Error && 'code' in e && (e as { code: unknown }).code === 400
+  );
 }

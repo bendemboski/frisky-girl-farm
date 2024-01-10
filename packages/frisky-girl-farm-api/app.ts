@@ -1,7 +1,7 @@
 import sls from 'serverless-http';
 import createClient from './src/sheets/create-client';
 import Spreadsheet from './src/sheets/spreadsheet';
-import AWS from 'aws-sdk';
+import { SES } from '@aws-sdk/client-ses';
 import buildApp from './src/build-app';
 import os from 'os';
 import path from 'path';
@@ -18,7 +18,7 @@ module.exports = {
           createClient(keyPath),
         );
       },
-      () => AWS,
+      () => ({ ses: new SES() }),
     ),
   ),
 };

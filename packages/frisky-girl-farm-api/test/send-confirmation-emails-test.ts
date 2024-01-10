@@ -2,13 +2,13 @@ import { describe, beforeEach, afterEach, test, expect } from 'vitest';
 import sinon, { SinonStub } from 'sinon';
 import sendConfirmationEmails from '../src/send-confirmation-emails';
 import type { User } from '../src/types';
-import type { SES } from 'aws-sdk';
+import {
+  type SendBulkTemplatedEmailRequest,
+  type SES,
+} from '@aws-sdk/client-ses';
 
 describe('sendConfirmationEmails', function () {
-  let sendStub: SinonStub<
-    [SES.Types.SendBulkTemplatedEmailRequest],
-    ReturnType<SES['sendBulkTemplatedEmail']>
-  >;
+  let sendStub: SinonStub;
 
   beforeEach(function () {
     sendStub = sinon.stub();
@@ -19,12 +19,11 @@ describe('sendConfirmationEmails', function () {
   });
 
   class SESStub {
-    sendBulkTemplatedEmail(request: SES.Types.SendBulkTemplatedEmailRequest) {
-      return { promise: () => sendStub(request) };
+    sendBulkTemplatedEmail(request: SendBulkTemplatedEmailRequest) {
+      return sendStub(request);
     }
   }
-  const awsFactory = () =>
-    ({ SES: SESStub }) as unknown as typeof import('aws-sdk');
+  const awsFactory = () => ({ ses: new SESStub() as SES });
 
   const locations = [
     {

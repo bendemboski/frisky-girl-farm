@@ -19,8 +19,9 @@ import type {
   User,
   PastOrderProductsResponse,
 } from './types';
+import type { SES } from '@aws-sdk/client-ses';
 
-export type AWSFactory = () => typeof import('aws-sdk');
+export type AWSFactory = () => { ses: SES };
 
 function serializeProducts(products: ProductOrderMap): ProductsResponse {
   return {

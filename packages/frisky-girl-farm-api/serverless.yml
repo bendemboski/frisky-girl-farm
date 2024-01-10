@@ -2,13 +2,10 @@ service: frisky-girl-farm-api
 
 provider:
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs20.x
   stage: ${opt:stage, 'prod'}
   region: us-west-2
   timeout: 30
-  # This will become the default in serverless v3, and can be removed at that
-  # point
-  lambdaHashingVersion: 20201221
   environment:
     GOOGLE_SPREADSHEET_ID: ${file(config.${self:provider.stage}.json):spreadsheet_id}
     GOOGLE_CONFIG: ${file(config.${self:provider.stage}.json)}
@@ -37,8 +34,7 @@ functions:
           cors: true
 
 plugins:
-  - serverless-plugin-monorepo
-  - serverless-plugin-typescript
+  - serverless-esbuild
   - '@haftahave/serverless-ses-template'
   - '@connected-home/serverless-plugin-stringify-variables'
 

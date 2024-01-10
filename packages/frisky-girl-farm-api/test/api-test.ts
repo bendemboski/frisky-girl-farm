@@ -5,6 +5,10 @@ import buildApp from '../src/build-app';
 import request from 'supertest';
 import MockSheetsClient, { MockSheet } from './support/mock-sheets-client';
 import Spreadsheet from '../src/sheets/spreadsheet';
+import {
+  type SES,
+  type SendBulkTemplatedEmailRequest,
+} from '@aws-sdk/client-ses';
 
 describe('API', function () {
   let client: MockSheetsClient;
@@ -12,11 +16,11 @@ describe('API', function () {
   let sendEmailsStub: SinonStub;
 
   class SESStub {
-    sendBulkTemplatedEmail(...args: unknown[]) {
-      return { promise: () => sendEmailsStub(...args) };
+    sendBulkTemplatedEmail(request: SendBulkTemplatedEmailRequest) {
+      return sendEmailsStub(request);
     }
   }
-  const awsFactory = () => ({ SES: SESStub }) as typeof import('aws-sdk');
+  const awsFactory = () => ({ ses: new SESStub() as SES });
 
   beforeEach(function () {
     client = new MockSheetsClient();
