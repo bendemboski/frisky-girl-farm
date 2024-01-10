@@ -596,6 +596,7 @@ describe('API', function () {
           'herbie@friskygirlfarm.com',
           'Herb Dog',
           'Lake City',
+          '4258675309',
           35.0,
           100.0,
           65.0,

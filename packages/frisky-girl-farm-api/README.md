@@ -29,15 +29,16 @@ There must be a sheet named `Locations` laid out like this:
 
 There must be a sheet named `Users` laid out like this:
 
-|   | A       | B      | C          | D       | E                  | F
-| 1 | email   | name   | location   | balance | starting balance   | spent
-| 2 | (email) | (name) | (location) | =F2-G2  | (starting balance) | (spent)
-| 3 | (email) | (name) | (location) | =F3-G3  | (starting balance) | (spent)
-| 4 | (email) | (name) | (location) | =F4-G4  | (starting balance) | (spent)
+|   | A       | B      | C          | D       | E       | F                  | G
+| 1 | email   | name   | location   | phone   | balance | starting balance   | spent
+| 2 | (email) | (name) | (location) | (phone) | =F2-G2  | (starting balance) | (spent)
+| 3 | (email) | (name) | (location) | (phone) | =F3-G3  | (starting balance) | (spent)
+| 4 | (email) | (name) | (location) | (phone) | =F4-G4  | (starting balance) | (spent)
 
 * `email` (string) The user's email
 * `name` (string) The user's name
 * `location` (string) The location where the user is picking up their order
+* `phone` (string) The user's phone number (not currently used by the system, just a convenience for the farmers)
 * `starting balance` (currency) The user's starting balance for the season
 * `spent` (currency) The amount the user has already spent, not including the current order (if any)
 
