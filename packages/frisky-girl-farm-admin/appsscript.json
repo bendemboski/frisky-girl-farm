@@ -10,12 +10,12 @@
   "addOns": {
     "common": {
       "name": "Frisky Girl Farm Admin",
-      "logoUrl": "https://github.com/bendemboski/frisky-girl-farm/blob/13e9440008dbdc6228dc47d5c409da6db9f35c80/assets/logo-32.jpg?raw=true",
+      "logoUrl": "https://raw.githubusercontent.com/bendemboski/frisky-girl-farm/13e9440008dbdc6228dc47d5c409da6db9f35c80/assets/logo-32.jpg",
       "layoutProperties": {
         "primaryColor": "#bada55"
       }
     },
-    "sheets" : {
+    "sheets": {
       "homepageTrigger": {
         "runFunction": "onHomepage"
       }
