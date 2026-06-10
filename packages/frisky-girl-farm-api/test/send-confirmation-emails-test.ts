@@ -72,7 +72,7 @@ describe('sendConfirmationEmails', function () {
     ).resolves.toEqual([]);
     expect(sendStub.callCount).toEqual(1);
     expect(sendStub.lastCall.args[0].Source).toEqual(
-      'friskygirlfarm@gmail.com',
+      'Frisky Girl Farm <farmers@friskygirlfarm.com>',
     );
     expect(sendStub.lastCall.args[0].Template).toEqual('order_confirmation');
     expect(sendStub.lastCall.args[0].ConfigurationSetName).toEqual('default');
@@ -157,7 +157,7 @@ describe('sendConfirmationEmails', function () {
     expect(sendStub.callCount).toEqual(3);
 
     expect(sendStub.firstCall.args[0].Source).toEqual(
-      'friskygirlfarm@gmail.com',
+      'Frisky Girl Farm <farmers@friskygirlfarm.com>',
     );
     expect(sendStub.firstCall.args[0].Template).toEqual('order_confirmation');
     expect(sendStub.firstCall.args[0].ConfigurationSetName).toEqual('default');
@@ -190,7 +190,7 @@ describe('sendConfirmationEmails', function () {
     });
 
     expect(sendStub.secondCall.args[0].Source).toEqual(
-      'friskygirlfarm@gmail.com',
+      'Frisky Girl Farm <farmers@friskygirlfarm.com>',
     );
     expect(sendStub.secondCall.args[0].Template).toEqual('order_confirmation');
     expect(sendStub.secondCall.args[0].ConfigurationSetName).toEqual('default');
@@ -223,7 +223,7 @@ describe('sendConfirmationEmails', function () {
     });
 
     expect(sendStub.thirdCall.args[0].Source).toEqual(
-      'friskygirlfarm@gmail.com',
+      'Frisky Girl Farm <farmers@friskygirlfarm.com>',
     );
     expect(sendStub.thirdCall.args[0].Template).toEqual('order_confirmation');
     expect(sendStub.thirdCall.args[0].ConfigurationSetName).toEqual('default');

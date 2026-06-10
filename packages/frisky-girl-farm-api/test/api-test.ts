@@ -629,7 +629,7 @@ describe('API', function () {
 
       expect(sendEmailsStub.callCount).toEqual(1);
       expect(sendEmailsStub.lastCall.args[0].Source).toEqual(
-        'friskygirlfarm@gmail.com',
+        'Frisky Girl Farm <farmers@friskygirlfarm.com>',
       );
       expect(sendEmailsStub.lastCall.args[0].Template).toEqual(
         'order_confirmation',

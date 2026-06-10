@@ -32,7 +32,7 @@ export default async function sendConfirmationEmails(
   for (let chunk of userChunks) {
     try {
       let { Status: statuses = [] } = await ses.sendBulkTemplatedEmail({
-        Source: 'friskygirlfarm@gmail.com',
+        Source: 'Frisky Girl Farm <farmers@friskygirlfarm.com>',
         Template: 'order_confirmation',
         ConfigurationSetName: 'default',
         Destinations: chunk.map((user) => ({
