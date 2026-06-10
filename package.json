@@ -14,10 +14,6 @@
     "yarn": "use pnpm",
     "npm": "use pnpm"
   },
-  "volta": {
-    "node": "20.9.0",
-    "pnpm": "8.14.0"
-  },
   "pnpm": {
     "overrides": {
       "@glimmer/validator": "0.84.3"

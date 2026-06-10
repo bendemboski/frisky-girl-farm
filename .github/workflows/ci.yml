@@ -2,26 +2,22 @@ name: CI
 
 on:
   push:
-    branches: '*'
-
-env:
-  VOLTA_FEATURE_PNPM: 1
+    branches: "*"
 
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: volta-cli/action@v4
-      - uses: actions/cache@v3
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v6
         with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+          node-version-file: "package.json"
+          cache: pnpm
 
       - run: pnpm install
+
       - run: pnpm lint
 
       - name: Test backend
@@ -41,14 +37,12 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
       AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
     steps:
-      - uses: actions/checkout@v4
-      - uses: volta-cli/action@v4
-      - uses: actions/cache@v3
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v6
         with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+          node-version-file: "package.json"
+          cache: pnpm
 
       - run: pnpm install
 
