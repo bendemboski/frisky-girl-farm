@@ -14,33 +14,35 @@ The API server looks for several sheets in the spreadsheet, identified by name. 
 
 There must be a sheet named `Locations` laid out like this:
 
-|   | A      | B            | C             | D
-| 1 | name   | Pickup day   | Harvest day   | Pickup instructions
-| 2 | (name) | (pickup day) | (harvest day) | (pickup instructions)
-| 3 | (name) | (pickup day) | (harvest day) | (pickup instructions)
-| 4 | (name) | (pickup day) | (harvest day) | (pickup instructions)
+|     | A      | B            | C             | D                     |
+| --- | ------ | ------------ | ------------- | --------------------- |
+| 1   | name   | Pickup day   | Harvest day   | Pickup instructions   |
+| 2   | (name) | (pickup day) | (harvest day) | (pickup instructions) |
+| 3   | (name) | (pickup day) | (harvest day) | (pickup instructions) |
+| 4   | (name) | (pickup day) | (harvest day) | (pickup instructions) |
 
-* `name` (string) the name of the location (must be unique)
-* `pickup day` the day of the week that users pick up from this location
-* `harvest day` the day of the week that the farmers harvest for this location
-* `pickup instruction` instructions for pickup which are included in the order confirmation emails for users picking up at this location
+- `name` (string) the name of the location (must be unique)
+- `pickup day` the day of the week that users pick up from this location
+- `harvest day` the day of the week that the farmers harvest for this location
+- `pickup instruction` instructions for pickup which are included in the order confirmation emails for users picking up at this location
 
 ### Users
 
 There must be a sheet named `Users` laid out like this:
 
-|   | A       | B      | C          | D       | E       | F                  | G
-| 1 | email   | name   | location   | phone   | balance | starting balance   | spent
-| 2 | (email) | (name) | (location) | (phone) | =F2-G2  | (starting balance) | (spent)
-| 3 | (email) | (name) | (location) | (phone) | =F3-G3  | (starting balance) | (spent)
-| 4 | (email) | (name) | (location) | (phone) | =F4-G4  | (starting balance) | (spent)
+|     | A       | B      | C          | D       | E       | F                  | G       |
+| --- | ------- | ------ | ---------- | ------- | ------- | ------------------ | ------- |
+| 1   | email   | name   | location   | phone   | balance | starting balance   | spent   |
+| 2   | (email) | (name) | (location) | (phone) | =F2-G2  | (starting balance) | (spent) |
+| 3   | (email) | (name) | (location) | (phone) | =F3-G3  | (starting balance) | (spent) |
+| 4   | (email) | (name) | (location) | (phone) | =F4-G4  | (starting balance) | (spent) |
 
-* `email` (string) The user's email
-* `name` (string) The user's name
-* `location` (string) The location where the user is picking up their order
-* `phone` (string) The user's phone number (not currently used by the system, just a convenience for the farmers)
-* `starting balance` (currency) The user's starting balance for the season
-* `spent` (currency) The amount the user has already spent, not including the current order (if any)
+- `email` (string) The user's email
+- `name` (string) The user's name
+- `location` (string) The location where the user is picking up their order
+- `phone` (string) The user's phone number (not currently used by the system, just a convenience for the farmers)
+- `starting balance` (currency) The user's starting balance for the season
+- `spent` (currency) The amount the user has already spent, not including the current order (if any)
 
 Rows `2` - `4` (and beyond) are filled in dynamically by the API.
 
@@ -48,23 +50,23 @@ Rows `2` - `4` (and beyond) are filled in dynamically by the API.
 
 The API server looks for a sheet named `Orders`. When this sheet is present, it will be used to track orders for a currently open order period. When not present, orders are not tracked/allowed. The `Orders` sheet is laid out like this:
 
-|   | A         | B              | C              | D              |
-|---|-----------|----------------|----------------|----------------|
-| 1 |           | (product name) | (product name) | (product name) |
-| 2 | price     | (price)        | (price)        | (price)        |
-| 3 | image     | (image URL)    | (image URL)    | (image URL)    |
-| 4 | total     | (total)        | (total)        | (total)        |
-| 5 | ordered   | =sum(B6:B)     | =sum(C6:C)     | =sum(D6:D)     |
-| 6 | (user id) | (ordered)      | (ordered)      | (ordered)      |
-| 7 | (user id) | (ordered)      | (ordered)      | (ordered)      |
-| 8 | (user id) | (ordered)      | (ordered)      | (ordered)      |
+|     | A         | B              | C              | D              |
+| --- | --------- | -------------- | -------------- | -------------- |
+| 1   |           | (product name) | (product name) | (product name) |
+| 2   | price     | (price)        | (price)        | (price)        |
+| 3   | image     | (image URL)    | (image URL)    | (image URL)    |
+| 4   | total     | (total)        | (total)        | (total)        |
+| 5   | ordered   | =sum(B6:B)     | =sum(C6:C)     | =sum(D6:D)     |
+| 6   | (user id) | (ordered)      | (ordered)      | (ordered)      |
+| 7   | (user id) | (ordered)      | (ordered)      | (ordered)      |
+| 8   | (user id) | (ordered)      | (ordered)      | (ordered)      |
 
-* `product name` (string) the product's name
-* `price` (currency) the product's price
-* `image URL` (string) the URL of an image of the product
-* `total` (number) the total quantity of the product that is available (0 to disable the product or -1 to not have a limit)
-* `user id` (string) the id of a user
-* `ordered` (number) a user's quantity of a product ordered
+- `product name` (string) the product's name
+- `price` (currency) the product's price
+- `image URL` (string) the URL of an image of the product
+- `total` (number) the total quantity of the product that is available (0 to disable the product or -1 to not have a limit)
+- `user id` (string) the id of a user
+- `ordered` (number) a user's quantity of a product ordered
 
 The user order rows (`7` - `9` and beyond) are filled in dynamically by the API server.
 
@@ -72,7 +74,7 @@ Since sheets with names not specified here are ignored, the sheet for an order p
 
 ## Email setup
 
-The API server is used to send confirmation emails to users via AWS SES. Currently, the sending email address is hard-coded to be, so the AWS account must have `friskygirlfarm@gmail.com` as a verified email address, and production access enabled for the SES account (moved out of the sandbox).
+The API server is used to send confirmation emails to users via AWS SES. Currently, the sending email address is hard-coded to be `farmers@friskygirlfarm.com`, so the AWS account must have `farmers@friskygirlfarm.com` as a verified email address or `friskygirlfarm.com` as a verified domain, and production access enabled for the SES account (moved out of the sandbox).
 
 ## Build credentials
 
