@@ -11,7 +11,8 @@
     "src"
   ],
   "scripts": {
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint:fix": "concurrently \"npm:lint:*:fix\" --names \"fix:\"",
     "lint:js": "eslint . --cache",
     "lint": "concurrently \"npm:lint:*(!fix)\" --names \"lint:\"",
